@@ -165,7 +165,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetPath)" "$(SolutionDir)St.Host\bin\x86\Debug\modules"</PostBuildEvent>
+    <PostBuildEvent>Copy "$(TargetPath)" "$(SolutionDir)St.Host\$(OutDir)modules"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
