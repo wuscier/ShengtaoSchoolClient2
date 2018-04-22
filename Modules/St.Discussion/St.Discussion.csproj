@@ -195,6 +195,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\MeetingSdk2\MeetingSdk.NetAgent\MeetingSdk.NetAgent.csproj">
+      <Project>{4c141806-f4fa-43fc-8813-b5f02425ebeb}</Project>
+      <Name>MeetingSdk.NetAgent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\MeetingSdk2\MeetingSdk.Wpf\MeetingSdk.Wpf.csproj">
+      <Project>{1ac195a5-91eb-4c63-8035-0b9b1fa837e2}</Project>
+      <Name>MeetingSdk.Wpf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\St.Common\St.Common.csproj">
       <Project>{303508AF-7F6F-48A5-96E3-253312ED7D9A}</Project>
       <Name>St.Common</Name>
