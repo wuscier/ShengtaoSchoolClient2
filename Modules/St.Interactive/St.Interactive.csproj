@@ -88,9 +88,6 @@
       <HintPath>..\..\packages\MaterialDesignThemes.2.3.0.823\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MeetingSdk, Version=1.0.25.0, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\..\packages\MeetingSdk.dll.1.0.25\lib\net452\MeetingSdk.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
       <Private>True</Private>
@@ -160,6 +157,10 @@
     <ProjectReference Include="..\..\..\MeetingSdk2\MeetingSdk.Wpf\MeetingSdk.Wpf.csproj">
       <Project>{1ac195a5-91eb-4c63-8035-0b9b1fa837e2}</Project>
       <Name>MeetingSdk.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\MeetingSdk\MeetingSdk\MeetingSdk.csproj">
+      <Project>{906a73b6-c6df-4fc0-8b04-d2245f13f7c5}</Project>
+      <Name>MeetingSdk</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\St.Common\St.Common.csproj">
       <Project>{303508af-7f6f-48a5-96e3-253312ed7d9a}</Project>

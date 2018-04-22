@@ -111,9 +111,6 @@
       <HintPath>..\packages\MaterialDesignThemes.2.3.0.823\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MeetingSdk, Version=1.0.25.0, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\MeetingSdk.dll.1.0.25\lib\net452\MeetingSdk.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.2.2.1\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
     </Reference>
@@ -328,6 +325,10 @@
     <ProjectReference Include="..\..\MeetingSdk2\MeetingSdk.Wpf\MeetingSdk.Wpf.csproj">
       <Project>{1ac195a5-91eb-4c63-8035-0b9b1fa837e2}</Project>
       <Name>MeetingSdk.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MeetingSdk\MeetingSdk\MeetingSdk.csproj">
+      <Project>{906a73b6-c6df-4fc0-8b04-d2245f13f7c5}</Project>
+      <Name>MeetingSdk</Name>
     </ProjectReference>
     <ProjectReference Include="..\JsonConfig\JsonConfig.csproj">
       <Project>{18b47204-1bc5-42ed-bb9e-07cc1310077e}</Project>

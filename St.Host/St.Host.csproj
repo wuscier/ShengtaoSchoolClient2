@@ -136,9 +136,6 @@
       <HintPath>..\packages\MaterialDesignThemes.2.3.0.823\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MeetingSdk, Version=1.0.25.0, Culture=neutral, processorArchitecture=x86">
-      <HintPath>..\packages\MeetingSdk.1.0.25\lib\net452\MeetingSdk.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Client, Version=2.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Client.2.2.1\lib\net45\Microsoft.AspNet.SignalR.Client.dll</HintPath>
     </Reference>
@@ -300,9 +297,6 @@
     <EmbeddedResource Include="default.conf" />
     <None Include="bin\Debug\sdk\config\ctrlagent.ip" />
     <None Include="bin\Debug\sdk\config\sdkcfg.ini" />
-    <None Include="bin\Debug\sdk\VirtualCam.ax" />
-    <None Include="bin\Debug\sdk\VirtualCam_register.bat" />
-    <None Include="bin\Debug\sdk\VirtualCam_unregister.bat" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -324,6 +318,10 @@
     <ProjectReference Include="..\..\MeetingSdk2\MeetingSdk.Wpf\MeetingSdk.Wpf.csproj">
       <Project>{1ac195a5-91eb-4c63-8035-0b9b1fa837e2}</Project>
       <Name>MeetingSdk.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\MeetingSdk\MeetingSdk\MeetingSdk.csproj">
+      <Project>{906a73b6-c6df-4fc0-8b04-d2245f13f7c5}</Project>
+      <Name>MeetingSdk</Name>
     </ProjectReference>
     <ProjectReference Include="..\JsonConfig\JsonConfig.csproj">
       <Project>{18B47204-1BC5-42ED-BB9E-07CC1310077E}</Project>
@@ -368,110 +366,7 @@
     <Resource Include="starting.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\sdk\avcodec-56.dll" />
-    <Content Include="bin\Debug\sdk\avdevice-56.dll" />
-    <Content Include="bin\Debug\sdk\avfilter-5.dll" />
-    <Content Include="bin\Debug\sdk\avformat-56.dll" />
-    <Content Include="bin\Debug\sdk\avutil-54.dll" />
-    <Content Include="bin\Debug\sdk\ComposeSource.dll" />
-    <Resource Include="bin\Debug\sdk\config\bandwithresult.txt" />
-    <Resource Include="bin\Debug\sdk\config\boot.xml" />
-    <Resource Include="bin\Debug\sdk\config\CodeRate.xml" />
-    <Resource Include="bin\Debug\sdk\config\generalparam.xml" />
-    <Resource Include="bin\Debug\sdk\config\Log.xml" />
-    <Resource Include="bin\Debug\sdk\config\LogFileUpdateConfig.xml" />
-    <Resource Include="bin\Debug\sdk\config\NetAdapt.xml" />
-    <Resource Include="bin\Debug\sdk\config\param.xml" />
-    <Resource Include="bin\Debug\sdk\config\Parameter.xml" />
-    <Resource Include="bin\Debug\sdk\config\relayCfg.xml" />
-    <Resource Include="bin\Debug\sdk\config\shareScreenAgentAddr.txt" />
-    <Content Include="bin\Debug\sdk\dataprovider.dll" />
-    <Content Include="bin\Debug\sdk\dataprovider_bak.dll" />
-    <Content Include="bin\Debug\sdk\DetectClient.dll" />
-    <Content Include="bin\Debug\sdk\DetectClientServce.exe" />
-    <Content Include="bin\Debug\sdk\DownloadDll.dll" />
-    <Content Include="bin\Debug\sdk\ffmp4record.dll" />
-    <Content Include="bin\Debug\sdk\ffmpeg.exe" />
-    <Content Include="bin\Debug\sdk\FileUploadClient.dll" />
-    <Content Include="bin\Debug\sdk\GifImageLib.dll" />
-    <Content Include="bin\Debug\sdk\glew32.dll" />
-    <Content Include="bin\Debug\sdk\GM.Utilities.dll" />
-    <Content Include="bin\Debug\sdk\libaacplus-2.dll" />
-    <Content Include="bin\Debug\sdk\libcurl.dll" />
-    <Content Include="bin\Debug\sdk\libfaac.dll" />
-    <Content Include="bin\Debug\sdk\libgcc_s_dw2-1.dll" />
-    <Content Include="bin\Debug\sdk\libiconv-2.dll" />
-    <Content Include="bin\Debug\sdk\libmp4v2.dll" />
-    <Content Include="bin\Debug\sdk\libspeex-1.dll" />
-    <Content Include="bin\Debug\sdk\libwinpthread-1.dll" />
-    <Content Include="bin\Debug\sdk\libx264-144.dll" />
-    <Content Include="bin\Debug\sdk\libx265.dll" />
-    <Content Include="bin\Debug\sdk\LiteZip.dll" />
-    <Resource Include="bin\Debug\sdk\Log.xml" />
-    <Content Include="bin\Debug\sdk\Log_writer.dll" />
-    <Content Include="bin\Debug\sdk\MediaFrameLive.dll" />
-    <Content Include="bin\Debug\sdk\MediaFramework.dll" />
-    <Content Include="bin\Debug\sdk\MediaSdkAgentDll.dll" />
-    <Content Include="bin\Debug\sdk\media_input_camera.dll" />
-    <Content Include="bin\Debug\sdk\MeetingCtrlAgent.dll" />
-    <Content Include="bin\Debug\sdk\MeetingHostAgentDll.dll" />
-    <Content Include="bin\Debug\sdk\MeetingLog.dll" />
-    <Content Include="bin\Debug\sdk\MeetingMediaFrameWork.dll" />
-    <Content Include="bin\Debug\sdk\MeetingQosInfoReportTools.dll" />
-    <Content Include="bin\Debug\sdk\MeetingRecord.dll" />
-    <Content Include="bin\Debug\sdk\MeetingSDKAgent.dll" />
-    <Content Include="bin\Debug\sdk\MeetingSDKServer.exe" />
-    <Content Include="bin\Debug\sdk\mfc100.dll" />
-    <Content Include="bin\Debug\sdk\MP4CutHeader.dll" />
-    <Content Include="bin\Debug\sdk\Mp4Record.dll" />
-    <Content Include="bin\Debug\sdk\MP4V2.dll" />
-    <Content Include="bin\Debug\sdk\MP4V2DLL.dll" />
-    <Content Include="bin\Debug\sdk\msvcp100.dll" />
-    <Content Include="bin\Debug\sdk\msvcp100d.dll" />
-    <Content Include="bin\Debug\sdk\msvcp120.dll" />
-    <Content Include="bin\Debug\sdk\msvcp71.dll" />
-    <Content Include="bin\Debug\sdk\msvcr100.dll" />
-    <Content Include="bin\Debug\sdk\msvcr100d.dll" />
-    <Content Include="bin\Debug\sdk\msvcr120.dll" />
-    <Content Include="bin\Debug\sdk\msvcr71.dll" />
-    <Content Include="bin\Debug\sdk\NetworkDiagnosticAgent.dll" />
-    <Content Include="bin\Debug\sdk\Newtonsoft.Json.dll" />
-    <Content Include="bin\Debug\sdk\NLogSetting2.exe" />
-    <Content Include="bin\Debug\sdk\ortp.dll" />
-    <Content Include="bin\Debug\sdk\PLugin\RDWinDesktopCapture.dll" />
-    <Content Include="bin\Debug\sdk\PLugin\RDWinDesktopCodec.dll" />
-    <Content Include="bin\Debug\sdk\PLugin\RDWinG711Codec.dll" />
-    <Content Include="bin\Debug\sdk\PLugin\RDWinH264SoftCodec.dll" />
-    <Content Include="bin\Debug\sdk\PLugin\RDWinH265SoftCodec.dll" />
-    <Content Include="bin\Debug\sdk\PLugin\RDWinMediaCapture.dll" />
-    <Content Include="bin\Debug\sdk\PLugin\RDWinMediaRender.dll" />
-    <Content Include="bin\Debug\sdk\PLugin\RDWinOpusCodec.dll" />
-    <Content Include="bin\Debug\sdk\PLugin\RDWinSpeexCodec.dll" />
-    <Content Include="bin\Debug\sdk\postproc-53.dll" />
-    <Content Include="bin\Debug\sdk\pthreadGC2.dll" />
-    <Content Include="bin\Debug\sdk\pthreadVC2.dll" />
-    <Content Include="bin\Debug\sdk\QosTool.exe" />
-    <Content Include="bin\Debug\sdk\Resources\voice\audiotest.wav" />
-    <Content Include="bin\Debug\sdk\Resources\voice\begin_speak.wav" />
-    <Content Include="bin\Debug\sdk\Resources\voice\exit.wav" />
-    <Content Include="bin\Debug\sdk\Resources\voice\incoming.wav" />
-    <Content Include="bin\Debug\sdk\Resources\voice\invite.wav" />
-    <Content Include="bin\Debug\sdk\Resources\voice\join.wav" />
-    <Content Include="bin\Debug\sdk\Resources\voice\request_speak.wav" />
-    <Content Include="bin\Debug\sdk\RouterClient.dll" />
-    <Content Include="bin\Debug\sdk\RTMPDll.dll" />
-    <Content Include="bin\Debug\sdk\RtmpStreamer.dll" />
-    <Content Include="bin\Debug\sdk\ScreenSharingXOneAgent.dll" />
-    <Content Include="bin\Debug\sdk\screen_frame_encode.dll" />
-    <Content Include="bin\Debug\sdk\ShortLinkDetectClient.dll" />
-    <Content Include="bin\Debug\sdk\skipdetect.dll" />
-    <Content Include="bin\Debug\sdk\smsdk.dll" />
-    <Content Include="bin\Debug\sdk\swresample-1.dll" />
-    <Content Include="bin\Debug\sdk\swscale-3.dll" />
-    <Content Include="bin\Debug\sdk\tbb.dll" />
-    <Content Include="bin\Debug\sdk\video_encode_generic.dll" />
-    <Content Include="bin\Debug\sdk\video_mixer.dll" />
-    <Content Include="bin\Debug\sdk\X86AutoUpdateService.exe" />
+    <Folder Include="bin\Debug\sdk\Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
