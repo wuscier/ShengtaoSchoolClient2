@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "St.CommandListener", "Modul
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "St.DrawingBoard", "Modules\St.DrawingBoard\St.DrawingBoard.csproj", "{2CE03CE2-2D86-44B4-97E7-4DE046F942D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetingSdk.NetAgent", "..\MeetingSdk2\MeetingSdk.NetAgent\MeetingSdk.NetAgent.csproj", "{4C141806-F4FA-43FC-8813-B5F02425EBEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeetingSdk.Wpf", "..\MeetingSdk2\MeetingSdk.Wpf\MeetingSdk.Wpf.csproj", "{1AC195A5-91EB-4C63-8035-0B9B1FA837E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +163,22 @@ Global
 		{2CE03CE2-2D86-44B4-97E7-4DE046F942D6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2CE03CE2-2D86-44B4-97E7-4DE046F942D6}.Release|x86.ActiveCfg = Release|x86
 		{2CE03CE2-2D86-44B4-97E7-4DE046F942D6}.Release|x86.Build.0 = Release|x86
+		{4C141806-F4FA-43FC-8813-B5F02425EBEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C141806-F4FA-43FC-8813-B5F02425EBEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C141806-F4FA-43FC-8813-B5F02425EBEB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4C141806-F4FA-43FC-8813-B5F02425EBEB}.Debug|x86.Build.0 = Debug|Any CPU
+		{4C141806-F4FA-43FC-8813-B5F02425EBEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C141806-F4FA-43FC-8813-B5F02425EBEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C141806-F4FA-43FC-8813-B5F02425EBEB}.Release|x86.ActiveCfg = Release|Any CPU
+		{4C141806-F4FA-43FC-8813-B5F02425EBEB}.Release|x86.Build.0 = Release|Any CPU
+		{1AC195A5-91EB-4C63-8035-0B9B1FA837E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AC195A5-91EB-4C63-8035-0B9B1FA837E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AC195A5-91EB-4C63-8035-0B9B1FA837E2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1AC195A5-91EB-4C63-8035-0B9B1FA837E2}.Debug|x86.Build.0 = Debug|Any CPU
+		{1AC195A5-91EB-4C63-8035-0B9B1FA837E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AC195A5-91EB-4C63-8035-0B9B1FA837E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AC195A5-91EB-4C63-8035-0B9B1FA837E2}.Release|x86.ActiveCfg = Release|Any CPU
+		{1AC195A5-91EB-4C63-8035-0B9B1FA837E2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
