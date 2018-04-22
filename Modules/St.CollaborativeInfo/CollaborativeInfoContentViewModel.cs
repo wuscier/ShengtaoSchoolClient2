@@ -11,6 +11,9 @@ using Caliburn.Micro;
 using MeetingSdk.SdkWrapper;
 using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Prism.Regions;
+using MeetingSdk.NetAgent;
+using System.Reflection;
+using MeetingSdk.NetAgent.Models;
 
 namespace St.CollaborativeInfo
 {
@@ -20,6 +23,7 @@ namespace St.CollaborativeInfo
         {
             _bmsService = IoC.Get<IBms>();
             _sdkService = IoC.Get<IMeeting>();
+            _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
             _lessonInfo = IoC.Get<LessonInfo>();
             _regionManager = IoC.Get<IRegionManager>();
 
@@ -33,6 +37,7 @@ namespace St.CollaborativeInfo
         //private fields
         private readonly IBms _bmsService;
         private readonly IMeeting _sdkService;
+        private readonly IMeetingSdkAgent _meetingSdkAgent;
         private readonly LessonInfo _lessonInfo;
         private readonly IRegionManager _regionManager;
 
@@ -107,29 +112,43 @@ namespace St.CollaborativeInfo
         {
             if (!_sdkService.IsServerStarted)
             {
-                _sdkService.SetSdkServerPath(Path.Combine(Environment.CurrentDirectory, "sdk"));
+                var path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-                IVisualizeShell visualizeShellService =
-                    IoC.Get<IVisualizeShell>();
+                IVisualizeShell visualizeShellService = IoC.Get<IVisualizeShell>();
 
                 visualizeShellService.StartingSdk();
 
-                UserInfo userInfo = IoC.Get<UserInfo>();
 
-                AsyncCallbackMsg startResult = await _sdkService.StartServerViaAppKey(userInfo.AppKey, userInfo.OpenId,
-                    userInfo.GetNube(), "http://xmeeting.butel.com/nps_x1");
+                MeetingResult result = await _meetingSdkAgent.Start("PCJM", path);
 
-                if (startResult.Status != 0)
+
+                if (result.StatusCode != 0)
                 {
-                    visualizeShellService.FinishStartingSdk(false, startResult.Message);
+                    visualizeShellService.FinishStartingSdk(false, $"启动失败！{result.Message}");
                 }
                 else
                 {
-                    visualizeShellService.FinishStartingSdk(true, Messages.InfoMeetingSdkStarted);
-                    AsyncCallbackMsg setFillModeResult = _sdkService.SetFillMode(0);
+                    UserInfo userInfo = IoC.Get<UserInfo>();
 
-                    HasErrorMsg(setFillModeResult.Status.ToString(), Messages.WarningSetFillModeFailed);
+                    MeetingResult<LoginModel> meetingResult = await _meetingSdkAgent.LoginThirdParty(userInfo.GetNube(), userInfo.AppKey, userInfo.OpenId);
+
+                    if (meetingResult.StatusCode != 0)
+                    {
+                        visualizeShellService.FinishStartingSdk(false, "登录失败！");
+                    }
+                    else
+                    {
+                        visualizeShellService.FinishStartingSdk(true, Messages.InfoMeetingSdkStarted);
+                        AsyncCallbackMsg setFillModeResult = _sdkService.SetFillMode(0);
+
+                        HasErrorMsg(setFillModeResult.Status.ToString(), Messages.WarningSetFillModeFailed);
+                    }
+
                 }
+
+
+
+
 
                 //Thread.Sleep(1000);
             }

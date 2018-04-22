@@ -17,6 +17,7 @@ using Caliburn.Micro;
 using MeetingSdk.SdkWrapper;
 using St.Common.RtClient;
 using St.Host.Core;
+using MeetingSdk.NetAgent;
 
 namespace St.Host
 {
@@ -168,6 +169,10 @@ namespace St.Host
 
             builder.RegisterType<BmsService>().As<IBms>().SingleInstance();
             builder.RegisterType<MeetingSdk.SdkWrapper.MeetingService>().As<IMeeting>().SingleInstance();
+
+            builder.RegisterInstance(DefaultMeetingSdkAgent.Instance).As<IMeetingSdkAgent>().SingleInstance();
+
+
             builder.RegisterType<ViewLayoutService>().As<IViewLayout>().SingleInstance();
             builder.RegisterType<GroupManager>().As<IGroupManager>().SingleInstance();
             builder.RegisterType<DialogHelper>().As<IDialogHelper>().SingleInstance();
