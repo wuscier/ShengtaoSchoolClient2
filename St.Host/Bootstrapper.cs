@@ -212,8 +212,8 @@ namespace St.Host
 
         private void GetSerialNo()
         {
-            IMeeting sdkService = IoC.Get<IMeeting>();
-            GlobalData.Instance.SerialNo = sdkService.GetSerialNo();
+            IMeetingSdkAgent sdkService = IoC.Get<IMeetingSdkAgent>();
+            GlobalData.Instance.SerialNo = sdkService.GetSerialNo()?.Result;
 
             Log.Logger.Debug($"【device no.】：{GlobalData.Instance.SerialNo}");
         }

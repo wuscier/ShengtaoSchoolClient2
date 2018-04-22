@@ -110,7 +110,7 @@ namespace St.CollaborativeInfo
 
         private async Task StartSdkAsync()
         {
-            if (!_sdkService.IsServerStarted)
+            if (!_meetingSdkAgent.IsStarted)
             {
                 var path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
@@ -139,16 +139,8 @@ namespace St.CollaborativeInfo
                     else
                     {
                         visualizeShellService.FinishStartingSdk(true, Messages.InfoMeetingSdkStarted);
-                        AsyncCallbackMsg setFillModeResult = _sdkService.SetFillMode(0);
-
-                        HasErrorMsg(setFillModeResult.Status.ToString(), Messages.WarningSetFillModeFailed);
                     }
-
                 }
-
-
-
-
 
                 //Thread.Sleep(1000);
             }
