@@ -408,35 +408,48 @@ namespace St.Setting
         {
             await Task.Run(() =>
             {
-                var cameraList = _sdkService.GetDevices(1);
-                CachedCameras.Clear();
-                foreach (var camera in cameraList)
-                {
-                    if (!string.IsNullOrEmpty(camera.Name))
-                    {
-                        CachedCameras.Add(camera.Name);
-                    }
-                }
-                CachedCameras.Add(NonExclusiveItem);
+                var cameraList = _meetingSdkAgent.GetVideoDevices();
 
-                var micList = _sdkService.GetDevices(3);
-                CachedMicrophones.Clear();
-                foreach (var mic in micList)
+                if (cameraList.Result != null)
                 {
-                    if (!string.IsNullOrEmpty(mic.Name))
+                    CachedCameras.Clear();
+                    foreach (var camera in cameraList.Result)
                     {
-                        CachedMicrophones.Add(mic.Name);
+                        if (!string.IsNullOrEmpty(camera.DeviceName))
+                        {
+                            CachedCameras.Add(camera.DeviceName);
+                        }
                     }
+                    CachedCameras.Add(NonExclusiveItem);
                 }
-                CachedMicrophones.Add(NonExclusiveItem);
 
-                var speakerList = _sdkService.GetDevices(4);
-                CachedSpeakers.Clear();
-                foreach (var speaer in speakerList)
+
+                var micList = _meetingSdkAgent.GetMicrophones();
+
+                if (micList.Result != null)
                 {
-                    if (!string.IsNullOrEmpty(speaer.Name))
+                    CachedMicrophones.Clear();
+                    foreach (var mic in micList.Result)
                     {
-                        CachedSpeakers.Add(speaer.Name);
+                        if (!string.IsNullOrEmpty(mic))
+                        {
+                            CachedMicrophones.Add(mic);
+                        }
+                    }
+                    CachedMicrophones.Add(NonExclusiveItem);
+                }
+
+                var speakerList = _meetingSdkAgent.GetLoudSpeakers();
+
+                if (speakerList.Result!=null)
+                {
+                    CachedSpeakers.Clear();
+                    foreach (var speaer in speakerList.Result)
+                    {
+                        if (!string.IsNullOrEmpty(speaer))
+                        {
+                            CachedSpeakers.Add(speaer);
+                        }
                     }
                 }
             });
