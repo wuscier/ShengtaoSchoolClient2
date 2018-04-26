@@ -80,7 +80,7 @@
                     <StackPanel>
                         <ComboBox x:Name="mainCamera"
                                   ItemsSource="{Binding MainCameras}"
-                                  SelectedItem="{Binding MeetingConfigResult.MainCamera.Name}"
+                                  SelectedItem="{Binding SelectedCameraDevice}"
                                   Tag="{Binding ConfigItemTag.MainCamera}"
                                   md:HintAssist.Hint="设备"
                                   >
@@ -175,7 +175,7 @@
                     <StackPanel>
                         <ComboBox x:Name="secondaryCamera"
                                   ItemsSource="{Binding SecondaryCameras}"
-                                  SelectedItem="{Binding MeetingConfigResult.SecondaryCamera.Name}"
+                                  SelectedItem="{Binding SelectedDocDevice}"
                                   Tag="{Binding ConfigItemTag.SecondaryCamera}"
                                   md:HintAssist.Hint="设备"
                                   >
