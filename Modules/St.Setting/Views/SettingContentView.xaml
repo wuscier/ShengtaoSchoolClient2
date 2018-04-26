@@ -99,8 +99,9 @@
                         </ComboBox>
 
                         <ComboBox x:Name="mainCameraColorspace"
-                                  ItemsSource="{Binding MeetingConfigParameter.UserCameraSetting.Colorspaces}"
-                                  SelectedItem="{Binding MeetingConfigResult.MainCamera.Colorspace}"
+                                  ItemsSource="{Binding MainColorspaces}"
+                                  SelectedItem="{Binding SelectedCameraColorSpace}"
+                                  DisplayMemberPath="ColorspaceName"
                                   Tag="{Binding ConfigItemTag.MainColorspace}"
                                   md:HintAssist.Hint="颜色空间"
                                   >
@@ -121,7 +122,7 @@
 
 
                         <ComboBox x:Name="mainCameraResolution"
-                                  ItemsSource="{Binding MeetingConfigParameter.UserCameraSetting.ResolutionList}"
+                                  ItemsSource="{Binding VedioParameterVgaList}"
                                   SelectedItem="{Binding MeetingConfigResult.MainCamera.Resolution}"
                                   Tag="{Binding ConfigItemTag.MainCameraResolution}"
                                   md:HintAssist.Hint="分辨率"
@@ -193,8 +194,9 @@
                         </ComboBox>
 
                         <ComboBox x:Name="secondaryCameraColorspace"
-                                  ItemsSource="{Binding MeetingConfigParameter.DataCameraSetting.Colorspaces}"
-                                  SelectedItem="{Binding MeetingConfigResult.SecondaryCamera.Colorspace}"
+                                  ItemsSource="{Binding SecondaryColorspaces}"
+                                  SelectedItem="{Binding SelectedDocColorSpace}"
+                                  DisplayMemberPath="ColorspaceName"
                                   Tag="{Binding ConfigItemTag.SecondaryColorspace}"
                                   md:HintAssist.Hint="颜色空间"
                                   >
@@ -216,7 +218,7 @@
 
 
                         <ComboBox x:Name="secondaryCameraResolution"
-                                  ItemsSource="{Binding MeetingConfigParameter.DataCameraSetting.ResolutionList}"
+                                  ItemsSource="{Binding DocParameterVgaList}"
                                   SelectedItem="{Binding MeetingConfigResult.SecondaryCamera.Resolution}"
                                   Tag="{Binding ConfigItemTag.SecondaryCameraResolution}"
                                   md:HintAssist.Hint="分辨率"

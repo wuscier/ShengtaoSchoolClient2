@@ -77,10 +77,12 @@ namespace St.Common
 
             MainCamera.CodeRate = newConfig.MainCamera.CodeRate;
             MainCamera.Name = newConfig.MainCamera.Name;
+            MainCamera.Colorspace = newConfig.MainCamera.Colorspace;
             MainCamera.Resolution = newConfig.MainCamera.Resolution;
 
             SecondaryCamera.CodeRate = newConfig.SecondaryCamera.CodeRate;
             SecondaryCamera.Name = newConfig.SecondaryCamera.Name;
+            SecondaryCamera.Colorspace = newConfig.SecondaryCamera.Colorspace;
             SecondaryCamera.Resolution = newConfig.SecondaryCamera.Resolution;
 
             AudioConfig.CodeRate = newConfig.AudioConfig.CodeRate;

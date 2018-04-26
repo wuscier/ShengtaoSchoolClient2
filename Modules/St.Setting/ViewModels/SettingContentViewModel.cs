@@ -16,6 +16,8 @@ using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Serilog;
 using Action = System.Action;
 using MeetingSdk.NetAgent;
+using MeetingSdk.NetAgent.Models;
+using MeetingSdk.Wpf;
 
 namespace St.Setting
 {
@@ -26,6 +28,7 @@ namespace St.Setting
             _meetingConfigView = meetingConfigView;
             _sdkService = IoC.Get<IMeeting>();
             _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
+            _deviceNameAccessor = IoC.Get<IDeviceNameAccessor>();
 
             LoadSettingCommand = DelegateCommand.FromAsyncHandler(LoadSettingAsync);
             ConfigItemChangedCommand = DelegateCommand<ConfigChangedItem>.FromAsyncHandler(ConfigItemChangedAsync);
@@ -39,13 +42,21 @@ namespace St.Setting
         //private fields
         private readonly SettingContentView _meetingConfigView;
         private readonly IMeeting _sdkService;
+        private readonly IDeviceNameAccessor _deviceNameAccessor;
         private readonly IMeetingSdkAgent _meetingSdkAgent;
         private static readonly string NonExclusiveItem = "空";
 
         //properties
-        public List<string> CachedCameras { get; set; }
+        public List<VideoDeviceModel> CachedCameras { get; set; }
         public ObservableCollection<string> MainCameras { get; set; }
         public ObservableCollection<string> SecondaryCameras { get; set; }
+
+        public ObservableCollection<VideoFormatModel> MainColorspaces { get; set; }
+        public ObservableCollection<VideoFormatModel> SecondaryColorspaces { get; set; }
+
+        public ObservableCollection<string> VedioParameterVgaList { get; set; }
+        public ObservableCollection<string> DocParameterVgaList { get; set; }
+
 
         public List<string> CachedMicrophones { get; set; }
         public ObservableCollection<string> MainMicrophones { get; set; }
@@ -385,15 +396,171 @@ namespace St.Setting
         }
 
 
+        private string _selectedCameraDevice;
+        private string _selectedDocDevice;
+
+
+        public string SelectedCameraDevice
+        {
+            get { return _selectedCameraDevice; }
+            set
+            {
+
+                if (SetProperty(ref _selectedCameraDevice, value))
+                {
+                    _deviceNameAccessor.SetName(DeviceName.Camera, "");
+                    _deviceNameAccessor.SetName(DeviceName.Camera, value, "first");
+
+                    if (!string.IsNullOrEmpty(SelectedDocDevice))
+                    {
+                        _deviceNameAccessor.SetName(DeviceName.Camera, SelectedDocDevice, "second");
+                    }
+
+                    UpdateCameraColorSpace();
+                }
+            }
+        }
+        public string SelectedDocDevice
+        {
+            get { return _selectedDocDevice; }
+            set
+            {
+                if (SetProperty(ref _selectedDocDevice, value))
+                {
+                    _deviceNameAccessor.SetName(DeviceName.Camera, "");
+                    _deviceNameAccessor.SetName(DeviceName.Camera, value, "second");
+                    if (!string.IsNullOrEmpty(SelectedCameraDevice))
+                    {
+                        _deviceNameAccessor.SetName(DeviceName.Camera, SelectedCameraDevice, "first");
+                    }
+
+
+                    UpdateDocColorSpace();
+                }
+
+            }
+        }
+
+
+
+        private VideoFormatModel _selectedCameraColorSpace;
+        public VideoFormatModel SelectedCameraColorSpace
+        {
+            get { return _selectedCameraColorSpace; }
+            set
+            {
+                if (SetProperty(ref _selectedCameraColorSpace, value))
+                {
+                    UpdateCameraVgaSource();
+                }
+            }
+        }
+
+        private VideoFormatModel _selectedDocColorSpace;
+        public VideoFormatModel SelectedDocColorSpace
+        {
+            get { return _selectedDocColorSpace; }
+            set
+            {
+                if (SetProperty(ref _selectedDocColorSpace, value))
+                {
+                    UpdateDocVgaSource();
+                }
+            }
+        }
+
+        private void UpdateCameraVgaSource()
+        {
+            VedioParameterVgaList.Clear();
+            var cameraVgaList = VgaList(SelectedCameraColorSpace);
+            cameraVgaList.ForEach(v => { VedioParameterVgaList.Add(v); });
+        }
+
+        private void UpdateDocVgaSource()
+        {
+            DocParameterVgaList.Clear();
+            var docVgaList = VgaList(SelectedDocColorSpace);
+            docVgaList.ForEach(v => { DocParameterVgaList.Add(v); });
+        }
+
+        private List<string> VgaList(VideoFormatModel videoFormatModel)
+        {
+            var vgaList = new List<string>();
+
+            if (videoFormatModel == null)
+            {
+                return vgaList;
+            }
+
+            if (videoFormatModel.SizeModels.Count == 0)
+            {
+                return vgaList;
+            }
+
+            videoFormatModel.SizeModels.ForEach(size =>
+            {
+                vgaList.Add($"{size.Width}*{size.Height}");
+            });
+
+            return vgaList.Distinct().ToList();
+        }
+
+
+        private void UpdateCameraColorSpace()
+        {
+            VideoDeviceModel videoDeviceModel = CachedCameras.FirstOrDefault(camera => camera.DeviceName == MeetingConfigResult.MainCamera.Name);
+
+            if (videoDeviceModel != null)
+            {
+                MainColorspaces.Clear();
+
+                videoDeviceModel.VideoFormatModels.ForEach(vfm =>
+                {
+                    MainColorspaces.Add(vfm);
+                });
+
+                SelectedCameraColorSpace = videoDeviceModel.VideoFormatModels.FirstOrDefault();
+            }
+            else
+            {
+                SelectedCameraColorSpace = null;
+            }
+        }
+        private void UpdateDocColorSpace()
+        {
+            VideoDeviceModel videoDeviceModel = CachedCameras.FirstOrDefault(camera => camera.DeviceName == MeetingConfigResult.SecondaryCamera.Name);
+            if (videoDeviceModel != null)
+            {
+                SecondaryColorspaces.Clear();
+
+                videoDeviceModel.VideoFormatModels.ForEach(vfm =>
+                {
+                    SecondaryColorspaces.Add(vfm);
+                });
+
+                SelectedDocColorSpace = videoDeviceModel.VideoFormatModels.FirstOrDefault();
+            }
+            else
+            {
+                SelectedDocColorSpace = null;
+            }
+        }
+
+
+
+
         //methods
         public void InitializeBindingDataSource()
         {
-            CachedCameras = new List<string>();
+            CachedCameras = new List<VideoDeviceModel>();
             CachedMicrophones = new List<string>();
             CachedSpeakers = new List<string>();
 
             MainCameras = new ObservableCollection<string>();
             SecondaryCameras = new ObservableCollection<string>();
+
+            MainColorspaces = new ObservableCollection<VideoFormatModel>();
+            SecondaryColorspaces = new ObservableCollection<VideoFormatModel>();
 
             MainMicrophones = new ObservableCollection<string>();
             SecondaryMicrophones = new ObservableCollection<string>();
@@ -412,15 +579,7 @@ namespace St.Setting
 
                 if (cameraList.Result != null)
                 {
-                    CachedCameras.Clear();
-                    foreach (var camera in cameraList.Result)
-                    {
-                        if (!string.IsNullOrEmpty(camera.DeviceName))
-                        {
-                            CachedCameras.Add(camera.DeviceName);
-                        }
-                    }
-                    CachedCameras.Add(NonExclusiveItem);
+                    CachedCameras = cameraList.Result.ToList();
                 }
 
 
@@ -428,30 +587,19 @@ namespace St.Setting
 
                 if (micList.Result != null)
                 {
-                    CachedMicrophones.Clear();
-                    foreach (var mic in micList.Result)
-                    {
-                        if (!string.IsNullOrEmpty(mic))
-                        {
-                            CachedMicrophones.Add(mic);
-                        }
-                    }
-                    CachedMicrophones.Add(NonExclusiveItem);
+                    CachedMicrophones = micList.Result.ToList();
                 }
+
+                CachedMicrophones.Add(NonExclusiveItem);
 
                 var speakerList = _meetingSdkAgent.GetLoudSpeakers();
 
-                if (speakerList.Result!=null)
+                if (speakerList.Result != null)
                 {
-                    CachedSpeakers.Clear();
-                    foreach (var speaer in speakerList.Result)
-                    {
-                        if (!string.IsNullOrEmpty(speaer))
-                        {
-                            CachedSpeakers.Add(speaer);
-                        }
-                    }
+                    CachedSpeakers = speakerList.Result.ToList();
                 }
+
+                CachedSpeakers.Add(NonExclusiveItem);
             });
         }
 
@@ -486,8 +634,8 @@ namespace St.Setting
                 ClearDeviceList();
                 CachedCameras.ForEach((camera) =>
                 {
-                    MainCameras.Add(camera);
-                    SecondaryCameras.Add(camera);
+                    MainCameras.Add(camera.DeviceName);
+                    SecondaryCameras.Add(camera.DeviceName);
                 });
 
                 CachedMicrophones.ForEach((microphone) =>
@@ -526,11 +674,11 @@ namespace St.Setting
             defaultConfigParameter.UserCameraSetting.BitRateList.Add("2000");
             defaultConfigParameter.UserCameraSetting.BitRateList.Add("3000");
 
-            defaultConfigParameter.UserCameraSetting.ResolutionList.Add("640*360");
-            defaultConfigParameter.UserCameraSetting.ResolutionList.Add("640*480");
-            defaultConfigParameter.UserCameraSetting.ResolutionList.Add("1024*768");
-            defaultConfigParameter.UserCameraSetting.ResolutionList.Add("1280*720");
-            defaultConfigParameter.UserCameraSetting.ResolutionList.Add("1920*1080");
+            //defaultConfigParameter.UserCameraSetting.ResolutionList.Add("640*360");
+            //defaultConfigParameter.UserCameraSetting.ResolutionList.Add("640*480");
+            //defaultConfigParameter.UserCameraSetting.ResolutionList.Add("1024*768");
+            //defaultConfigParameter.UserCameraSetting.ResolutionList.Add("1280*720");
+            //defaultConfigParameter.UserCameraSetting.ResolutionList.Add("1920*1080");
 
 
             defaultConfigParameter.DataCameraSetting.BitRateList.Add("500");
@@ -542,11 +690,11 @@ namespace St.Setting
             defaultConfigParameter.DataCameraSetting.BitRateList.Add("2000");
             defaultConfigParameter.DataCameraSetting.BitRateList.Add("3000");
 
-            defaultConfigParameter.DataCameraSetting.ResolutionList.Add("640*360");
-            defaultConfigParameter.DataCameraSetting.ResolutionList.Add("640*480");
-            defaultConfigParameter.DataCameraSetting.ResolutionList.Add("1024*768");
-            defaultConfigParameter.DataCameraSetting.ResolutionList.Add("1280*720");
-            defaultConfigParameter.DataCameraSetting.ResolutionList.Add("1920*1080");
+            //defaultConfigParameter.DataCameraSetting.ResolutionList.Add("640*360");
+            //defaultConfigParameter.DataCameraSetting.ResolutionList.Add("640*480");
+            //defaultConfigParameter.DataCameraSetting.ResolutionList.Add("1024*768");
+            //defaultConfigParameter.DataCameraSetting.ResolutionList.Add("1280*720");
+            //defaultConfigParameter.DataCameraSetting.ResolutionList.Add("1920*1080");
 
             defaultConfigParameter.Live.BitRateList.Add("500");
             defaultConfigParameter.Live.BitRateList.Add("600");
@@ -1000,7 +1148,9 @@ namespace St.Setting
         private void ClearDeviceList()
         {
             MainCameras.Clear();
+            MainColorspaces.Clear();
             SecondaryCameras.Clear();
+            SecondaryColorspaces.Clear();
             MainMicrophones.Clear();
             SecondaryMicrophones.Clear();
             Speakers.Clear();
