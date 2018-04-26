@@ -3,9 +3,11 @@
     public enum ConfigItemKey
     {
         MainCamera,
+        MainColorspace,
         MainCameraResolution,
         MainCameraCodeRate,
         SecondaryCamera,
+        SecondaryColorspace,
         SecondaryCameraResolution,
         SecondaryCameraCodeRate,
         MainMicrophone,
@@ -24,9 +26,11 @@
         public ConfigItemTag()
         {
             MainCamera = ConfigItemKey.MainCamera;
+            MainColorspace = ConfigItemKey.MainColorspace;
             MainCameraResolution = ConfigItemKey.MainCameraResolution;
             MainCameraCodeRate = ConfigItemKey.MainCameraCodeRate;
             SecondaryCamera = ConfigItemKey.SecondaryCamera;
+            SecondaryColorspace = ConfigItemKey.SecondaryColorspace;
             SecondaryCameraResolution = ConfigItemKey.SecondaryCameraResolution;
             SecondaryCameraCodeRate = ConfigItemKey.SecondaryCameraCodeRate;
             MainMicrophone = ConfigItemKey.MainMicrophone;
@@ -39,9 +43,11 @@
         }
 
         public ConfigItemKey MainCamera { get; set; }
+        public ConfigItemKey MainColorspace { get; set; }
         public ConfigItemKey MainCameraResolution { get; set; }
         public ConfigItemKey MainCameraCodeRate { get; set; }
         public ConfigItemKey SecondaryCamera { get; set; }
+        public ConfigItemKey SecondaryColorspace { get; set; }
         public ConfigItemKey SecondaryCameraResolution { get; set; }
         public ConfigItemKey SecondaryCameraCodeRate { get; set; }
         public ConfigItemKey MainMicrophone { get; set; }

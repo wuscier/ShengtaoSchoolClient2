@@ -98,6 +98,28 @@
                             </i:Interaction.Triggers>
                         </ComboBox>
 
+                        <ComboBox x:Name="mainCameraColorspace"
+                                  ItemsSource="{Binding MeetingConfigParameter.UserCameraSetting.Colorspaces}"
+                                  SelectedItem="{Binding MeetingConfigResult.MainCamera.Colorspace}"
+                                  Tag="{Binding ConfigItemTag.MainColorspace}"
+                                  md:HintAssist.Hint="颜色空间"
+                                  >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
+                                        <i:InvokeCommandAction.CommandParameter>
+                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
+                                                <Binding ElementName="mainCameraColorspace" Path="Tag"></Binding>
+                                                <Binding ElementName="mainCameraColorspace" Path="SelectedItem"></Binding>
+                                            </MultiBinding>
+                                        </i:InvokeCommandAction.CommandParameter>
+                                    </i:InvokeCommandAction>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+
+                        </ComboBox>
+
+
                         <ComboBox x:Name="mainCameraResolution"
                                   ItemsSource="{Binding MeetingConfigParameter.UserCameraSetting.ResolutionList}"
                                   SelectedItem="{Binding MeetingConfigResult.MainCamera.Resolution}"
@@ -169,6 +191,29 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </ComboBox>
+
+                        <ComboBox x:Name="secondaryCameraColorspace"
+                                  ItemsSource="{Binding MeetingConfigParameter.DataCameraSetting.Colorspaces}"
+                                  SelectedItem="{Binding MeetingConfigResult.SecondaryCamera.Colorspace}"
+                                  Tag="{Binding ConfigItemTag.SecondaryColorspace}"
+                                  md:HintAssist.Hint="颜色空间"
+                                  >
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
+                                        <i:InvokeCommandAction.CommandParameter>
+                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
+                                                <Binding ElementName="secondaryCameraColorspace" Path="Tag"></Binding>
+                                                <Binding ElementName="secondaryCameraColorspace" Path="SelectedItem"></Binding>
+                                            </MultiBinding>
+                                        </i:InvokeCommandAction.CommandParameter>
+                                    </i:InvokeCommandAction>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+
+                        </ComboBox>
+
+
 
                         <ComboBox x:Name="secondaryCameraResolution"
                                   ItemsSource="{Binding MeetingConfigParameter.DataCameraSetting.ResolutionList}"

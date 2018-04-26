@@ -28,5 +28,14 @@ namespace St.Common
             get { return codeRate; }
             set { SetProperty(ref codeRate, value); }
         }
+
+        private int _colorspace;
+
+        public int Colorspace
+        {
+            get { return _colorspace; }
+            set { SetProperty(ref _colorspace, value); }
+        }
+
     }
 }

@@ -15,6 +15,7 @@ using MeetingSdk.SdkWrapper;
 using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Serilog;
 using Action = System.Action;
+using MeetingSdk.NetAgent;
 
 namespace St.Setting
 {
@@ -24,6 +25,7 @@ namespace St.Setting
         {
             _meetingConfigView = meetingConfigView;
             _sdkService = IoC.Get<IMeeting>();
+            _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
 
             LoadSettingCommand = DelegateCommand.FromAsyncHandler(LoadSettingAsync);
             ConfigItemChangedCommand = DelegateCommand<ConfigChangedItem>.FromAsyncHandler(ConfigItemChangedAsync);
@@ -37,6 +39,7 @@ namespace St.Setting
         //private fields
         private readonly SettingContentView _meetingConfigView;
         private readonly IMeeting _sdkService;
+        private readonly IMeetingSdkAgent _meetingSdkAgent;
         private static readonly string NonExclusiveItem = "空";
 
         //properties
