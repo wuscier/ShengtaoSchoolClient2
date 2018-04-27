@@ -540,8 +540,7 @@ namespace St.Setting
                 _configManager.DocVideoInfo.ColorSpace = SelectedDocColorSpace.Colorsapce;
             }
 
-            if (!string.IsNullOrEmpty(SelectedDocDevice) || !string.IsNullOrEmpty(SelectedCameraDevice))
-                Common.ConfigManager.WriteConfig();
+            //Common.ConfigManager.WriteConfig();
         }
 
         private void SaveAudioSettings()
@@ -556,7 +555,7 @@ namespace St.Setting
             _configManager.AudioInfo.DocAudioSammpleDevice = SelectedDocAudioSource;
 
 
-            Common.ConfigManager.WriteConfig();
+            //Common.ConfigManager.WriteConfig();
         }
 
         private void SaveLiveRecordSettings()
@@ -576,7 +575,7 @@ namespace St.Setting
             _configManager.RecordInfo.RecordDisplayWidth = int.Parse(SelectedLocalResolution.Split('*')[0]);
             _configManager.RecordInfo.RecordDisplayHeight = int.Parse(SelectedLocalResolution.Split('*')[1]);
 
-            Common.ConfigManager.WriteConfig();
+            //Common.ConfigManager.WriteConfig();
         }
 
         private void SelectRecordPath()
@@ -611,6 +610,8 @@ namespace St.Setting
                 SaveVideoSettings();
                 SaveAudioSettings();
                 SaveLiveRecordSettings();
+
+                Common.ConfigManager.WriteConfig();
             }
             catch (Exception ex)
             {
@@ -799,7 +800,6 @@ namespace St.Setting
             DocParameterVgaList.Clear();
 
             VedioParameterRatesList.Clear();
-
 
             var cameraList = _meetingSdkAgent.GetVideoDevices();
 

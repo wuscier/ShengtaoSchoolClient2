@@ -129,7 +129,7 @@ namespace St.Common
                         Message = Messages.ErrorWriteEmptyConfig
                     };
                 }
-                string configJson = JsonConvert.SerializeObject(GlobalData.Instance.AggregatedConfig);
+                string configJson = JsonConvert.SerializeObject(GlobalData.Instance.AggregatedConfig,Newtonsoft.Json.Formatting.Indented);
 
                 File.WriteAllText(ConfigFileName, configJson, Encoding.UTF8);
 
