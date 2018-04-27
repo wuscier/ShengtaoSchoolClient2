@@ -3,25 +3,16 @@
 namespace St.Common
 {
 
-    public class LiveConfig : BindableBase
+
+    public class LiveStreamInfo:BindableBase
     {
-        public string Description { get; set; }
+        //public string Description { get; set; }
 
-        private string resolution;
+        public int LiveStreamDisplayWidth { get; set; }
 
-        public string Resolution
-        {
-            get { return resolution; }
-            set { SetProperty(ref resolution, value); }
-        }
+        public int LiveStreamDisplayHeight { get; set; }
 
-        private string codeRate;
-
-        public string CodeRate
-        {
-            get { return codeRate; }
-            set { SetProperty(ref codeRate, value); }
-        }
+        public int LiveStreamBitRate { get; set; }
 
         private string pushLiveStreamUrl;
 
@@ -31,6 +22,7 @@ namespace St.Common
             set { SetProperty(ref pushLiveStreamUrl, value); }
         }
 
-        public bool IsEnabled { get; set; }
+        //public bool IsEnabled { get; set; }
     }
+
 }

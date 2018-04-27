@@ -2,35 +2,16 @@
 
 namespace St.Common
 {
-
-    public class RecordConfig : BindableBase
+    public class RecordInfo
     {
-        public string Description { get; set; }
+        //public string Description { get; set; }
 
-        private string resolution;
+        public int RecordDisplayWidth { get; set; }
 
-        public string Resolution
-        {
-            get { return resolution; }
-            set { SetProperty(ref resolution, value); }
-        }
+        public int RecordDisplayHeight { get; set; }
 
-        private string codeRate;
+        public int RecordBitRate { get; set; }
 
-        public string CodeRate
-        {
-            get { return codeRate; }
-            set { SetProperty(ref codeRate, value); }
-        }
-
-        private string recordPath;
-
-        public string RecordPath
-        {
-            get { return recordPath; }
-            set { SetProperty(ref recordPath, value); }
-        }
-
+        public string RecordDirectory { get; set; }
     }
-
 }

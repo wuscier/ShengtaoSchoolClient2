@@ -16,12 +16,12 @@ namespace St.Common
         public string DeviceKey { get; set; }
         public int CommandServerPort { get; set; }
         public LoginConfig AccountAutoLogin { get; set; }
-        public VideoConfig MainCamera { get; set; }
-        public VideoConfig SecondaryCamera { get; set; }
-        public AudioConfig AudioConfig { get; set; }
-        public LiveConfig LocalLiveConfig { get; set; }
-        public LiveConfig RemoteLiveConfig { get; set; }
-        public RecordConfig RecordConfig { get; set; }
+        public VideoInfo MainVideoInfo { get; set; }
+        public VideoInfo DocVideoInfo { get; set; }
+        public AudioInfo AudioInfo { get; set; }
+        public LiveStreamInfo LocalLiveStreamInfo { get; set; }
+        public LiveStreamInfo RemoteLiveStreamInfo { get; set; }
+        public RecordInfo RecordInfo { get; set; }
 
         public AggregatedConfig()
         {
@@ -34,74 +34,74 @@ namespace St.Common
 
             AccountAutoLogin = new LoginConfig();
 
-            MainCamera = new VideoConfig()
-            {
-                Type = "主摄像头",
-            };
+            //MainCamera = new VideoConfig()
+            //{
+            //    Type = "主摄像头",
+            //};
 
-            SecondaryCamera = new VideoConfig()
-            {
-                Type = "辅摄像头"
-            };
-            AudioConfig = new AudioConfig();
-            LocalLiveConfig = new LiveConfig()
-            {
-                Description = "本地推流",
-                IsEnabled = true
-            };
-            RemoteLiveConfig = new LiveConfig()
-            {
-                Description = "服务器推流",
-                IsEnabled = true
-            };
-            RecordConfig = new RecordConfig()
-            {
-                Description = "录制"
-            };
+            //SecondaryCamera = new VideoConfig()
+            //{
+            //    Type = "辅摄像头"
+            //};
+            //AudioConfig = new AudioConfig();
+            //LocalLiveConfig = new LiveConfig()
+            //{
+            //    Description = "本地推流",
+            //    IsEnabled = true
+            //};
+            //RemoteLiveConfig = new LiveConfig()
+            //{
+            //    Description = "服务器推流",
+            //    IsEnabled = true
+            //};
+            //RecordConfig = new RecordConfig()
+            //{
+            //    Description = "录制"
+            //};
         }
 
-        public void CloneConfig(AggregatedConfig newConfig)
-        {
-            InterfaceType = newConfig.InterfaceType;
+        //public void CloneConfig(AggregatedConfig newConfig)
+        //{
+        //    InterfaceType = newConfig.InterfaceType;
 
-            InterfaceTypes = newConfig.InterfaceTypes;
+        //    InterfaceTypes = newConfig.InterfaceTypes;
 
-            DeviceNo = newConfig.DeviceNo;
-            DeviceKey = newConfig.DeviceKey;
+        //    DeviceNo = newConfig.DeviceNo;
+        //    DeviceKey = newConfig.DeviceKey;
 
-            CommandServerPort = newConfig.CommandServerPort;
+        //    CommandServerPort = newConfig.CommandServerPort;
 
-            AccountAutoLogin.IsAutoLogin = newConfig.AccountAutoLogin.IsAutoLogin;
-            AccountAutoLogin.UserName = newConfig.AccountAutoLogin.UserName;
-            AccountAutoLogin.Password = newConfig.AccountAutoLogin.Password;
+        //    AccountAutoLogin.IsAutoLogin = newConfig.AccountAutoLogin.IsAutoLogin;
+        //    AccountAutoLogin.UserName = newConfig.AccountAutoLogin.UserName;
+        //    AccountAutoLogin.Password = newConfig.AccountAutoLogin.Password;
 
-            MainCamera.CodeRate = newConfig.MainCamera.CodeRate;
-            MainCamera.Name = newConfig.MainCamera.Name;
-            MainCamera.Colorspace = newConfig.MainCamera.Colorspace;
-            MainCamera.Resolution = newConfig.MainCamera.Resolution;
+        //    MainCamera.CodeRate = newConfig.MainCamera.CodeRate;
+        //    MainCamera.Name = newConfig.MainCamera.Name;
+        //    MainCamera.Colorspace = newConfig.MainCamera.Colorspace;
+        //    MainCamera.Resolution = newConfig.MainCamera.Resolution;
 
-            SecondaryCamera.CodeRate = newConfig.SecondaryCamera.CodeRate;
-            SecondaryCamera.Name = newConfig.SecondaryCamera.Name;
-            SecondaryCamera.Colorspace = newConfig.SecondaryCamera.Colorspace;
-            SecondaryCamera.Resolution = newConfig.SecondaryCamera.Resolution;
+        //    SecondaryCamera.CodeRate = newConfig.SecondaryCamera.CodeRate;
+        //    SecondaryCamera.Name = newConfig.SecondaryCamera.Name;
+        //    SecondaryCamera.Colorspace = newConfig.SecondaryCamera.Colorspace;
+        //    SecondaryCamera.Resolution = newConfig.SecondaryCamera.Resolution;
 
-            AudioConfig.CodeRate = newConfig.AudioConfig.CodeRate;
-            AudioConfig.MainMicrophone = newConfig.AudioConfig.MainMicrophone;
-            AudioConfig.SampleRate = newConfig.AudioConfig.SampleRate;
-            AudioConfig.SecondaryMicrophone = newConfig.AudioConfig.SecondaryMicrophone;
-            AudioConfig.Speaker = newConfig.AudioConfig.Speaker;
+        //    AudioConfig.CodeRate = newConfig.AudioConfig.CodeRate;
+        //    AudioConfig.MainMicrophone = newConfig.AudioConfig.MainMicrophone;
+        //    AudioConfig.SampleRate = newConfig.AudioConfig.SampleRate;
+        //    AudioConfig.SecondaryMicrophone = newConfig.AudioConfig.SecondaryMicrophone;
+        //    AudioConfig.Speaker = newConfig.AudioConfig.Speaker;
 
-            LocalLiveConfig.CodeRate = newConfig.LocalLiveConfig.CodeRate;
-            LocalLiveConfig.Resolution = newConfig.LocalLiveConfig.Resolution;
-            LocalLiveConfig.PushLiveStreamUrl = newConfig.LocalLiveConfig.PushLiveStreamUrl;
-            LocalLiveConfig.IsEnabled = newConfig.LocalLiveConfig.IsEnabled;
-            RemoteLiveConfig.CodeRate = newConfig.RemoteLiveConfig.CodeRate;
-            RemoteLiveConfig.Resolution = newConfig.RemoteLiveConfig.Resolution;
-            RemoteLiveConfig.IsEnabled = newConfig.RemoteLiveConfig.IsEnabled;
-            RecordConfig.CodeRate = newConfig.RecordConfig.CodeRate;
-            RecordConfig.Resolution = newConfig.RecordConfig.Resolution;
-            RecordConfig.RecordPath = newConfig.RecordConfig.RecordPath;
-        }
+        //    LocalLiveConfig.CodeRate = newConfig.LocalLiveConfig.CodeRate;
+        //    LocalLiveConfig.Resolution = newConfig.LocalLiveConfig.Resolution;
+        //    LocalLiveConfig.PushLiveStreamUrl = newConfig.LocalLiveConfig.PushLiveStreamUrl;
+        //    LocalLiveConfig.IsEnabled = newConfig.LocalLiveConfig.IsEnabled;
+        //    RemoteLiveConfig.CodeRate = newConfig.RemoteLiveConfig.CodeRate;
+        //    RemoteLiveConfig.Resolution = newConfig.RemoteLiveConfig.Resolution;
+        //    RemoteLiveConfig.IsEnabled = newConfig.RemoteLiveConfig.IsEnabled;
+        //    RecordConfig.CodeRate = newConfig.RecordConfig.CodeRate;
+        //    RecordConfig.Resolution = newConfig.RecordConfig.Resolution;
+        //    RecordConfig.RecordPath = newConfig.RecordConfig.RecordPath;
+        //}
 
         public InterfaceItem GetInterfaceItem()
         {

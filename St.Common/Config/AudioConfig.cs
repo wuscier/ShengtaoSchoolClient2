@@ -2,40 +2,25 @@
 
 namespace St.Common
 {
-    public class AudioConfig:BindableBase
+    public class AudioInfo
     {
-        private string mainMicrophone;
-        public string MainMicrophone
-        {
-            get { return mainMicrophone; }
-            set { SetProperty(ref mainMicrophone, value); }
-        }
+        public string AudioSammpleDevice { get; set; }
 
-        private string secondaryMicrophone;
-        public string SecondaryMicrophone
-        {
-            get { return secondaryMicrophone; }
-            set { SetProperty(ref secondaryMicrophone, value); }
-        }
+        public string XsAudioSammpleDevice { get; set; }
 
+        public string DocAudioSammpleDevice { get; set; }
+        /// <summary>
+        /// 采样率
+        /// </summary>
+        public int SampleRate { get; set; }
+        /// <summary>
+        /// 音频码率
+        /// </summary>
+        public int AAC { get; set; }
+        /// <summary>
+        /// 放音设备
+        /// </summary>
+        public string AudioOutPutDevice { get; set; }
 
-        private string speaker;
-        public string Speaker
-        {
-            get { return speaker; }
-            set { SetProperty(ref speaker, value); }
-        }
-        private string sampleRate;
-        public string SampleRate
-        {
-            get { return sampleRate; }
-            set { SetProperty(ref sampleRate, value); }
-        }
-        private string codeRate;
-        public string CodeRate
-        {
-            get { return codeRate; }
-            set { SetProperty(ref codeRate, value); }
-        }
     }
 }

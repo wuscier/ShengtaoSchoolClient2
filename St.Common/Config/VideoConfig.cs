@@ -3,39 +3,48 @@
 namespace St.Common
 {
 
-    public class VideoConfig : BindableBase
+    public class VideoInfo : BindableBase
     {
-        public string Type { get; set; }
-
-
-        private string name;
-        public string Name
+        private string _videoDevice;
+        public string VideoDevice
         {
-            get { return name; }
-            set { SetProperty(ref name, value); }
+            get { return _videoDevice; }
+            set { SetProperty(ref _videoDevice, value); }
         }
 
-        private string resolution;
-        public string Resolution
+
+        private int _displayWidth;
+        public int DisplayWidth
         {
-            get { return resolution; }
-            set { SetProperty(ref resolution, value); }
+            get { return _displayWidth; }
+            set { SetProperty(ref _displayWidth, value); }
         }
 
-        private string codeRate;
-        public string CodeRate
+        private int _displayHeight;
+        public int DisplayHeight
         {
-            get { return codeRate; }
-            set { SetProperty(ref codeRate, value); }
+            get { return _displayHeight; }
+            set { SetProperty(ref _displayHeight, value); }
         }
 
-        private int _colorspace;
-
-        public int Colorspace
+        private int _videoBitRate;
+        public int VideoBitRate
         {
-            get { return _colorspace; }
-            set { SetProperty(ref _colorspace, value); }
+            get { return _videoBitRate; }
+            set { SetProperty(ref _videoBitRate, value); }
         }
 
+        private int _colorSpace;
+        public int ColorSpace
+        {
+            get
+            {
+                return _colorSpace;
+            }
+            set
+            {
+                SetProperty(ref _colorSpace, value);
+            }
+        }
     }
 }
