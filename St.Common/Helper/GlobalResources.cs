@@ -4,7 +4,7 @@
     {
         public const string DevConfigPath = "Config.Dev.conf";
         public const string ConfigPath = "Config.conf";
-        public const string SettingPath = "Setting.json";
+        public const string SettingPath = "Parameter.xml";
         public const string NpsPath = @"sdk\config\boot.xml";
 
         public const string SdkSettingPath = @"sdk\UserData\setting\setting.xml";

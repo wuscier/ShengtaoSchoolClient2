@@ -296,7 +296,7 @@
                                   >
                         </ComboBox>
 
-                        <TextBox IsReadOnly="True" md:HintAssist.Hint="双击选择录制路径" Text="{Binding LocalRecordPath}" Margin="0 10 0 0">
+                        <TextBox IsReadOnly="True" md:HintAssist.Hint="双击选择录制路径" Text="{Binding SelectedLocalPath}" Margin="0 10 0 0">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseDoubleClick">
                                     <i:InvokeCommandAction Command="{Binding SelectRecordPathCommand}"></i:InvokeCommandAction>

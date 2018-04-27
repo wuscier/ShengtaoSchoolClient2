@@ -18,6 +18,7 @@ using MeetingSdk.SdkWrapper;
 using St.Common.RtClient;
 using St.Host.Core;
 using MeetingSdk.NetAgent;
+using MeetingSdk.Wpf;
 
 namespace St.Host
 {
@@ -151,10 +152,10 @@ namespace St.Host
 
             builder.RegisterType<AutofacRegister>().As<IAutofacRegister>();
             builder.RegisterType<LessonInfo>().SingleInstance();
-            builder.RegisterType<UserInfo>().SingleInstance();
+            builder.RegisterType<Common.UserInfo>().SingleInstance();
             builder.RegisterType<LessonDetail>().SingleInstance();
 
-            builder.RegisterInstance(new List<UserInfo>()).SingleInstance();
+            builder.RegisterInstance(new List<Common.UserInfo>()).SingleInstance();
             builder.RegisterType<MainView>().AsSelf().SingleInstance();
 
             builder.RegisterInstance(
@@ -171,6 +172,11 @@ namespace St.Host
             builder.RegisterType<MeetingSdk.SdkWrapper.MeetingService>().As<IMeeting>().SingleInstance();
 
             builder.RegisterInstance(DefaultMeetingSdkAgent.Instance).As<IMeetingSdkAgent>().SingleInstance();
+            builder.RegisterType<MeetingWindowManager>().As<IMeetingWindowManager>().SingleInstance();
+            builder.RegisterType<DeviceConfigLoader>().As<IDeviceConfigLoader>().SingleInstance();
+            builder.RegisterType<DeviceNameAccessor>().As<IDeviceNameAccessor>().SingleInstance();
+            builder.RegisterType<DeviceNameProvider>().As<IDeviceNameProvider>().SingleInstance();
+            builder.RegisterType<VideoBoxManager>().As<IVideoBoxManager>();
 
 
             builder.RegisterType<ViewLayoutService>().As<IViewLayout>().SingleInstance();

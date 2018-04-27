@@ -80,6 +80,9 @@
     <Reference Include="Caliburn.Micro.Wpf, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Caliburn.Micro.Wpf.1.0.1\lib\net452\Caliburn.Micro.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="GM.Utilities">
+      <HintPath>Lib\GM.Utilities.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors, Version=1.1.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MaterialDesignColors.1.1.3\lib\net45\MaterialDesignColors.dll</HintPath>
       <Private>True</Private>

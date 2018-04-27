@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Text;
+using System.Xml;
 using JsonConfig;
 using Newtonsoft.Json;
 using Serilog;
@@ -10,6 +12,7 @@ namespace St.Common
     public static class ConfigManager
     {
         public static string ConfigFileName = Path.Combine(Environment.CurrentDirectory, GlobalResources.ConfigPath);
+        public static string SettingFileName = Path.Combine(Environment.CurrentDirectory, GlobalResources.SettingPath);
         public static string DevConfigFileName = Path.Combine(Environment.CurrentDirectory, GlobalResources.DevConfigPath);
 
         public static BaseResult ReadConfig()
@@ -23,6 +26,21 @@ namespace St.Common
                 {
                     sw.Write(defaultConfigString);
                 }
+            }
+
+            if (!File.Exists(SettingFileName))
+            {
+                Type type = MethodBase.GetCurrentMethod().DeclaringType;
+                string nspace = type.Namespace;
+                string resourceName = nspace + ".Parameter.xml";
+
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                Stream stream = assembly.GetManifestResourceStream(resourceName);
+
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(stream);
+
+                xmlDoc.Save(SettingFileName);
             }
 
             ConfigObject configObject = Config.ApplyJsonFromPath(ConfigFileName);
@@ -61,6 +79,17 @@ namespace St.Common
                     Message = Messages.ErrorReadEmptyConfig
                 };
             }
+
+            if (aggregatedConfig.MainVideoInfo == null)
+            {
+                aggregatedConfig.MainVideoInfo = new VideoInfo();
+            }
+
+            if (aggregatedConfig.DocVideoInfo == null)
+            {
+                aggregatedConfig.DocVideoInfo = new VideoInfo();
+            }
+
 
             GlobalData.Instance.AggregatedConfig = aggregatedConfig;
             return new BaseResult()

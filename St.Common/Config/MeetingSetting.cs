@@ -1,20 +1,51 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace St.Common
 {
-    public class MeetingSetting
+    public class SettingParameter
     {
-        public VideoSetting UserCameraSetting { get; set; }
-        public VideoSetting DataCameraSetting { get; set; }
-        public VideoSetting Live { get; set; }
-        public AudioSetting Audio { get; set; }
+        public List<VedioParameterVGA> VedioParameterVGAs { get; set; }
 
-        public MeetingSetting()
-        {
-            UserCameraSetting = new VideoSetting() { BitRateList = new ObservableCollection<string>(), ResolutionList = new ObservableCollection<string>(), VideoType = "人像" };
-            DataCameraSetting = new VideoSetting() { BitRateList = new ObservableCollection<string>(), ResolutionList = new ObservableCollection<string>(), VideoType = "数据" };
-            Live = new VideoSetting() { BitRateList = new ObservableCollection<string>(), ResolutionList = new ObservableCollection<string>(), VideoType = "直播录制" };
-            Audio = new AudioSetting() { BitRateList = new ObservableCollection<string>(), SampleRateList = new ObservableCollection<string>() };
-        }
+        public List<VedioParameterRate> VedioParameterRates { get; set; }
+
+        public List<AudioParameterSampleRate> AudioParameterSampleRates { get; set; }
+
+        public List<AudioParameterAAC> AudioParameterAACs { get; set; }
+
+        public List<LiveParameterVGA> LiveParameterVGAs { get; set; }
+
+        public List<LiveParameterRate> LiveParameterRates { get; set; }
     }
+
+    public class VedioParameterVGA
+    {
+        public string VideoDisplayWidth { get; set; } //宽*高       
+    }
+
+    public class VedioParameterRate
+    {
+        public int VideoBitRate { get; set; }
+    }
+
+    public class AudioParameterSampleRate
+    {
+        public int SampleRate { get; set; }
+    }
+
+    public class AudioParameterAAC
+    {
+        public int AAC { get; set; }
+    }
+
+    public class LiveParameterVGA
+    {
+        public string LiveDisplayWidth { get; set; } //推流分辨率       
+    }
+
+    public class LiveParameterRate
+    {
+        public int LiveBitRate { get; set; } //  推流码率 
+    }
+
 }
