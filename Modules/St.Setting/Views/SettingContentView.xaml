@@ -79,88 +79,39 @@
                     </Expander.Header>
                     <StackPanel>
                         <ComboBox x:Name="mainCamera"
-                                  ItemsSource="{Binding MainCameras}"
-                                  SelectedItem="{Binding SelectedCameraDevice}"
-                                  Tag="{Binding ConfigItemTag.MainCamera}"
+                                  ItemsSource="{Binding CameraDeviceList}"
+                                  SelectedItem="{Binding SelectedCameraDevice,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="设备"
                                   >
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="mainCamera" Path="Tag"></Binding>
-                                                <Binding ElementName="mainCamera" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
+                                    <i:InvokeCommandAction Command="{Binding CheckCameraDeviceCommand}">
                                     </i:InvokeCommandAction>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </ComboBox>
 
                         <ComboBox x:Name="mainCameraColorspace"
-                                  ItemsSource="{Binding MainColorspaces}"
-                                  SelectedItem="{Binding SelectedCameraColorSpace}"
+                                  ItemsSource="{Binding CameraColorSpaces}"
+                                  SelectedItem="{Binding SelectedCameraColorSpace,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   DisplayMemberPath="ColorspaceName"
-                                  Tag="{Binding ConfigItemTag.MainColorspace}"
                                   md:HintAssist.Hint="颜色空间"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="mainCameraColorspace" Path="Tag"></Binding>
-                                                <Binding ElementName="mainCameraColorspace" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
 
                         <ComboBox x:Name="mainCameraResolution"
                                   ItemsSource="{Binding VedioParameterVgaList}"
-                                  SelectedItem="{Binding MeetingConfigResult.MainCamera.Resolution}"
-                                  Tag="{Binding ConfigItemTag.MainCameraResolution}"
+                                  SelectedItem="{Binding SelectedVedioVGA,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="分辨率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="mainCameraResolution" Path="Tag"></Binding>
-                                                <Binding ElementName="mainCameraResolution" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
                         <ComboBox x:Name="mainCameraCodeRate"
-                                  ItemsSource="{Binding MeetingConfigParameter.UserCameraSetting.BitRateList}"
-                                  SelectedItem="{Binding MeetingConfigResult.MainCamera.CodeRate}"
-                                  Tag="{Binding ConfigItemTag.MainCameraCodeRate}"
+                                  ItemsSource="{Binding VedioParameterRatesList}"
+                                  SelectedItem="{Binding SelectedVedioRate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="码率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="mainCameraCodeRate" Path="Tag"></Binding>
-                                                <Binding ElementName="mainCameraCodeRate" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
                     </StackPanel>
@@ -174,89 +125,39 @@
                     </Expander.Header>
                     <StackPanel>
                         <ComboBox x:Name="secondaryCamera"
-                                  ItemsSource="{Binding SecondaryCameras}"
-                                  SelectedItem="{Binding SelectedDocDevice}"
-                                  Tag="{Binding ConfigItemTag.SecondaryCamera}"
+                                  ItemsSource="{Binding DocDeviceList}"
+                                  SelectedItem="{Binding SelectedDocDevice,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="设备"
                                   >
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="secondaryCamera" Path="Tag"></Binding>
-                                                <Binding ElementName="secondaryCamera" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
+                                    <i:InvokeCommandAction Command="{Binding CheckDocDeviceCommand}"></i:InvokeCommandAction>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </ComboBox>
 
                         <ComboBox x:Name="secondaryCameraColorspace"
-                                  ItemsSource="{Binding SecondaryColorspaces}"
-                                  SelectedItem="{Binding SelectedDocColorSpace}"
+                                  ItemsSource="{Binding DocColorSpaces}"
+                                  SelectedItem="{Binding SelectedDocColorSpace,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   DisplayMemberPath="ColorspaceName"
-                                  Tag="{Binding ConfigItemTag.SecondaryColorspace}"
                                   md:HintAssist.Hint="颜色空间"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="secondaryCameraColorspace" Path="Tag"></Binding>
-                                                <Binding ElementName="secondaryCameraColorspace" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
 
 
                         <ComboBox x:Name="secondaryCameraResolution"
                                   ItemsSource="{Binding DocParameterVgaList}"
-                                  SelectedItem="{Binding MeetingConfigResult.SecondaryCamera.Resolution}"
-                                  Tag="{Binding ConfigItemTag.SecondaryCameraResolution}"
+                                  SelectedItem="{Binding SelectedDocVGA,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="分辨率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="secondaryCameraResolution" Path="Tag"></Binding>
-                                                <Binding ElementName="secondaryCameraResolution" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
                         <ComboBox x:Name="secondaryCameraCodeRate"
-                                  ItemsSource="{Binding MeetingConfigParameter.DataCameraSetting.BitRateList}"
-                                  SelectedItem="{Binding MeetingConfigResult.SecondaryCamera.CodeRate}"
-                                  Tag="{Binding ConfigItemTag.SecondaryCameraCodeRate}"
+                                  ItemsSource="{Binding VedioParameterRatesList}"
+                                  SelectedItem="{Binding SelectedDocRate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="码率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="secondaryCameraCodeRate" Path="Tag"></Binding>
-                                                <Binding ElementName="secondaryCameraCodeRate" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
                     </StackPanel>
                 </Expander>
@@ -269,21 +170,13 @@
                     </Expander.Header>
                     <StackPanel>
                         <ComboBox x:Name="mainMicrophone"
-                                  ItemsSource="{Binding MainMicrophones}"
-                                  SelectedItem="{Binding MeetingConfigResult.AudioConfig.MainMicrophone}"
-                                  Tag="{Binding ConfigItemTag.MainMicrophone}"
+                                  ItemsSource="{Binding AudioSource}"
+                                  SelectedItem="{Binding SelectedAudioSource,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="人像麦克风"
                                   >
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="mainMicrophone" Path="Tag"></Binding>
-                                                <Binding ElementName="mainMicrophone" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
+                                    <i:InvokeCommandAction Command="{Binding CheckPeopleSourceDeviceCommand}"></i:InvokeCommandAction>
                                 </i:EventTrigger>
 
                             </i:Interaction.Triggers>
@@ -291,86 +184,36 @@
                         </ComboBox>
 
                         <ComboBox x:Name="secondaryMicrophone"
-                                  ItemsSource="{Binding SecondaryMicrophones}"
-                                  SelectedItem="{Binding MeetingConfigResult.AudioConfig.SecondaryMicrophone}"
-                                  Tag="{Binding ConfigItemTag.SecondaryMicrophone}"
+                                  ItemsSource="{Binding DocAudioSource}"
+                                  SelectedItem="{Binding SelectedDocAudioSource,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="数据麦克风"
                                   >
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="secondaryMicrophone" Path="Tag"></Binding>
-                                                <Binding ElementName="secondaryMicrophone" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
+                                    <i:InvokeCommandAction Command="{Binding CheckDocSourceDeviceCommand}"></i:InvokeCommandAction>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </ComboBox>
 
                         <ComboBox x:Name="speaker"
-                                  ItemsSource="{Binding Speakers}"
-                                  SelectedItem="{Binding MeetingConfigResult.AudioConfig.Speaker}"
-                                  Tag="{Binding ConfigItemTag.Speaker}"
+                                  ItemsSource="{Binding AudioOutPutDevice}"
+                                  SelectedItem="{Binding SelectedAudioOutPutDevice,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="扬声器"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="speaker" Path="Tag"></Binding>
-                                                <Binding ElementName="speaker" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
                         <ComboBox x:Name="audioSampleRate"
-                                  ItemsSource="{Binding MeetingConfigParameter.Audio.SampleRateList}"
-                                  SelectedItem="{Binding MeetingConfigResult.AudioConfig.SampleRate}"
-                                  Tag="{Binding ConfigItemTag.AudioSampleRate}"
+                                  ItemsSource="{Binding SampleRate}"
+                                  SelectedItem="{Binding SelectedSampleRate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="采样率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="audioSampleRate" Path="Tag"></Binding>
-                                                <Binding ElementName="audioSampleRate" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
                         <ComboBox x:Name="audioCodeRate"
-                                  ItemsSource="{Binding MeetingConfigParameter.Audio.BitRateList}"
-                                  SelectedItem="{Binding MeetingConfigResult.AudioConfig.CodeRate}"
-                                  Tag="{Binding ConfigItemTag.AudioCodeRate}"
+                                  ItemsSource="{Binding Aac}"
+                                  SelectedItem="{Binding SelectedAac,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="码率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="audioCodeRate" Path="Tag"></Binding>
-                                                <Binding ElementName="audioCodeRate" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
                     </StackPanel>
                 </Expander>
@@ -383,48 +226,20 @@
                     </Expander.Header>
                     <StackPanel>
                         <ComboBox x:Name="liveResolution"
-                                  ItemsSource="{Binding MeetingConfigParameter.Live.ResolutionList}"
-                                  SelectedItem="{Binding MeetingConfigResult.LocalLiveConfig.Resolution}"
-                                  Tag="{Binding ConfigItemTag.LiveResolution}"
+                                  ItemsSource="{Binding LiveDisplaySource}"
+                                  SelectedItem="{Binding SelectedLiveDisplay,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="分辨率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="liveResolution" Path="Tag"></Binding>
-                                                <Binding ElementName="liveResolution" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
                         <ComboBox x:Name="liveCodeRate"
-                                  ItemsSource="{Binding MeetingConfigParameter.Live.BitRateList}"
-                                  SelectedItem="{Binding MeetingConfigResult.LocalLiveConfig.CodeRate}"
-                                  Tag="{Binding ConfigItemTag.LiveCodeRate}"
+                                  ItemsSource="{Binding LiveRateSource}"
+                                  SelectedItem="{Binding SelectedLiveRate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="码率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="liveCodeRate" Path="Tag"></Binding>
-                                                <Binding ElementName="liveCodeRate" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
-                        <TextBox md:HintAssist.Hint="推流地址" Text="{Binding Path=MeetingConfigResult.LocalLiveConfig.PushLiveStreamUrl,UpdateSourceTrigger=PropertyChanged}" Margin="0 10 0 0" Foreground="{Binding LiveUrlColor}"
+                        <TextBox md:HintAssist.Hint="推流地址" Text="{Binding ManualPushLiveStreamUrl,UpdateSourceTrigger=PropertyChanged}" Margin="0 10 0 0" Foreground="{Binding LiveUrlColor}"
                                  >
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="TextChanged">
@@ -445,45 +260,17 @@
                     </Expander.Header>
                     <StackPanel>
                         <ComboBox x:Name="liveServerResolution"
-                                  ItemsSource="{Binding MeetingConfigParameter.Live.ResolutionList}"
-                                  SelectedItem="{Binding MeetingConfigResult.RemoteLiveConfig.Resolution}"
-                                  Tag="{Binding ConfigItemTag.LiveResolution}"
+                                  ItemsSource="{Binding LiveDisplaySource}"
+                                  SelectedItem="{Binding SelectedRemoteDisplay,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="分辨率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="liveServerResolution" Path="Tag"></Binding>
-                                                <Binding ElementName="liveServerResolution" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
                         <ComboBox x:Name="liveServerCodeRate"
-                                  ItemsSource="{Binding MeetingConfigParameter.Live.BitRateList}"
-                                  SelectedItem="{Binding MeetingConfigResult.RemoteLiveConfig.CodeRate}"
-                                  Tag="{Binding ConfigItemTag.LiveCodeRate}"
+                                  ItemsSource="{Binding LiveRateSource}"
+                                  SelectedItem="{Binding SelectedRemoteRate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="码率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="liveServerCodeRate" Path="Tag"></Binding>
-                                                <Binding ElementName="liveServerCodeRate" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
                     </StackPanel>
                 </Expander>
@@ -496,48 +283,20 @@
                     </Expander.Header>
                     <StackPanel>
                         <ComboBox x:Name="recordResolution"
-                                  ItemsSource="{Binding MeetingConfigParameter.Live.ResolutionList}"
-                                  SelectedItem="{Binding MeetingConfigResult.RecordConfig.Resolution}"
-                                  Tag="{Binding ConfigItemTag.LiveResolution}"
+                                  ItemsSource="{Binding LiveDisplaySource}"
+                                  SelectedItem="{Binding SelectedLocalResolution,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="分辨率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="recordResolution" Path="Tag"></Binding>
-                                                <Binding ElementName="recordResolution" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
                         <ComboBox x:Name="recordCodeRate"
-                                  ItemsSource="{Binding MeetingConfigParameter.Live.BitRateList}"
-                                  SelectedItem="{Binding MeetingConfigResult.RecordConfig.CodeRate}"
-                                  Tag="{Binding ConfigItemTag.LiveCodeRate}"
+                                  ItemsSource="{Binding LiveRateSource}"
+                                  SelectedItem="{Binding SelectedLocalBitrate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                   md:HintAssist.Hint="码率"
                                   >
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="SelectionChanged">
-                                    <i:InvokeCommandAction Command="{Binding ConfigItemChangedCommand}">
-                                        <i:InvokeCommandAction.CommandParameter>
-                                            <MultiBinding Converter="{StaticResource ConfigChangedItemConverter}">
-                                                <Binding ElementName="recordCodeRate" Path="Tag"></Binding>
-                                                <Binding ElementName="recordCodeRate" Path="SelectedItem"></Binding>
-                                            </MultiBinding>
-                                        </i:InvokeCommandAction.CommandParameter>
-                                    </i:InvokeCommandAction>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
-
                         </ComboBox>
 
-                        <TextBox IsReadOnly="True" md:HintAssist.Hint="双击选择录制路径" Text="{Binding MeetingConfigResult.RecordConfig.RecordPath}" Margin="0 10 0 0">
+                        <TextBox IsReadOnly="True" md:HintAssist.Hint="双击选择录制路径" Text="{Binding LocalRecordPath}" Margin="0 10 0 0">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="MouseDoubleClick">
                                     <i:InvokeCommandAction Command="{Binding SelectRecordPathCommand}"></i:InvokeCommandAction>
