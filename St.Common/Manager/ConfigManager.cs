@@ -95,6 +95,20 @@ namespace St.Common
                 aggregatedConfig.AudioInfo = new AudioInfo();
             }
 
+            if (aggregatedConfig.LocalLiveStreamInfo == null)
+            {
+                aggregatedConfig.LocalLiveStreamInfo = new LiveStreamInfo();
+            }
+
+            if (aggregatedConfig.RemoteLiveStreamInfo == null)
+            {
+                aggregatedConfig.RemoteLiveStreamInfo = new LiveStreamInfo();
+            }
+
+            if (aggregatedConfig.RecordInfo == null)
+            {
+                aggregatedConfig.RecordInfo = new RecordInfo();
+            }
 
             GlobalData.Instance.AggregatedConfig = aggregatedConfig;
             return new BaseResult()

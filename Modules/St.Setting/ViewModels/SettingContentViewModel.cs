@@ -484,6 +484,100 @@ namespace St.Setting
             SelectedLocalPath = _configManager.RecordInfo.RecordDirectory;
         }
 
+        private void SaveVideoSettings()
+        {
+            _deviceConfigLoader.SaveConfig(_deviceNameAccessor);
+
+            var cameraDeviceName = SelectedCameraDevice;
+            var docDeviceName = SelectedDocDevice;
+
+            var videoVga = SelectedVedioVGA;
+            var docVga = SelectedDocVGA;
+
+            var videoRate = SelectedVedioRate;
+            var videoDocRate = SelectedDocRate;
+
+            _configManager.MainVideoInfo = new VideoInfo();
+            _configManager.DocVideoInfo = new VideoInfo();
+
+            if (string.IsNullOrEmpty(SelectedCameraDevice) && string.IsNullOrEmpty(SelectedDocDevice))
+            {
+                HasErrorMsg("-1", "未选择任何视频采集源！");
+            }
+
+            if (!string.IsNullOrEmpty(SelectedCameraDevice))
+            {
+                if (!string.IsNullOrEmpty(videoVga))
+                {
+                    var videoVgaWith = int.Parse(videoVga.Split('*')[0]);
+                    var videoVgaHeight = int.Parse(videoVga.Split('*')[1]);
+
+                    _configManager.MainVideoInfo.DisplayWidth = videoVgaWith;
+                    _configManager.MainVideoInfo.DisplayHeight = videoVgaHeight;
+                }
+
+                _configManager.MainVideoInfo.VideoDevice = cameraDeviceName;
+                _configManager.MainVideoInfo.VideoBitRate = videoRate;
+                _configManager.MainVideoInfo.ColorSpace = SelectedCameraColorSpace.Colorsapce;
+            }
+
+            if (!string.IsNullOrEmpty(SelectedDocDevice))
+            {
+                if (!string.IsNullOrEmpty(docVga))
+                {
+                    var docVgaWith = int.Parse(docVga.Split('*')[0]);
+                    var docVgaHeight = int.Parse(docVga.Split('*')[1]);
+
+                    _configManager.DocVideoInfo.DisplayHeight = docVgaHeight;
+                    _configManager.DocVideoInfo.DisplayWidth = docVgaWith;
+
+                }
+
+                var docRate = SelectedDocRate;
+
+                _configManager.DocVideoInfo.VideoBitRate = docRate;
+                _configManager.DocVideoInfo.VideoDevice = docDeviceName;
+                _configManager.DocVideoInfo.ColorSpace = SelectedDocColorSpace.Colorsapce;
+            }
+
+            if (!string.IsNullOrEmpty(SelectedDocDevice) || !string.IsNullOrEmpty(SelectedCameraDevice))
+                Common.ConfigManager.WriteConfig();
+        }
+
+        private void SaveAudioSettings()
+        {
+            _deviceConfigLoader.SaveConfig(_deviceNameAccessor);
+
+            //保存设置到本地配置文件
+            _configManager.AudioInfo.AAC = SelectedAac;
+            _configManager.AudioInfo.AudioOutPutDevice = SelectedAudioOutPutDevice;
+            _configManager.AudioInfo.AudioSammpleDevice = SelectedAudioSource;
+            _configManager.AudioInfo.SampleRate = SelectedSampleRate;
+            _configManager.AudioInfo.DocAudioSammpleDevice = SelectedDocAudioSource;
+
+
+            Common.ConfigManager.WriteConfig();
+        }
+
+        private void SaveLiveRecordSettings()
+        {
+            _configManager.LocalLiveStreamInfo.LiveStreamBitRate = SelectedLiveRate;
+            _configManager.LocalLiveStreamInfo.LiveStreamDisplayHeight = int.Parse(SelectedLiveDisplay.Split('*')[1]);
+            _configManager.LocalLiveStreamInfo.LiveStreamDisplayWidth = int.Parse(SelectedLiveDisplay.Split('*')[0]);
+
+            _configManager.RemoteLiveStreamInfo.LiveStreamBitRate = SelectedRemoteRate;
+            _configManager.RemoteLiveStreamInfo.LiveStreamDisplayHeight =
+                int.Parse(SelectedRemoteDisplay.Split('*')[1]);
+            _configManager.RemoteLiveStreamInfo.LiveStreamDisplayWidth = int.Parse(SelectedRemoteDisplay.Split('*')[0]);
+
+
+            _configManager.RecordInfo.RecordBitRate = SelectedLocalBitrate;
+            _configManager.RecordInfo.RecordDirectory = SelectedLocalPath;
+            _configManager.RecordInfo.RecordDisplayWidth = int.Parse(SelectedLocalResolution.Split('*')[0]);
+            _configManager.RecordInfo.RecordDisplayHeight = int.Parse(SelectedLocalResolution.Split('*')[1]);
+
+            Common.ConfigManager.WriteConfig();
+        }
 
         private void SelectRecordPath()
         {
@@ -514,14 +608,9 @@ namespace St.Setting
         {
             try
             {
-                //string configResultPath = Path.Combine(Environment.CurrentDirectory, Common.GlobalResources.ConfigPath);
-
-                //GlobalData.Instance.AggregatedConfig.CloneConfig(MeetingConfigResult);
-
-                //string json = JsonConvert.SerializeObject(MeetingConfigResult, Formatting.Indented);
-
-                //File.WriteAllText(configResultPath, json, Encoding.UTF8);
-                ////SscUpdateManager.WriteConfigToVersionFolder(json);
+                SaveVideoSettings();
+                SaveAudioSettings();
+                SaveLiveRecordSettings();
             }
             catch (Exception ex)
             {
@@ -543,14 +632,6 @@ namespace St.Setting
 
         public ICommand LoadSettingCommand { get; set; }
         public ICommand UnloadSettingCommand { get; set; }
-
-        //private ConfigItemTag configItemTag;
-
-        //public ConfigItemTag ConfigItemTag
-        //{
-        //    get { return configItemTag; }
-        //    set { SetProperty(ref configItemTag, value); }
-        //}
 
         private bool isMainCameraExpanded;
 
@@ -630,16 +711,6 @@ namespace St.Setting
             get { return liveUrlColor; }
             set { SetProperty(ref liveUrlColor, value); }
         }
-
-        //private string _pushUrlExplanation;
-        //public string PushUrlExplanation
-        //{
-        //    get { return _pushUrlExplanation; }
-        //    set { SetProperty(ref _pushUrlExplanation, value); }
-        //}
-
-        //commands
-        //public ICommand ConfigItemChangedCommand { get; set; }
 
         //command handlers
         private void LoadSettingAsync()
@@ -761,595 +832,6 @@ namespace St.Setting
 
         }
 
-        //private async Task ConfigItemChangedAsync(ConfigChangedItem configChangedItem)
-        //{
-        //    if (string.IsNullOrEmpty(configChangedItem.value))
-        //    {
-        //        return;
-        //    }
-
-        //    await Task.Run(async () =>
-        //    {
-
-        //        switch (configChangedItem.key)
-        //        {
-        //            case ConfigItemKey.MainCamera:
-        //                await RefreshExclusiveDataSourceAsync(ConfigItemKey.MainCamera, configChangedItem.value);
-        //                _sdkService.SetDefaultDevice(1, configChangedItem.value);
-
-
-        //                await _view.Dispatcher.BeginInvoke(new Action(() =>
-        //                {
-        //                    RefreshResolutionsAsync(configChangedItem);
-        //                }));
-        //                break;
-
-        //            case ConfigItemKey.MainCameraResolution:
-        //                string[] mainResolution = configChangedItem.value.Split('*');
-        //                _sdkService.SetVideoResolution(1, int.Parse(mainResolution[0]), int.Parse(mainResolution[1]));
-        //                break;
-
-        //            case ConfigItemKey.MainCameraCodeRate:
-        //                _sdkService.SetVideoBitRate(1, int.Parse(configChangedItem.value));
-
-        //                break;
-        //            case ConfigItemKey.SecondaryCamera:
-        //                await RefreshExclusiveDataSourceAsync(ConfigItemKey.SecondaryCamera, configChangedItem.value);
-        //                _sdkService.SetDefaultDevice(2, configChangedItem.value);
-
-        //                await _view.Dispatcher.BeginInvoke(new Action(() =>
-        //                {
-        //                    RefreshResolutionsAsync(configChangedItem);
-        //                }));
-        //                break;
-        //            case ConfigItemKey.SecondaryCameraResolution:
-        //                string[] secondaryResolution = configChangedItem.value.Split('*');
-        //                _sdkService.SetVideoResolution(2, int.Parse(secondaryResolution[0]),
-        //                    int.Parse(secondaryResolution[1]));
-        //                break;
-        //            case ConfigItemKey.SecondaryCameraCodeRate:
-        //                _sdkService.SetVideoBitRate(2, int.Parse(configChangedItem.value));
-        //                break;
-        //            case ConfigItemKey.MainMicrophone:
-        //                await RefreshExclusiveDataSourceAsync(ConfigItemKey.MainMicrophone, configChangedItem.value);
-        //                _sdkService.SetDefaultDevice(3, configChangedItem.value);
-
-        //                break;
-        //            case ConfigItemKey.SecondaryMicrophone:
-        //                await
-        //                    RefreshExclusiveDataSourceAsync(ConfigItemKey.SecondaryMicrophone, configChangedItem.value);
-        //                _sdkService.SetDefaultDevice(5, configChangedItem.value);
-
-        //                break;
-        //            case ConfigItemKey.Speaker:
-        //                _sdkService.SetDefaultDevice(4, configChangedItem.value);
-        //                break;
-        //            case ConfigItemKey.AudioSampleRate:
-        //                _sdkService.SetAudioSampleRate(int.Parse(configChangedItem.value));
-        //                break;
-        //            case ConfigItemKey.AudioCodeRate:
-        //                _sdkService.SetAudioBitRate(int.Parse(configChangedItem.value));
-        //                break;
-        //            case ConfigItemKey.LiveResolution:
-
-        //                break;
-        //            case ConfigItemKey.LiveCodeRate:
-
-        //                break;
-        //            case ConfigItemKey.Unknown:
-        //            default:
-        //                break;
-        //        }
-
-        //        SaveConfig();
-        //    });
-        //}
-
-        //private void RefreshResolutionsAsync(ConfigChangedItem configChangedItem)
-        //{
-        //    if (configChangedItem.value == NonExclusiveItem)
-        //    {
-        //        return;
-        //    }
-
-        //    Camera videoDeviceInfo = _sdkService.GetCameraInfo(configChangedItem.value);
-
-
-        //    if (configChangedItem.key == ConfigItemKey.MainCamera)
-        //    {
-        //        if (videoDeviceInfo.CameraParameters.Count > 0)
-        //        {
-        //            MeetingConfigParameter.UserCameraSetting.ResolutionList.Clear();
-
-        //            CameraParameter cameraParameter = videoDeviceInfo.CameraParameters[0];
-
-        //            foreach (Size t in cameraParameter.VideoSizes)
-        //            {
-        //                string resolution = $"{t.Width}*{t.Height}";
-
-        //                if (!MeetingConfigParameter.UserCameraSetting.ResolutionList.Contains(resolution))
-        //                {
-        //                    MeetingConfigParameter.UserCameraSetting.ResolutionList.Add(resolution);
-        //                }
-        //            }
-
-        //        }
-
-        //        if (
-        //            MeetingConfigParameter.UserCameraSetting.ResolutionList.Contains(
-        //                GlobalData.Instance.AggregatedConfig.MainCamera.Resolution))
-        //        {
-        //            MeetingConfigResult.MainCamera.Resolution =
-        //                GlobalData.Instance.AggregatedConfig.MainCamera.Resolution;
-        //        }
-        //        else if (MeetingConfigParameter.UserCameraSetting.ResolutionList.Count > 0)
-        //        {
-        //            MeetingConfigResult.MainCamera.Resolution =
-        //                MeetingConfigParameter.UserCameraSetting.ResolutionList[0];
-        //        }
-        //    }
-
-        //    if (configChangedItem.key == ConfigItemKey.SecondaryCamera)
-        //    {
-        //        if (videoDeviceInfo.CameraParameters.Count > 0)
-        //        {
-        //            MeetingConfigParameter.DataCameraSetting.ResolutionList.Clear();
-
-        //            CameraParameter cameraParameter = videoDeviceInfo.CameraParameters[0];
-
-        //            foreach (Size t in cameraParameter.VideoSizes)
-        //            {
-        //                string resolution = $"{t.Width}*{t.Height}";
-
-        //                if (!MeetingConfigParameter.DataCameraSetting.ResolutionList.Contains(resolution))
-        //                {
-        //                    MeetingConfigParameter.DataCameraSetting.ResolutionList.Add(resolution);
-        //                }
-        //            }
-        //        }
-
-        //        if (
-        //            MeetingConfigParameter.DataCameraSetting.ResolutionList.Contains(
-        //                GlobalData.Instance.AggregatedConfig.SecondaryCamera.Resolution))
-        //        {
-        //            MeetingConfigResult.SecondaryCamera.Resolution =
-        //                GlobalData.Instance.AggregatedConfig.SecondaryCamera.Resolution;
-        //        }
-        //        else if (MeetingConfigParameter.DataCameraSetting.ResolutionList.Count > 0)
-        //        {
-        //            MeetingConfigResult.SecondaryCamera.Resolution =
-        //                MeetingConfigParameter.DataCameraSetting.ResolutionList[0];
-        //        }
-        //    }
-        //}
-
-
-
-        //methods
-        //public void InitializeBindingDataSource()
-        //{
-        //    CachedCameras = new List<VideoDeviceModel>();
-        //    CachedMicrophones = new List<string>();
-        //    CachedSpeakers = new List<string>();
-
-        //    MainCameras = new ObservableCollection<string>();
-        //    SecondaryCameras = new ObservableCollection<string>();
-
-        //    MainColorspaces = new ObservableCollection<VideoFormatModel>();
-        //    SecondaryColorspaces = new ObservableCollection<VideoFormatModel>();
-
-        //    MainMicrophones = new ObservableCollection<string>();
-        //    SecondaryMicrophones = new ObservableCollection<string>();
-        //    Speakers = new ObservableCollection<string>();
-        //    MeetingConfigResult = new AggregatedConfig();
-        //    MeetingConfigParameter = new MeetingSetting();
-
-        //    ConfigItemTag = new ConfigItemTag();
-        //}
-
-        //private async Task CacheDeviceListAsync()
-        //{
-        //    await Task.Run(() =>
-        //    {
-        //        var cameraList = _meetingSdkAgent.GetVideoDevices();
-
-        //        if (cameraList.Result != null)
-        //        {
-        //            CachedCameras = cameraList.Result.ToList();
-        //        }
-
-
-        //        var micList = _meetingSdkAgent.GetMicrophones();
-
-        //        if (micList.Result != null)
-        //        {
-        //            CachedMicrophones = micList.Result.ToList();
-        //        }
-
-        //        CachedMicrophones.Add(NonExclusiveItem);
-
-        //        var speakerList = _meetingSdkAgent.GetLoudSpeakers();
-
-        //        if (speakerList.Result != null)
-        //        {
-        //            CachedSpeakers = speakerList.Result.ToList();
-        //        }
-
-        //        CachedSpeakers.Add(NonExclusiveItem);
-        //    });
-        //}
-
-
-        //private async Task SetupDeviceListAsync()
-        //{
-        //    await _meetingConfigView.Dispatcher.BeginInvoke(new Action(() =>
-        //    {
-        //        ClearDeviceList();
-        //        CachedCameras.ForEach((camera) =>
-        //        {
-        //            MainCameras.Add(camera.DeviceName);
-        //            SecondaryCameras.Add(camera.DeviceName);
-        //        });
-
-        //        CachedMicrophones.ForEach((microphone) =>
-        //        {
-        //            MainMicrophones.Add(microphone);
-        //            SecondaryMicrophones.Add(microphone);
-        //        });
-
-        //        CachedSpeakers.ForEach((speaker) =>
-        //        {
-        //            Speakers.Add(speaker);
-        //        });
-        //    }));
-        //}
-
-        //private async Task GetConfigFromGlobalConfigAsync()
-        //{
-        //    MeetingConfigResult.CloneConfig(GlobalData.Instance.AggregatedConfig);
-
-        //    await AutoSelectConfigAsync();
-        //}
-
-
-        //private async Task AutoSelectConfigAsync()
-        //{
-        //    await _meetingConfigView.Dispatcher.BeginInvoke(new Action(async () =>
-        //    {
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.MainCamera.Resolution))
-        //        {
-        //            MeetingConfigResult.MainCamera.Resolution =
-        //                MeetingConfigParameter.UserCameraSetting.ResolutionList.Count > 0
-        //                    ? MeetingConfigParameter.UserCameraSetting.ResolutionList[0]
-        //                    : null;
-        //        }
-
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.MainCamera.CodeRate))
-        //        {
-        //            MeetingConfigResult.MainCamera.CodeRate =
-        //                MeetingConfigParameter.UserCameraSetting.BitRateList.Count > 0
-        //                    ? MeetingConfigParameter.UserCameraSetting.BitRateList[0]
-        //                    : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.SecondaryCamera.Resolution))
-        //        {
-        //            MeetingConfigResult.SecondaryCamera.Resolution =
-        //                MeetingConfigParameter.DataCameraSetting.ResolutionList.Count > 0
-        //                    ? MeetingConfigParameter.DataCameraSetting.ResolutionList[0]
-        //                    : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.SecondaryCamera.CodeRate))
-        //        {
-        //            MeetingConfigResult.SecondaryCamera.CodeRate =
-        //                MeetingConfigParameter.DataCameraSetting.BitRateList.Count > 0
-        //                    ? MeetingConfigParameter.DataCameraSetting.BitRateList[0]
-        //                    : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.AudioConfig.Speaker))
-        //        {
-        //            MeetingConfigResult.AudioConfig.Speaker = Speakers.Count > 0 ? Speakers[0] : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.AudioConfig.SampleRate))
-        //        {
-        //            MeetingConfigResult.AudioConfig.SampleRate = MeetingConfigParameter.Audio.SampleRateList.Count > 0
-        //                ? MeetingConfigParameter.Audio.SampleRateList[0]
-        //                : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.AudioConfig.CodeRate))
-        //        {
-        //            MeetingConfigResult.AudioConfig.CodeRate = MeetingConfigParameter.Audio.BitRateList.Count > 0
-        //                ? MeetingConfigParameter.Audio.BitRateList[0]
-        //                : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.LocalLiveConfig.Resolution))
-        //        {
-        //            MeetingConfigResult.LocalLiveConfig.Resolution = MeetingConfigParameter.Live.ResolutionList.Count >
-        //                                                             0
-        //                ? MeetingConfigParameter.Live.ResolutionList[0]
-        //                : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.LocalLiveConfig.CodeRate))
-        //        {
-        //            MeetingConfigResult.LocalLiveConfig.CodeRate = MeetingConfigParameter.Live.BitRateList.Count > 0
-        //                ? MeetingConfigParameter.Live.BitRateList[0]
-        //                : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.RemoteLiveConfig.Resolution))
-        //        {
-        //            MeetingConfigResult.RemoteLiveConfig.Resolution = MeetingConfigParameter.Live.ResolutionList.Count >
-        //                                                              0
-        //                ? MeetingConfigParameter.Live.ResolutionList[0]
-        //                : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.RemoteLiveConfig.CodeRate))
-        //        {
-        //            MeetingConfigResult.RemoteLiveConfig.CodeRate = MeetingConfigParameter.Live.BitRateList.Count > 0
-        //                ? MeetingConfigParameter.Live.BitRateList[0]
-        //                : null;
-
-        //        }
-
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.RecordConfig.Resolution))
-        //        {
-        //            MeetingConfigResult.RecordConfig.Resolution = MeetingConfigParameter.Live.ResolutionList.Count > 0
-        //                ? MeetingConfigParameter.Live.ResolutionList[0]
-        //                : null;
-
-        //        }
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.RecordConfig.CodeRate))
-        //        {
-        //            MeetingConfigResult.RecordConfig.CodeRate = MeetingConfigParameter.Live.BitRateList.Count > 0
-        //                ? MeetingConfigParameter.Live.BitRateList[0]
-        //                : null;
-
-        //        }
-
-
-        //        //exclusive1
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.MainCamera.Name) && MainCameras.Count > 0)
-        //        {
-        //            MeetingConfigResult.MainCamera.Name = MainCameras[0];
-
-        //            RefreshResolutionsAsync(new ConfigChangedItem()
-        //            {
-        //                key = ConfigItemKey.MainCamera,
-        //                value = MainCameras[0]
-        //            });
-
-        //            if (MainCameras[0] != NonExclusiveItem)
-        //            {
-        //                SecondaryCameras.Remove(MainCameras[0]);
-        //            }
-        //        }
-
-        //        //exclusive1
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.SecondaryCamera.Name) && SecondaryCameras.Count > 0)
-        //        {
-        //            MeetingConfigResult.SecondaryCamera.Name = SecondaryCameras[0];
-
-        //            RefreshResolutionsAsync(new ConfigChangedItem()
-        //            {
-        //                key = ConfigItemKey.SecondaryCamera,
-        //                value = SecondaryCameras[0]
-        //            });
-
-        //            if (SecondaryCameras[0] != NonExclusiveItem)
-        //            {
-        //                MainCameras.Remove(SecondaryCameras[0]);
-        //            }
-        //        }
-
-        //        //exclusive2
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.AudioConfig.MainMicrophone) && MainMicrophones.Count > 0)
-        //        {
-        //            MeetingConfigResult.AudioConfig.MainMicrophone = MainMicrophones[0];
-
-        //            if (MainMicrophones[0] != NonExclusiveItem)
-        //            {
-        //                SecondaryMicrophones.Remove(MainMicrophones[0]);
-        //            }
-        //        }
-
-        //        //exclusive2
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.AudioConfig.SecondaryMicrophone) &&
-        //            SecondaryMicrophones.Count > 0)
-        //        {
-        //            MeetingConfigResult.AudioConfig.SecondaryMicrophone = SecondaryMicrophones[0];
-
-        //            if (SecondaryMicrophones[0] != NonExclusiveItem)
-        //            {
-        //                MainMicrophones.Remove(SecondaryMicrophones[0]);
-        //            }
-        //        }
-
-
-        //        if (MainCameras.Contains(MeetingConfigResult.MainCamera.Name))
-        //        {
-        //            await
-        //                RefreshExclusiveDataSourceAsync(ConfigItemKey.MainCamera, MeetingConfigResult.MainCamera.Name);
-
-        //            RefreshResolutionsAsync(new ConfigChangedItem()
-        //            {
-        //                key = ConfigItemKey.MainCamera,
-        //                value = MeetingConfigResult.MainCamera.Name
-        //            });
-        //        }
-
-        //        if (SecondaryCameras.Contains(MeetingConfigResult.SecondaryCamera.Name))
-        //        {
-        //            await
-        //                RefreshExclusiveDataSourceAsync(ConfigItemKey.SecondaryCamera,
-        //                    MeetingConfigResult.SecondaryCamera.Name);
-
-        //            RefreshResolutionsAsync(new ConfigChangedItem()
-        //            {
-        //                key = ConfigItemKey.SecondaryCamera,
-        //                value = MeetingConfigResult.SecondaryCamera.Name
-        //            });
-        //        }
-
-        //        if (MainMicrophones.Contains(MeetingConfigResult.AudioConfig.MainMicrophone))
-        //        {
-        //            await
-        //                RefreshExclusiveDataSourceAsync(ConfigItemKey.MainMicrophone,
-        //                    MeetingConfigResult.AudioConfig.MainMicrophone);
-        //        }
-
-        //        if (SecondaryMicrophones.Contains(MeetingConfigResult.AudioConfig.SecondaryMicrophone))
-        //        {
-        //            await
-        //                RefreshExclusiveDataSourceAsync(ConfigItemKey.SecondaryMicrophone,
-        //                    MeetingConfigResult.AudioConfig.SecondaryMicrophone);
-        //        }
-
-        //        if (string.IsNullOrEmpty(MeetingConfigResult.RecordConfig.RecordPath))
-        //        {
-        //            MeetingConfigResult.RecordConfig.RecordPath =
-        //                Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
-        //        }
-
-        //        SaveConfig();
-        //    }));
-        //}
-
-        //private async Task SetDefaultConfigResultsAsync()
-        //{
-        //    await Task.Run(() =>
-        //    {
-        //        if (MeetingConfigResult.MainCamera.Name != NonExclusiveItem)
-        //        {
-        //            _sdkService.SetDefaultDevice(1, MeetingConfigResult.MainCamera.Name);
-        //            string[] mainResolution = MeetingConfigResult.MainCamera.Resolution.Split('*');
-        //            _sdkService.SetVideoResolution(1, int.Parse(mainResolution[0]), int.Parse(mainResolution[1]));
-        //            _sdkService.SetVideoBitRate(1, int.Parse(MeetingConfigResult.MainCamera.CodeRate));
-        //        }
-
-        //        if (MeetingConfigResult.SecondaryCamera.Name != NonExclusiveItem)
-        //        {
-        //            _sdkService.SetDefaultDevice(2, MeetingConfigResult.SecondaryCamera.Name);
-        //            string[] secondaryResolution = MeetingConfigResult.SecondaryCamera.Resolution.Split('*');
-        //            _sdkService.SetVideoResolution(2, int.Parse(secondaryResolution[0]),
-        //                int.Parse(secondaryResolution[1]));
-        //            _sdkService.SetVideoBitRate(2, int.Parse(MeetingConfigResult.SecondaryCamera.CodeRate));
-        //        }
-
-        //        if (MeetingConfigResult.AudioConfig.MainMicrophone != NonExclusiveItem)
-        //        {
-        //            _sdkService.SetDefaultDevice(3, MeetingConfigResult.AudioConfig.MainMicrophone);
-        //        }
-
-        //        if (MeetingConfigResult.AudioConfig.SecondaryMicrophone != NonExclusiveItem)
-        //        {
-        //            _sdkService.SetDefaultDevice(5, MeetingConfigResult.AudioConfig.SecondaryMicrophone);
-        //        }
-
-        //        _sdkService.SetDefaultDevice(4, MeetingConfigResult.AudioConfig.Speaker);
-
-        //        _sdkService.SetAudioSampleRate(int.Parse(MeetingConfigResult.AudioConfig.SampleRate));
-        //        _sdkService.SetAudioBitRate(int.Parse(MeetingConfigResult.AudioConfig.CodeRate));
-        //    });
-        //}
-
-
-        //private async Task RefreshExclusiveDataSourceAsync(ConfigItemKey configItemKey, string exclusiveItem)
-        //{
-        //    await _meetingConfigView.Dispatcher.BeginInvoke(new Action(() =>
-        //    {
-        //        switch (configItemKey)
-        //        {
-        //            case ConfigItemKey.MainCamera:
-
-        //                string tempSecondaryCamera = MeetingConfigResult.SecondaryCamera.Name;
-
-        //                SecondaryCameras.Clear();
-
-        //                CachedCameras.ForEach((camera) =>
-        //                {
-        //                    if (camera != exclusiveItem)
-        //                    {
-        //                        SecondaryCameras.Add(camera);
-        //                    }
-        //                });
-        //                if (!SecondaryCameras.Contains(NonExclusiveItem))
-        //                {
-        //                    SecondaryCameras.Add(NonExclusiveItem);
-        //                }
-        //                MeetingConfigResult.SecondaryCamera.Name = tempSecondaryCamera;
-
-        //                break;
-        //            case ConfigItemKey.SecondaryCamera:
-
-        //                string tempMainCamera = MeetingConfigResult.MainCamera.Name;
-        //                MainCameras.Clear();
-        //                CachedCameras.ForEach((camera) =>
-        //                {
-        //                    if (camera != exclusiveItem)
-        //                    {
-        //                        MainCameras.Add(camera);
-        //                    }
-        //                });
-
-        //                if (!MainCameras.Contains(NonExclusiveItem))
-        //                {
-        //                    MainCameras.Add(NonExclusiveItem);
-        //                }
-        //                MeetingConfigResult.MainCamera.Name = tempMainCamera;
-
-        //                break;
-        //            case ConfigItemKey.MainMicrophone:
-        //                string tempSecondaryMic = MeetingConfigResult.AudioConfig.SecondaryMicrophone;
-
-        //                SecondaryMicrophones.Clear();
-
-        //                CachedMicrophones.ForEach((mic) =>
-        //                {
-        //                    if (mic != exclusiveItem)
-        //                    {
-        //                        SecondaryMicrophones.Add(mic);
-        //                    }
-        //                });
-
-        //                if (!SecondaryMicrophones.Contains(NonExclusiveItem))
-        //                {
-        //                    SecondaryMicrophones.Add(NonExclusiveItem);
-        //                }
-
-        //                MeetingConfigResult.AudioConfig.SecondaryMicrophone = tempSecondaryMic;
-        //                break;
-        //            case ConfigItemKey.SecondaryMicrophone:
-        //                string tempMainMic = MeetingConfigResult.AudioConfig.MainMicrophone;
-
-        //                MainMicrophones.Clear();
-        //                CachedMicrophones.ForEach((mic) =>
-        //                {
-        //                    if (mic != exclusiveItem)
-        //                    {
-        //                        MainMicrophones.Add(mic);
-        //                    }
-        //                });
-
-        //                if (!MainMicrophones.Contains(NonExclusiveItem))
-        //                {
-        //                    MainMicrophones.Add(NonExclusiveItem);
-        //                }
-        //                MeetingConfigResult.AudioConfig.MainMicrophone = tempMainMic;
-        //                break;
-        //            case ConfigItemKey.Unknown:
-        //            default:
-        //                break;
-        //        }
-
-        //    }));
-        //}
 
         //only one expander can be expanded at one time
         private void ManageExpanderStatue(bool isExpanded)
@@ -1368,70 +850,5 @@ namespace St.Setting
                 }
             }
         }
-
-        //private async Task CloneParameters(MeetingSetting newParameters)
-        //{
-        //    await _view.Dispatcher.BeginInvoke(new Action(() =>
-        //    {
-        //        MeetingConfigParameter.Audio.Clear();
-        //        MeetingConfigParameter.UserCameraSetting.ResolutionList.Clear();
-        //        MeetingConfigParameter.UserCameraSetting.BitRateList.Clear();
-        //        MeetingConfigParameter.DataCameraSetting.ResolutionList.Clear();
-        //        MeetingConfigParameter.DataCameraSetting.BitRateList.Clear();
-        //        MeetingConfigParameter.Live.ResolutionList.Clear();
-        //        MeetingConfigParameter.Live.BitRateList.Clear();
-
-        //        newParameters.Audio.BitRateList.ToList().ForEach(bitrate =>
-        //        {
-        //            MeetingConfigParameter.Audio.BitRateList.Add(bitrate);
-        //        });
-
-        //        newParameters.Audio.SampleRateList.ToList().ForEach(samplerate =>
-        //        {
-        //            MeetingConfigParameter.Audio.SampleRateList.Add(samplerate);
-        //        });
-
-        //        newParameters.UserCameraSetting.BitRateList.ToList().ForEach(bitrate =>
-        //        {
-        //            MeetingConfigParameter.UserCameraSetting.BitRateList.Add(bitrate);
-        //        });
-
-        //        newParameters.UserCameraSetting.ResolutionList.ToList().ForEach(resolution =>
-        //        {
-        //            MeetingConfigParameter.UserCameraSetting.ResolutionList.Add(resolution);
-        //        });
-
-        //        newParameters.DataCameraSetting.BitRateList.ToList().ForEach(bitrate =>
-        //        {
-        //            MeetingConfigParameter.DataCameraSetting.BitRateList.Add(bitrate);
-        //        });
-
-        //        newParameters.DataCameraSetting.ResolutionList.ToList().ForEach(resolution =>
-        //        {
-        //            MeetingConfigParameter.DataCameraSetting.ResolutionList.Add(resolution);
-        //        });
-
-        //        newParameters.Live.BitRateList.ToList().ForEach(bitrate =>
-        //        {
-        //            MeetingConfigParameter.Live.BitRateList.Add(bitrate);
-        //        });
-
-        //        newParameters.Live.ResolutionList.ToList().ForEach(resolution =>
-        //        {
-        //            MeetingConfigParameter.Live.ResolutionList.Add(resolution);
-        //        });
-        //    }));
-        //}
-
-        //private void ClearDeviceList()
-        //{
-        //    MainCameras.Clear();
-        //    MainColorspaces.Clear();
-        //    SecondaryCameras.Clear();
-        //    SecondaryColorspaces.Clear();
-        //    MainMicrophones.Clear();
-        //    SecondaryMicrophones.Clear();
-        //    Speakers.Clear();
-        //}
     }
 }
