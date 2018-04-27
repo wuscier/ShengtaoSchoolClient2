@@ -18,6 +18,12 @@
 
             </i:InvokeCommandAction>
         </i:EventTrigger>
+
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding UnloadSettingCommand}">
+
+            </i:InvokeCommandAction>
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     
     <UserControl.Resources>
@@ -41,8 +47,6 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-
-            <local:ConfigChangedItemConverter x:Key="ConfigChangedItemConverter"></local:ConfigChangedItemConverter>
 
         </ResourceDictionary>
     </UserControl.Resources>

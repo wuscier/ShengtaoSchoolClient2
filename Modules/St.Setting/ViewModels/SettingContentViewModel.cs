@@ -68,13 +68,15 @@ namespace St.Setting
 
 
             LoadSettingCommand = new DelegateCommand(LoadSettingAsync);
+            UnloadSettingCommand = new DelegateCommand(UnloadSetting);
             //ConfigItemChangedCommand = DelegateCommand<ConfigChangedItem>.FromAsyncHandler(ConfigItemChangedAsync);
 
-            //SelectRecordPathCommand = new DelegateCommand(SelectRecordPath);
-            //LiveUrlChangedCommand = new DelegateCommand(LiveUrlChangedHander);
+            SelectRecordPathCommand = new DelegateCommand(SelectRecordPath);
+            LiveUrlChangedCommand = new DelegateCommand(LiveUrlChangedHander);
 
             //InitializeBindingDataSource();
         }
+
 
         //private fields
         private readonly SettingContentView _view;
@@ -310,6 +312,14 @@ namespace St.Setting
             set { SetProperty(ref _selectedLocalPath, value); }
         }
 
+        private string _manualPushLiveStreamUrl;
+
+        public string ManualPushLiveStreamUrl
+        {
+            get { return _manualPushLiveStreamUrl; }
+            set { SetProperty(ref _manualPushLiveStreamUrl, value); }
+        }
+
 
         // methods
         private void UpdateCameraVgaSource()
@@ -455,6 +465,70 @@ namespace St.Setting
             SelectedDocAudioSource = _configManager.AudioInfo.DocAudioSammpleDevice;
             SelectedSampleRate = _configManager.AudioInfo.SampleRate;
         }
+        private void SetDefaultLiveRecordSetting()
+        {
+            //本地保存的配置
+            if (_configManager.LocalLiveStreamInfo == null) _configManager.LocalLiveStreamInfo = new LiveStreamInfo();
+            if (_configManager.RecordInfo == null) _configManager.RecordInfo = new RecordInfo();
+            if (_configManager.RemoteLiveStreamInfo == null) _configManager.RemoteLiveStreamInfo = new LiveStreamInfo();
+
+            SelectedLiveDisplay =
+                $"{_configManager.LocalLiveStreamInfo.LiveStreamDisplayWidth}*{_configManager.LocalLiveStreamInfo.LiveStreamDisplayHeight}";
+            SelectedLiveRate = _configManager.LocalLiveStreamInfo.LiveStreamBitRate;
+            SelectedRemoteDisplay =
+                $"{_configManager.RemoteLiveStreamInfo.LiveStreamDisplayWidth}*{_configManager.RemoteLiveStreamInfo.LiveStreamDisplayHeight}";
+            SelectedRemoteRate = _configManager.RemoteLiveStreamInfo.LiveStreamBitRate;
+            SelectedLocalResolution =
+                $"{_configManager.RecordInfo.RecordDisplayWidth}*{_configManager.RecordInfo.RecordDisplayHeight}";
+            SelectedLocalBitrate = _configManager.RecordInfo.RecordBitRate;
+            SelectedLocalPath = _configManager.RecordInfo.RecordDirectory;
+        }
+
+
+        private void SelectRecordPath()
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog { SelectedPath = Environment.CurrentDirectory };
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                SelectedLocalPath = fbd.SelectedPath;
+            }
+        }
+
+        private void LiveUrlChangedHander()
+        {
+            if (
+                !string.IsNullOrEmpty(
+                    ManualPushLiveStreamUrl) &&
+                Uri.IsWellFormedUriString(ManualPushLiveStreamUrl,
+                    UriKind.Absolute))
+            {
+                LiveUrlColor = "White";
+            }
+            else
+            {
+                LiveUrlColor = "Red";
+            }
+        }
+
+        private void SaveConfig()
+        {
+            try
+            {
+                //string configResultPath = Path.Combine(Environment.CurrentDirectory, Common.GlobalResources.ConfigPath);
+
+                //GlobalData.Instance.AggregatedConfig.CloneConfig(MeetingConfigResult);
+
+                //string json = JsonConvert.SerializeObject(MeetingConfigResult, Formatting.Indented);
+
+                //File.WriteAllText(configResultPath, json, Encoding.UTF8);
+                ////SscUpdateManager.WriteConfigToVersionFolder(json);
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Error($"【save config exception in setting page】：{ex}");
+            }
+        }
+
 
 
         // commands
@@ -465,15 +539,18 @@ namespace St.Setting
         public ICommand CheckDocSourceDeviceCommand { get; set; }
 
         public ICommand SelectRecordPathCommand { get; set; }
+        public ICommand LiveUrlChangedCommand { get; set; }
 
+        public ICommand LoadSettingCommand { get; set; }
+        public ICommand UnloadSettingCommand { get; set; }
 
-        private ConfigItemTag configItemTag;
+        //private ConfigItemTag configItemTag;
 
-        public ConfigItemTag ConfigItemTag
-        {
-            get { return configItemTag; }
-            set { SetProperty(ref configItemTag, value); }
-        }
+        //public ConfigItemTag ConfigItemTag
+        //{
+        //    get { return configItemTag; }
+        //    set { SetProperty(ref configItemTag, value); }
+        //}
 
         private bool isMainCameraExpanded;
 
@@ -562,9 +639,7 @@ namespace St.Setting
         //}
 
         //commands
-        public ICommand LoadSettingCommand { get; set; }
-        public ICommand ConfigItemChangedCommand { get; set; }
-        public ICommand LiveUrlChangedCommand { get; set; }
+        //public ICommand ConfigItemChangedCommand { get; set; }
 
         //command handlers
         private void LoadSettingAsync()
@@ -586,8 +661,17 @@ namespace St.Setting
             }
         }
 
+        private void UnloadSetting()
+        {
+            SaveConfig();
+        }
+
+
         private void Init_Live_Record_Settings()
         {
+            _settingParameter.LiveParameterVGAs.ForEach(v => { LiveDisplaySource.Add(v.LiveDisplayWidth); });
+            _settingParameter.LiveParameterRates.ForEach(r => { LiveRateSource.Add(r.LiveBitRate); });
+            SetDefaultLiveRecordSetting();
         }
 
         private void Init_Audio_Settings()
@@ -839,32 +923,6 @@ namespace St.Setting
         //    }
         //}
 
-        //private void SelectRecordPath()
-        //{
-        //    FolderBrowserDialog fbd = new FolderBrowserDialog {SelectedPath = Environment.CurrentDirectory};
-        //    if (fbd.ShowDialog() == DialogResult.OK)
-        //    {
-        //        MeetingConfigResult.RecordConfig.RecordPath = fbd.SelectedPath;
-        //        SaveConfig();
-        //    }
-        //}
-
-        //private void LiveUrlChangedHander()
-        //{
-        //    if (
-        //        !string.IsNullOrEmpty(
-        //            MeetingConfigResult.LocalLiveConfig.PushLiveStreamUrl) &&
-        //        Uri.IsWellFormedUriString(MeetingConfigResult.LocalLiveConfig.PushLiveStreamUrl,
-        //            UriKind.Absolute))
-        //    {
-        //        LiveUrlColor = "White";
-        //        SaveConfig();
-        //    }
-        //    else
-        //    {
-        //        LiveUrlColor = "Red";
-        //    }
-        //}
 
 
         //methods
@@ -1201,24 +1259,6 @@ namespace St.Setting
         //    });
         //}
 
-        //private void SaveConfig()
-        //{
-        //    try
-        //    {
-        //        string configResultPath = Path.Combine(Environment.CurrentDirectory, Common.GlobalResources.ConfigPath);
-
-        //        GlobalData.Instance.AggregatedConfig.CloneConfig(MeetingConfigResult);
-
-        //        string json = JsonConvert.SerializeObject(MeetingConfigResult, Formatting.Indented);
-
-        //        File.WriteAllText(configResultPath, json, Encoding.UTF8);
-        //        //SscUpdateManager.WriteConfigToVersionFolder(json);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.Logger.Error($"【save config exception in setting page】：{ex}");
-        //    }
-        //}
 
         //private async Task RefreshExclusiveDataSourceAsync(ConfigItemKey configItemKey, string exclusiveItem)
         //{
