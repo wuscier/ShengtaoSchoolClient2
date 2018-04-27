@@ -90,6 +90,11 @@ namespace St.Common
                 aggregatedConfig.DocVideoInfo = new VideoInfo();
             }
 
+            if (aggregatedConfig.AudioInfo == null)
+            {
+                aggregatedConfig.AudioInfo = new AudioInfo();
+            }
+
 
             GlobalData.Instance.AggregatedConfig = aggregatedConfig;
             return new BaseResult()

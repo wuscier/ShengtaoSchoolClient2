@@ -84,7 +84,7 @@ namespace St.Setting
         private readonly IMeetingSdkAgent _meetingSdkAgent;
 
         private AggregatedConfig _configManager = GlobalData.Instance.AggregatedConfig;
-
+        private SettingParameter _settingParameter;
 
         private string _selectedCameraDevice;
         private string _selectedDocDevice;
@@ -447,6 +447,14 @@ namespace St.Setting
             SelectedVedioRate = _configManager.MainVideoInfo.VideoBitRate;
             SelectedDocRate = _configManager.DocVideoInfo.VideoBitRate;
         }
+        private void SetDefaultAudioSetting()
+        {
+            SelectedAudioSource = _configManager.AudioInfo.AudioSammpleDevice;
+            SelectedAac = _configManager.AudioInfo.AAC;
+            SelectedAudioOutPutDevice = _configManager.AudioInfo.AudioOutPutDevice;
+            SelectedDocAudioSource = _configManager.AudioInfo.DocAudioSammpleDevice;
+            SelectedSampleRate = _configManager.AudioInfo.SampleRate;
+        }
 
 
         // commands
@@ -563,6 +571,8 @@ namespace St.Setting
         {
             try
             {
+                _settingParameter = GetParametersAsync();
+
                 Init_Video_Settings();
                 Init_Audio_Settings();
                 Init_Live_Record_Settings();
@@ -582,6 +592,44 @@ namespace St.Setting
 
         private void Init_Audio_Settings()
         {
+
+            AudioSource.Clear();
+            DocAudioSource.Clear();
+            AudioOutPutDevice.Clear();
+            Aac.Clear();
+            SampleRate.Clear();
+
+            //设备
+
+            var microphones = _meetingSdkAgent.GetMicrophones();
+
+            var audioSourceList = microphones;
+            var docSourceList = microphones;
+
+            var audioOutPutList = _meetingSdkAgent.GetLoudSpeakers();
+
+            var sampleRateList = _settingParameter.AudioParameterSampleRates;
+            var aac = _settingParameter.AudioParameterAACs;
+            //装载数据源
+            audioSourceList.Result.ToList().ForEach(a => { AudioSource.Add(a); });
+            docSourceList.Result.ToList().ForEach(d => { DocAudioSource.Add(d); });
+
+            audioOutPutList.Result.ToList().ForEach(o => { AudioOutPutDevice.Add(o); });
+            aac.ForEach(o => { Aac.Add(o.AAC); });
+            sampleRateList.ForEach(o => { SampleRate.Add(o.SampleRate); });
+            AudioSource.Add(string.Empty);
+            DocAudioSource.Add(string.Empty);
+
+            //设置默认选项
+            SetDefaultAudioSetting();
+
+            if (audioSourceList.Result.All(o => o != SelectedAudioSource))
+                SelectedAudioSource = string.Empty;
+            if (docSourceList.Result.All(o => o != SelectedDocAudioSource))
+                SelectedDocAudioSource = string.Empty;
+            if (audioOutPutList.Result.All(o => o != SelectedAudioOutPutDevice))
+                SelectedAudioOutPutDevice = string.Empty;
+
         }
 
         private void Init_Video_Settings()
@@ -609,11 +657,9 @@ namespace St.Setting
             _cameraDeviceList = cameraList.Result.ToList();
             _docDeviceList = cameraList.Result.ToList();
 
-            var settingLocalData = GetParametersAsync();
-
-            if (settingLocalData != null)
+            if (_settingParameter != null)
             {
-                var rateList = settingLocalData.VedioParameterRates;
+                var rateList = _settingParameter.VedioParameterRates;
                 rateList.ForEach(v => { VedioParameterRatesList.Add(v.VideoBitRate); });
             }
             _cameraDeviceList.ForEach(c => { CameraDeviceList.Add(c.DeviceName); });
