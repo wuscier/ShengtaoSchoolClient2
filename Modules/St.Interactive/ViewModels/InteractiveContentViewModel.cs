@@ -273,7 +273,6 @@ namespace St.Interactive
 
                     if (!HasErrorMsg(updateResult.Status, updateResult.Message))
                     {
-                        GlobalData.AddOrUpdate(CacheKey.HostId, _windowManager.Participant.Account.AccountId);
                         GlobalData.AddOrUpdate(CacheKey.MeetingId, instantMeetingResult.Result.MeetingId);
 
                         await GotoMeeting(instantMeetingResult.Result.MeetingId);
@@ -301,6 +300,8 @@ namespace St.Interactive
 
             if (curUser.UserId == CurLessonDetail.MasterUserId)
             {
+                GlobalData.AddOrUpdate(CacheKey.HostId, _windowManager.Participant.Account.AccountId);
+
                 _sdkService.CreatorPhoneId = curUser.GetNube();
             }
 
