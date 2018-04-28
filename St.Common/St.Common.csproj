@@ -275,6 +275,9 @@
       <DependentUpon>MsgBoxView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UiMessage\MsgBoxViewModel.cs" />
+    <Compile Include="VideoControl.xaml.cs">
+      <DependentUpon>VideoControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewLayout\ViewArea.cs" />
     <Compile Include="ViewLayout\UiMessage.cs" />
     <Compile Include="ViewLayout\ViewFrame.cs" />
@@ -312,6 +315,10 @@
     <Page Include="UiMessage\MsgBoxView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="VideoControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
