@@ -18,6 +18,9 @@ using St.Common.Commands;
 using St.Common.Contract;
 using St.Common.RtClient;
 using Action = System.Action;
+using MeetingSdk.NetAgent;
+using MeetingSdk.Wpf;
+using UserInfo = St.Common.UserInfo;
 
 namespace St.InteractiveWithouLive
 {
@@ -28,6 +31,10 @@ namespace St.InteractiveWithouLive
             _interactiveWithouLiveContentView = interactiveWithouLiveContentView;
             _bmsService = IoC.Get<IBms>();
             _sdkService = IoC.Get<IMeeting>();
+
+            _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
+            _windowManager = IoC.Get<IMeetingWindowManager>();
+
             _lessonInfo = IoC.Get<LessonInfo>();
             _groupManager = IoC.Get<IGroupManager>();
             _visualizeShellService = IoC.Get<IVisualizeShell>();
@@ -101,6 +108,9 @@ namespace St.InteractiveWithouLive
         private readonly InteractiveWithouLiveContentView _interactiveWithouLiveContentView;
         private readonly IBms _bmsService;
         private readonly IMeeting _sdkService;
+        private readonly IMeetingSdkAgent _meetingSdkAgent;
+        private readonly IMeetingWindowManager _windowManager;
+
         private readonly LessonInfo _lessonInfo;
         private readonly IGroupManager _groupManager;
         private readonly IVisualizeShell _visualizeShellService;
@@ -242,22 +252,27 @@ namespace St.InteractiveWithouLive
                     HasErrorMsg("-1", Messages.WarningYouNeedCreateAMeeting);
 
                     //create a meeting and update to database
-                    AsyncCallbackMsg createMeetingResult = await _sdkService.CreateInstantMeeting(new Participant[0]);
+
+                    var instantMeetingResult = await _meetingSdkAgent.CreateMeeting("");
 
                     Log.Logger.Debug(
-                        $"【create meeting result】：result={createMeetingResult.Status}, msg={createMeetingResult.Message}");
+    $"【create meeting result】：result={instantMeetingResult.StatusCode}, msg={instantMeetingResult.Message}");
 
-                    if (
-                        !HasErrorMsg(createMeetingResult.Status.ToString(),
-                            createMeetingResult.Message))
+                    if (instantMeetingResult.StatusCode != 0)
                     {
-                        ResponseResult updateResult =
-                            await _bmsService.UpdateMeetingId(CurLessonDetail.Id, _sdkService.MeetingId);
+                        HasErrorMsg("-1", $"创建课堂失败！{instantMeetingResult.Message}");
+                        return;
+                    }
 
-                        if (!HasErrorMsg(updateResult.Status, updateResult.Message))
-                        {
-                            await GotoMeeting(_sdkService.MeetingId);
-                        }
+                    ResponseResult updateResult =
+                        await _bmsService.UpdateMeetingId(CurLessonDetail.Id, instantMeetingResult.Result.MeetingId);
+
+                    if (!HasErrorMsg(updateResult.Status, updateResult.Message))
+                    {
+                        GlobalData.AddOrUpdate(CacheKey.HostId, _windowManager.Participant.Account.AccountId);
+                        GlobalData.AddOrUpdate(CacheKey.MeetingId, instantMeetingResult.Result.MeetingId);
+
+                        await GotoMeeting(instantMeetingResult.Result.MeetingId);
                     }
 
                     break;
@@ -268,6 +283,7 @@ namespace St.InteractiveWithouLive
                     break;
                 default:
                     int meetingId = int.Parse(meetingResult.Data.ToString());
+                    GlobalData.AddOrUpdate(CacheKey.MeetingId, meetingId);
 
                     await GotoMeeting(meetingId);
                     break;

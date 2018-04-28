@@ -18,6 +18,9 @@ using St.Common.Commands;
 using St.Common.Contract;
 using St.Common.RtClient;
 using Action = System.Action;
+using MeetingSdk.NetAgent;
+using MeetingSdk.Wpf;
+using UserInfo = St.Common.UserInfo;
 
 namespace St.Interactive
 {
@@ -29,6 +32,9 @@ namespace St.Interactive
 
             _bmsService = IoC.Get<IBms>();
             _sdkService = IoC.Get<IMeeting>();
+
+            _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
+            _windowManager = IoC.Get<IMeetingWindowManager>();
             _lessonInfo = IoC.Get<LessonInfo>();
             _groupManager = IoC.Get<IGroupManager>();
             _visualizeShellService = IoC.Get<IVisualizeShell>();
@@ -47,7 +53,7 @@ namespace St.Interactive
             ShowMainPointCommand = new DelegateCommand(() => { ShowMainPoint = true; });
             //GotoSettingCommand = new DelegateCommand(GotoSetting);
 
-            Attendees = new ObservableCollection<UserInfo>();
+            Attendees = new ObservableCollection<Common.UserInfo>();
             Lessons = new ObservableCollection<LessonInfo>();
         }
 
@@ -102,6 +108,8 @@ namespace St.Interactive
         private readonly InteractiveContentView _interactiveContentView;
         private readonly IBms _bmsService;
         private readonly IMeeting _sdkService;
+        private readonly IMeetingSdkAgent _meetingSdkAgent;
+        private readonly IMeetingWindowManager _windowManager;
         private readonly LessonInfo _lessonInfo;
         private readonly IGroupManager _groupManager;
         private readonly IVisualizeShell _visualizeShellService;
@@ -198,7 +206,7 @@ namespace St.Interactive
         //}
 
         public ObservableCollection<LessonInfo> Lessons { get; set; }
-        public ObservableCollection<UserInfo> Attendees { get; set; }
+        public ObservableCollection<Common.UserInfo> Attendees { get; set; }
 
 
         //commands
@@ -248,22 +256,27 @@ namespace St.Interactive
                     HasErrorMsg("-1", Messages.WarningYouNeedCreateAMeeting);
 
                     //create a meeting and update to database
-                    AsyncCallbackMsg createMeetingResult = await _sdkService.CreateInstantMeeting(new Participant[0]);
+
+                    var instantMeetingResult = await _meetingSdkAgent.CreateMeeting("");
 
                     Log.Logger.Debug(
-                        $"【create meeting result】：result={createMeetingResult.Status}, msg={createMeetingResult.Message}");
+    $"【create meeting result】：result={instantMeetingResult.StatusCode}, msg={instantMeetingResult.Message}");
 
-                    if (
-                        !HasErrorMsg(createMeetingResult.Status.ToString(),
-                            createMeetingResult.Message))
+                    if (instantMeetingResult.StatusCode != 0)
                     {
-                        ResponseResult updateResult =
-                            await _bmsService.UpdateMeetingId(CurLessonDetail.Id, _sdkService.MeetingId);
+                        HasErrorMsg("-1", $"创建课堂失败！{instantMeetingResult.Message}");
+                        return;
+                    }
 
-                        if (!HasErrorMsg(updateResult.Status, updateResult.Message))
-                        {
-                            await GotoMeeting(_sdkService.MeetingId);
-                        }
+                    ResponseResult updateResult =
+                        await _bmsService.UpdateMeetingId(CurLessonDetail.Id, instantMeetingResult.Result.MeetingId);
+
+                    if (!HasErrorMsg(updateResult.Status, updateResult.Message))
+                    {
+                        GlobalData.AddOrUpdate(CacheKey.HostId, _windowManager.Participant.Account.AccountId);
+                        GlobalData.AddOrUpdate(CacheKey.MeetingId, instantMeetingResult.Result.MeetingId);
+
+                        await GotoMeeting(instantMeetingResult.Result.MeetingId);
                     }
 
                     break;
@@ -275,6 +288,8 @@ namespace St.Interactive
                 default:
                     int meetingId = int.Parse(meetingResult.Data.ToString());
 
+                    GlobalData.AddOrUpdate(CacheKey.MeetingId, meetingId);
+
                     await GotoMeeting(meetingId);
                     break;
             }
@@ -282,7 +297,7 @@ namespace St.Interactive
 
         private async Task GotoMeeting(int meetingId)
         {
-            var curUser = IoC.Get<UserInfo>();
+            var curUser = IoC.Get<Common.UserInfo>();
 
             if (curUser.UserId == CurLessonDetail.MasterUserId)
             {
@@ -388,7 +403,7 @@ namespace St.Interactive
                     DetailVisibility = Visibility.Visible;
 
                     IsTeacher = CurLessonDetail.MasterUserId ==
-                                IoC.Get<UserInfo>().UserId
+                                IoC.Get<Common.UserInfo>().UserId
                         ? "(你是主讲)"
                         : string.Empty;
 

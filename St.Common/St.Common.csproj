@@ -203,6 +203,7 @@
     <Compile Include="Dragable\HostViewModel.cs" />
     <Compile Include="Helper\BaseResult.cs" />
     <Compile Include="Converter\BoolToStringConverter.cs" />
+    <Compile Include="Helper\CacheKey.cs" />
     <Compile Include="Helper\DataGridPlus.cs" />
     <Compile Include="Helper\HotKeyApi.cs" />
     <Compile Include="Helper\InputSimulatorManager.cs" />
