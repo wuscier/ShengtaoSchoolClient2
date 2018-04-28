@@ -276,8 +276,6 @@ namespace St.Discussion
 
                     if (!HasErrorMsg(updateResult.Status, updateResult.Message))
                     {
-                        GlobalData.AddOrUpdate(CacheKey.MeetingId, instantMeetingResult.Result.MeetingId);
-
                         await GotoMeeting(instantMeetingResult.Result.MeetingId);
                     }
 
@@ -289,8 +287,6 @@ namespace St.Discussion
                     break;
                 default:
                     int meetingId = int.Parse(meetingResult.Data.ToString());
-
-                    GlobalData.AddOrUpdate(CacheKey.MeetingId, meetingId);
 
                     await GotoMeeting(meetingId);
                     break;
@@ -304,14 +300,12 @@ namespace St.Discussion
             if (curUser.UserId == CurLessonDetail.MasterUserId)
             {
                 GlobalData.AddOrUpdate(CacheKey.HostId, _windowManager.Participant.Account.AccountId);
-
-                _sdkService.CreatorPhoneId = curUser.GetNube();
             }
 
             var lessonDetail = IoC.Get<LessonDetail>();
             lessonDetail.CloneLessonDetail(CurLessonDetail);
 
-            _sdkService.MeetingId = meetingId;
+            GlobalData.AddOrUpdate(CacheKey.MeetingId, meetingId);
 
             await _discussionContentView.Dispatcher.BeginInvoke(new Action(() =>
             {
