@@ -104,107 +104,9 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
 
-    <Grid>
-        <Grid x:Name="ViewItemsContainer">
-            <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
+    <Grid x:Name="Grid">
 
-            <WindowsFormsHost VerticalAlignment="{Binding ViewFrame1.VerticalAlignment}" HorizontalAlignment="{Binding ViewFrame1.HorizontalAlignment}" Width="{Binding ViewFrame1.Width}" Height="{Binding ViewFrame1.Height}" Background="Black"  Grid.Row="{Binding ViewFrame1.Row}" Grid.RowSpan="{Binding ViewFrame1.RowSpan}" Grid.Column="{Binding ViewFrame1.Column}" Grid.ColumnSpan="{Binding ViewFrame1.ColumnSpan}" Visibility="{Binding ViewFrame1.Visibility}">
-                <forms:Panel x:Name="Panel1" Dock="Fill" ></forms:Panel>
-            </WindowsFormsHost>
-
-            <WindowsFormsHost VerticalAlignment="{Binding ViewFrame2.VerticalAlignment}" HorizontalAlignment="{Binding ViewFrame2.HorizontalAlignment}"  Width="{Binding ViewFrame2.Width}"  Height="{Binding ViewFrame2.Height}" Background="Black"  Grid.Row="{Binding ViewFrame2.Row}" Grid.RowSpan="{Binding ViewFrame2.RowSpan}" Grid.Column="{Binding ViewFrame2.Column}" Grid.ColumnSpan="{Binding ViewFrame2.ColumnSpan}"  Visibility="{Binding ViewFrame2.Visibility}">
-                <forms:Panel x:Name="Panel2" Dock="Fill"></forms:Panel>
-            </WindowsFormsHost>
-
-            <WindowsFormsHost VerticalAlignment="{Binding ViewFrame3.VerticalAlignment}" HorizontalAlignment="{Binding ViewFrame3.HorizontalAlignment}"  Width="{Binding ViewFrame3.Width}" Height="{Binding ViewFrame3.Height}"  Background="Black"  Grid.Row="{Binding ViewFrame3.Row}" Grid.RowSpan="{Binding ViewFrame3.RowSpan}" Grid.Column="{Binding ViewFrame3.Column}" Grid.ColumnSpan="{Binding ViewFrame3.ColumnSpan}"  Visibility="{Binding ViewFrame3.Visibility}">
-                <forms:Panel x:Name="Panel3" Dock="Fill"></forms:Panel>
-            </WindowsFormsHost>
-
-            <WindowsFormsHost  VerticalAlignment="{Binding ViewFrame4.VerticalAlignment}" HorizontalAlignment="{Binding ViewFrame4.HorizontalAlignment}"   Width="{Binding ViewFrame4.Width}" Height="{Binding ViewFrame4.Height}" Background="Black"  Grid.Row="{Binding ViewFrame4.Row}" Grid.RowSpan="{Binding ViewFrame4.RowSpan}" Grid.Column="{Binding ViewFrame4.Column}"  Grid.ColumnSpan="{Binding ViewFrame4.ColumnSpan}" Visibility="{Binding ViewFrame4.Visibility}">
-                <forms:Panel x:Name="Panel4" Dock="Fill"></forms:Panel>
-            </WindowsFormsHost>
-
-            <WindowsFormsHost  VerticalAlignment="{Binding ViewFrame5.VerticalAlignment}" HorizontalAlignment="{Binding ViewFrame5.HorizontalAlignment}"  Width="{Binding ViewFrame5.Width}"  Height="{Binding ViewFrame5.Height}" Background="Black" Grid.Row="{Binding ViewFrame5.Row}" Grid.RowSpan="{Binding ViewFrame5.RowSpan}" Grid.Column="{Binding ViewFrame5.Column}" Grid.ColumnSpan="{Binding ViewFrame5.ColumnSpan}"  Visibility="{Binding ViewFrame5.Visibility}">
-                <forms:Panel x:Name="Panel5" Dock="Fill"></forms:Panel>
-            </WindowsFormsHost>
-
-
-        </Grid>
-
-
-        <!--<dockable:Layout Partition="2AE89D18-F236-4D20-9605-6C03319038E6"
-                     FloatingItemsSource="{Binding ToolItems}"
-                     FloatingItemHeaderMemberPath="Header"
-                     IsFloatDropZoneEnabled="True"
-                     ClosingFloatingItemCallback="{Binding ClosingFloatingItemHandler}"
-                     FloatingItemsContainerMargin="0 2 0 0"
-                     >
-
-            <dockable:Layout.BranchTemplate>
-                <DataTemplate>
-                    <dragable:TabablzControl Style="{StaticResource TabablzControlStyle}">
-                        <dragable:TabablzControl.InterTabController>
-                            <dragable:InterTabController InterTabClient="{Binding InterTabClient}" Partition="2AE89D18-F236-4D20-9605-6C03319038E6" />
-                        </dragable:TabablzControl.InterTabController>
-                    </dragable:TabablzControl>
-                </DataTemplate>
-            </dockable:Layout.BranchTemplate>
-
-            <dragable:TabablzControl x:Name="InitialTabablzControl"
-                                 FixedHeaderCount="0"
-                                 AddLocationHint="After"
-                                 Style="{StaticResource TabablzControlStyle}"
-                                 >
-                <dragable:TabablzControl.InterTabController>
-                    <dragable:InterTabController InterTabClient="{Binding InterTabClient}" Partition="2AE89D18-F236-4D20-9605-6C03319038E6" />
-                </dragable:TabablzControl.InterTabController>
-            </dragable:TabablzControl>
-
-        </dockable:Layout>-->
-        <Popup x:Name="TopMenu" IsOpen="{Binding IsMenuOpen}" Placement="Top" PlacementTarget="{Binding ElementName=ViewItemsContainer}" Height="50" Width="{Binding ElementName=ViewItemsContainer,Path=ActualWidth}" VerticalOffset="50">
+        <Popup x:Name="TopMenu" IsOpen="{Binding IsMenuOpen}" Placement="Top" PlacementTarget="{Binding ElementName=Grid}" Height="50" Width="{Binding ElementName=Grid,Path=ActualWidth}" VerticalOffset="50">
             <DockPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="{Binding MeetingOrLesson}"></TextBlock>
@@ -245,7 +147,7 @@
         </Popup>
 
 
-        <Popup x:Name="BottomMenu" IsOpen="{Binding IsMenuOpen}" Placement="Bottom" PlacementTarget="{Binding ElementName=ViewItemsContainer}" Height="50" Width="{Binding ElementName=ViewItemsContainer,Path=ActualWidth}" VerticalOffset="-50">
+        <Popup x:Name="BottomMenu" IsOpen="{Binding IsMenuOpen}" Placement="Bottom" PlacementTarget="{Binding ElementName=Grid}" Height="50" Width="{Binding ElementName=Grid,Path=ActualWidth}" VerticalOffset="-50">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"></ColumnDefinition>

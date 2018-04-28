@@ -38,7 +38,7 @@ namespace St.Meeting
             _meetingView = meetingView;
 
             _viewLayoutService = IoC.Get<IViewLayout>();
-            _viewLayoutService.ViewFrameList = InitializeViewFrameList(meetingView);
+            //_viewLayoutService.ViewFrameList = InitializeViewFrameList(meetingView);
 
             _sdkService = IoC.Get<IMeeting>();
             _bmsService = IoC.Get<IBms>();
@@ -684,78 +684,78 @@ namespace St.Meeting
 
         private async Task JoinMeetingAsync()
         {
-            GlobalData.Instance.ViewArea = new ViewArea()
-            {
-                Width = _meetingView.ActualWidth,
-                Height = _meetingView.ActualHeight
-            };
+            //GlobalData.Instance.ViewArea = new ViewArea()
+            //{
+            //    Width = _meetingView.ActualWidth,
+            //    Height = _meetingView.ActualHeight
+            //};
 
-            uint[] uint32SOfNonDataArray =
-            {
-                (uint) _meetingView.PictureBox1.Handle.ToInt32(),
-                (uint) _meetingView.PictureBox2.Handle.ToInt32(),
-                (uint) _meetingView.PictureBox3.Handle.ToInt32(),
-                (uint) _meetingView.PictureBox4.Handle.ToInt32(),
-            };
+            //uint[] uint32SOfNonDataArray =
+            //{
+            //    (uint) _meetingView.PictureBox1.Handle.ToInt32(),
+            //    (uint) _meetingView.PictureBox2.Handle.ToInt32(),
+            //    (uint) _meetingView.PictureBox3.Handle.ToInt32(),
+            //    (uint) _meetingView.PictureBox4.Handle.ToInt32(),
+            //};
 
-            foreach (var hwnd in uint32SOfNonDataArray)
-            {
-                Log.Logger.Debug($"【figure hwnd】：{hwnd}");
-            }
+            //foreach (var hwnd in uint32SOfNonDataArray)
+            //{
+            //    Log.Logger.Debug($"【figure hwnd】：{hwnd}");
+            //}
 
-            uint[] uint32SOfDataArray = { (uint)_meetingView.PictureBox5.Handle.ToInt32() };
+            //uint[] uint32SOfDataArray = { (uint)_meetingView.PictureBox5.Handle.ToInt32() };
 
-            foreach (var hwnd in uint32SOfDataArray)
-            {
-                Log.Logger.Debug($"【data hwnd】：{hwnd}");
-            }
+            //foreach (var hwnd in uint32SOfDataArray)
+            //{
+            //    Log.Logger.Debug($"【data hwnd】：{hwnd}");
+            //}
 
-            AsyncCallbackMsg joinMeetingResult =
-                await
-                    _sdkService.JoinMeeting(MeetingId, uint32SOfNonDataArray, uint32SOfNonDataArray.Length,
-                        uint32SOfDataArray,
-                        uint32SOfDataArray.Length);
+            //AsyncCallbackMsg joinMeetingResult =
+            //    await
+            //        _sdkService.JoinMeeting(MeetingId, uint32SOfNonDataArray, uint32SOfNonDataArray.Length,
+            //            uint32SOfDataArray,
+            //            uint32SOfDataArray.Length);
 
-            //if failed to join meeting, needs to roll back
-            if (joinMeetingResult.Status != 0)
-            {
-                Log.Logger.Error(
-                    $"【join meeting result】：result={joinMeetingResult.Status}, msg={joinMeetingResult.Message}");
-
-
-                _exitByDialog = true;
-                _meetingView.Close();
-                _startMeetingCallbackEvent(false, joinMeetingResult.Message);
-            }
-            else
-            {
-                GlobalCommands.Instance.SetCommandsStateInNonDiscussionClass(_sdkService.IsCreator);
-
-                //if join meeting successfully, then make main view invisible
-                _startMeetingCallbackEvent(true, "");
+            ////if failed to join meeting, needs to roll back
+            //if (joinMeetingResult.Status != 0)
+            //{
+            //    Log.Logger.Error(
+            //        $"【join meeting result】：result={joinMeetingResult.Status}, msg={joinMeetingResult.Message}");
 
 
-                //if not speaker, then clear mode menu items
-                if (!_sdkService.IsCreator)
-                {
-                    ModeMenuItems.Clear();
-                    IsSpeaker = Visibility.Collapsed;
-                }
-                else
-                {
-                    IsSpeaker = Visibility.Visible;
-                }
+            //    _exitByDialog = true;
+            //    _meetingView.Close();
+            //    _startMeetingCallbackEvent(false, joinMeetingResult.Message);
+            //}
+            //else
+            //{
+            //    GlobalCommands.Instance.SetCommandsStateInNonDiscussionClass(_sdkService.IsCreator);
 
-                if (_lessonDetail.Id > 0)
-                {
-                    ResponseResult result = await
-                        _bmsService.UpdateMeetingStatus(_lessonDetail.Id, _userInfo.UserId,
-                            DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                            string.Empty);
+            //    //if join meeting successfully, then make main view invisible
+            //    _startMeetingCallbackEvent(true, "");
 
-                    HasErrorMsg(result.Status, result.Message);
-                }
-            }
+
+            //    //if not speaker, then clear mode menu items
+            //    if (!_sdkService.IsCreator)
+            //    {
+            //        ModeMenuItems.Clear();
+            //        IsSpeaker = Visibility.Collapsed;
+            //    }
+            //    else
+            //    {
+            //        IsSpeaker = Visibility.Visible;
+            //    }
+
+            //    if (_lessonDetail.Id > 0)
+            //    {
+            //        ResponseResult result = await
+            //            _bmsService.UpdateMeetingStatus(_lessonDetail.Id, _userInfo.UserId,
+            //                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            //                string.Empty);
+
+            //        HasErrorMsg(result.Status, result.Message);
+            //    }
+            //}
 
         }
 
@@ -1199,24 +1199,24 @@ namespace St.Meeting
 
         #region Methods
 
-        private List<ViewFrame> InitializeViewFrameList(MeetingView meetingView)
-        {
-            List<ViewFrame> viewFrames = new List<ViewFrame>();
+        //private List<ViewFrame> InitializeViewFrameList(MeetingView meetingView)
+        //{
+        //    List<ViewFrame> viewFrames = new List<ViewFrame>();
 
-            ViewFrame1 = new ViewFrame(meetingView.PictureBox1.Handle, meetingView.PictureBox1, meetingView.Label1);
-            ViewFrame2 = new ViewFrame(meetingView.PictureBox2.Handle, meetingView.PictureBox2, meetingView.Label2);
-            ViewFrame3 = new ViewFrame(meetingView.PictureBox3.Handle, meetingView.PictureBox3, meetingView.Label3);
-            ViewFrame4 = new ViewFrame(meetingView.PictureBox4.Handle, meetingView.PictureBox4, meetingView.Label4);
-            ViewFrame5 = new ViewFrame(meetingView.PictureBox5.Handle, meetingView.PictureBox5, meetingView.Label5);
+        //    ViewFrame1 = new ViewFrame(meetingView.PictureBox1.Handle, meetingView.PictureBox1, meetingView.Label1);
+        //    ViewFrame2 = new ViewFrame(meetingView.PictureBox2.Handle, meetingView.PictureBox2, meetingView.Label2);
+        //    ViewFrame3 = new ViewFrame(meetingView.PictureBox3.Handle, meetingView.PictureBox3, meetingView.Label3);
+        //    ViewFrame4 = new ViewFrame(meetingView.PictureBox4.Handle, meetingView.PictureBox4, meetingView.Label4);
+        //    ViewFrame5 = new ViewFrame(meetingView.PictureBox5.Handle, meetingView.PictureBox5, meetingView.Label5);
 
-            viewFrames.Add(ViewFrame1);
-            viewFrames.Add(ViewFrame2);
-            viewFrames.Add(ViewFrame3);
-            viewFrames.Add(ViewFrame4);
-            viewFrames.Add(ViewFrame5);
+        //    viewFrames.Add(ViewFrame1);
+        //    viewFrames.Add(ViewFrame2);
+        //    viewFrames.Add(ViewFrame3);
+        //    viewFrames.Add(ViewFrame4);
+        //    viewFrames.Add(ViewFrame5);
 
-            return viewFrames;
-        }
+        //    return viewFrames;
+        //}
 
         public void RefreshLayoutMenu(object sender, RoutedEventArgs e)
         {
