@@ -741,13 +741,33 @@ namespace St.Setting
 
         private void Init_Live_Record_Settings()
         {
+            SelectedLiveDisplay = null;
+            SelectedLiveRate = 0;
+            SelectedRemoteDisplay = null;
+            SelectedRemoteRate = 0;
+            SelectedLocalResolution = null;
+            SelectedLocalBitrate = 0;
+
+            LiveDisplaySource.Clear();
+            LiveRateSource.Clear();
+
             _settingParameter.LiveParameterVGAs.ForEach(v => { LiveDisplaySource.Add(v.LiveDisplayWidth); });
             _settingParameter.LiveParameterRates.ForEach(r => { LiveRateSource.Add(r.LiveBitRate); });
             SetDefaultLiveRecordSetting();
         }
 
+
+
+
         private void Init_Audio_Settings()
         {
+
+            SelectedAudioSource = null;
+            SelectedAac = 0;
+            SelectedAudioOutPutDevice = null;
+            SelectedDocAudioSource = null;
+            SelectedSampleRate = 0;
+
 
             AudioSource.Clear();
             DocAudioSource.Clear();
@@ -790,6 +810,19 @@ namespace St.Setting
 
         private void Init_Video_Settings()
         {
+            //SelectedCameraDevice = _configManager.MainVideoInfo.VideoDevice;
+            //SelectedDocDevice = _configManager.DocVideoInfo.VideoDevice;
+
+            //SelectedCameraColorSpace = _cameraDeviceList.FirstOrDefault(vdm => vdm.DeviceName == SelectedCameraDevice)?.VideoFormatModels.FirstOrDefault(vfm => vfm.Colorsapce == _configManager.MainVideoInfo.ColorSpace);
+            //SelectedDocColorSpace = _docDeviceList.FirstOrDefault(vdm => vdm.DeviceName == SelectedDocDevice)?.VideoFormatModels.FirstOrDefault(vfm => vfm.Colorsapce == _configManager.DocVideoInfo.ColorSpace);
+
+            //SelectedVedioVGA = $"{_configManager.MainVideoInfo.DisplayWidth}*{_configManager.MainVideoInfo.DisplayHeight}";
+            //SelectedDocVGA = $"{_configManager.DocVideoInfo.DisplayWidth}*{_configManager.DocVideoInfo.DisplayHeight}";
+
+            SelectedVedioRate = 0;
+            SelectedDocRate = 0;
+
+
             CameraDeviceList.Clear();
             DocDeviceList.Clear();
 

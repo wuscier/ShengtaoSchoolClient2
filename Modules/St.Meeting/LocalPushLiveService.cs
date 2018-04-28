@@ -36,45 +36,47 @@ namespace St.Meeting
 
         public LiveVideoParameter GetLiveParam()
         {
-            // get live configuration from local xml file
-            if (!File.Exists(ConfigFile))
-            {
-                LiveParam = new LiveVideoParameter();
-                return new LiveVideoParameter();
-            }
-            try
-            {
-                LiveVideoParameter liveParam = new LiveVideoParameter
-                {
-                    AudioBitrate = 64,
-                    BitsPerSample = 16,
-                    Channels = 1,
-                    IsLive = true,
-                    IsRecord = false,
-                    SampleRate = 8000,
-                    RecordFilePath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            return null;
 
-                    Url1 = GlobalData.Instance.AggregatedConfig.LocalLiveConfig.PushLiveStreamUrl,
-                    VideoBitrate = int.Parse(GlobalData.Instance.AggregatedConfig.LocalLiveConfig.CodeRate)
-                };
+            //// get live configuration from local xml file
+            //if (!File.Exists(ConfigFile))
+            //{
+            //    LiveParam = new LiveVideoParameter();
+            //    return new LiveVideoParameter();
+            //}
+            //try
+            //{
+            //    LiveVideoParameter liveParam = new LiveVideoParameter
+            //    {
+            //        AudioBitrate = 64,
+            //        BitsPerSample = 16,
+            //        Channels = 1,
+            //        IsLive = true,
+            //        IsRecord = false,
+            //        SampleRate = 8000,
+            //        RecordFilePath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
 
-                string[] resolutionStrings =
-                    GlobalData.Instance.AggregatedConfig.LocalLiveConfig.Resolution.Split(new[] {'*'},
-                        StringSplitOptions.RemoveEmptyEntries);
+            //        Url1 = GlobalData.Instance.AggregatedConfig.LocalLiveConfig.PushLiveStreamUrl,
+            //        VideoBitrate = int.Parse(GlobalData.Instance.AggregatedConfig.LocalLiveConfig.CodeRate)
+            //    };
 
-                liveParam.Width = int.Parse(resolutionStrings[0]);
-                liveParam.Height = int.Parse(resolutionStrings[1]);
+            //    string[] resolutionStrings =
+            //        GlobalData.Instance.AggregatedConfig.LocalLiveConfig.Resolution.Split(new[] {'*'},
+            //            StringSplitOptions.RemoveEmptyEntries);
+
+            //    liveParam.Width = int.Parse(resolutionStrings[0]);
+            //    liveParam.Height = int.Parse(resolutionStrings[1]);
 
 
-                LiveParam = liveParam;
-                return liveParam;
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error($"【get local push live param exception】：{ex}");
-                LiveParam = new LiveVideoParameter();
-                return new LiveVideoParameter();
-            }
+            //    LiveParam = liveParam;
+            //    return liveParam;
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log.Logger.Error($"【get local push live param exception】：{ex}");
+            //    LiveParam = new LiveVideoParameter();
+            //    return new LiveVideoParameter();
+            //}
         }
 
         public AsyncCallbackMsg RefreshLiveStream(List<LiveVideoStream> openedStreamInfos)

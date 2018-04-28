@@ -36,39 +36,43 @@ namespace St.Meeting
 
         public bool GetRecordParam()
         {
-            if (!File.Exists(ConfigFile))
-            {
-                return false;
-            }
 
-            try
-            {
-                RecordParameter recordParam = new RecordParameter()
-                {
-                    AudioBitrate = 64,
-                    BitsPerSample = 16,
-                    Channels = 1,
-                    SampleRate = 8000,
-                    VideoBitrate = int.Parse(GlobalData.Instance.AggregatedConfig.RecordConfig.CodeRate)
-                };
 
-                string[] resolutionStrings =
-                    GlobalData.Instance.AggregatedConfig.RecordConfig.Resolution.Split(new[] {'*'},
-                        StringSplitOptions.RemoveEmptyEntries);
+            return true;
 
-                recordParam.Width = int.Parse(resolutionStrings[0]);
-                recordParam.Height = int.Parse(resolutionStrings[1]);
+            //if (!File.Exists(ConfigFile))
+            //{
+            //    return false;
+            //}
 
-                RecordParam = recordParam;
-                RecordDirectory = GlobalData.Instance.AggregatedConfig.RecordConfig.RecordPath;
+            //try
+            //{
+            //    RecordParameter recordParam = new RecordParameter()
+            //    {
+            //        AudioBitrate = 64,
+            //        BitsPerSample = 16,
+            //        Channels = 1,
+            //        SampleRate = 8000,
+            //        VideoBitrate = int.Parse(GlobalData.Instance.AggregatedConfig.RecordConfig.CodeRate)
+            //    };
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error($"【get record param exception】：{ex}");
-                return false;
-            }
+            //    string[] resolutionStrings =
+            //        GlobalData.Instance.AggregatedConfig.RecordConfig.Resolution.Split(new[] {'*'},
+            //            StringSplitOptions.RemoveEmptyEntries);
+
+            //    recordParam.Width = int.Parse(resolutionStrings[0]);
+            //    recordParam.Height = int.Parse(resolutionStrings[1]);
+
+            //    RecordParam = recordParam;
+            //    RecordDirectory = GlobalData.Instance.AggregatedConfig.RecordConfig.RecordPath;
+
+            //    return true;
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log.Logger.Error($"【get record param exception】：{ex}");
+            //    return false;
+            //}
         }
 
         public AsyncCallbackMsg RefreshLiveStream(List<LiveVideoStream> openedStreamInfos)

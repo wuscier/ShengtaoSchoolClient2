@@ -36,44 +36,46 @@ namespace St.Meeting
 
         public LiveVideoParameter GetLiveParam()
         {
-            if (!File.Exists(ConfigFile))
-            {
-                LiveParam = new LiveVideoParameter();
-                return new LiveVideoParameter();
-            }
+            return null;
 
-            try
-            {
-                LiveVideoParameter liveParam = new LiveVideoParameter()
-                {
-                    AudioBitrate = 64,
-                    BitsPerSample = 16,
-                    Channels = 1,
-                    IsLive = true,
-                    IsRecord = false,
-                    SampleRate = 8000,
-                    RecordFilePath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            //if (!File.Exists(ConfigFile))
+            //{
+            //    LiveParam = new LiveVideoParameter();
+            //    return new LiveVideoParameter();
+            //}
 
-                    VideoBitrate = int.Parse(GlobalData.Instance.AggregatedConfig.RemoteLiveConfig.CodeRate)
-                };
+            //try
+            //{
+            //    LiveVideoParameter liveParam = new LiveVideoParameter()
+            //    {
+            //        AudioBitrate = 64,
+            //        BitsPerSample = 16,
+            //        Channels = 1,
+            //        IsLive = true,
+            //        IsRecord = false,
+            //        SampleRate = 8000,
+            //        RecordFilePath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
 
-                string[] resolutionStrings =
-                    GlobalData.Instance.AggregatedConfig.RemoteLiveConfig.Resolution.Split(new[] {'*'},
-                        StringSplitOptions.RemoveEmptyEntries);
+            //        VideoBitrate = int.Parse(GlobalData.Instance.AggregatedConfig.RemoteLiveConfig.CodeRate)
+            //    };
 
-                liveParam.Width = int.Parse(resolutionStrings[0]);
-                liveParam.Height = int.Parse(resolutionStrings[1]);
+            //    string[] resolutionStrings =
+            //        GlobalData.Instance.AggregatedConfig.RemoteLiveConfig.Resolution.Split(new[] {'*'},
+            //            StringSplitOptions.RemoveEmptyEntries);
 
-                LiveParam = liveParam;
-                return liveParam;
+            //    liveParam.Width = int.Parse(resolutionStrings[0]);
+            //    liveParam.Height = int.Parse(resolutionStrings[1]);
 
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Error($"【get server push live param exception】：{ex}");
-                LiveParam = new LiveVideoParameter();
-                return new LiveVideoParameter();
-            }
+            //    LiveParam = liveParam;
+            //    return liveParam;
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log.Logger.Error($"【get server push live param exception】：{ex}");
+            //    LiveParam = new LiveVideoParameter();
+            //    return new LiveVideoParameter();
+            //}
         }
 
         public async Task<AsyncCallbackMsg> StartPushLiveStream(List<LiveVideoStream> liveVideoStreamInfos,
