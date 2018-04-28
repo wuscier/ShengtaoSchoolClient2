@@ -26,6 +26,7 @@ namespace St.Common
         public RunMode RunMode { get; set; }
         public IntPtr CurWindowHwnd { get; set; }
 
+        public static VideoControl VideoControl = null;
 
         private static IMeetingWindowManager _windowManager;
 

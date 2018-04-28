@@ -21,6 +21,8 @@ using Serilog;
 using St.Common.Commands;
 using Action = System.Action;
 using LogManager = St.Common.LogManager;
+using MeetingSdk.Wpf;
+using UserInfo = St.Common.UserInfo;
 
 namespace St.Meeting
 {
@@ -70,6 +72,11 @@ namespace St.Meeting
                 ? string.Empty
                 : string.Format($"课程名:{_lessonDetail.Name}");
 
+
+
+            RegisterMeetingEvents();
+
+
             LoadCommand = DelegateCommand.FromAsyncHandler(LoadAsync);
             ModeChangedCommand = DelegateCommand<string>.FromAsyncHandler(MeetingModeChangedAsync);
             SpeakingStatusChangedCommand = DelegateCommand.FromAsyncHandler(SpeakingStatusChangedAsync);
@@ -106,7 +113,6 @@ namespace St.Meeting
             ShowHelpCommand = new DelegateCommand(ShowHelp);
 
             InitializeMenuItems();
-            RegisterMeetingEvents();
         }
 
         private async void ExecuteCommand(SscCommand command)
@@ -666,6 +672,7 @@ namespace St.Meeting
 
         #region Command Handlers
 
+
         private void ChangeWindowStyleInDevMode()
         {
             if (GlobalData.Instance.RunMode == RunMode.Development)
@@ -762,6 +769,14 @@ namespace St.Meeting
         //command handlers
         private async Task LoadAsync()
         {
+            if (GlobalData.VideoControl == null)
+            {
+                GlobalData.VideoControl = new VideoControl();
+            }
+
+            _meetingView.Grid.Children.Add(GlobalData.VideoControl);
+
+
             GlobalData.Instance.CurWindowHwnd = new WindowInteropHelper(_meetingView).Handle;
 
             ChangeWindowStyleInDevMode();
@@ -889,6 +904,11 @@ namespace St.Meeting
                 AsyncCallbackMsg exitResult = await _sdkService.ExitMeeting();
                 _viewLayoutService.ResetAsInitialStatus();
 
+
+                _meetingView.Grid.Children.Remove(GlobalData.VideoControl);
+
+
+
                 Log.Logger.Debug($"【exit meeting】：result={exitResult.Status}, msg={exitResult.Message}");
                 HasErrorMsg(exitResult.Status.ToString(), exitResult.Message);
 
@@ -940,7 +960,6 @@ namespace St.Meeting
 
                 YesNoDialog yesNoDialog = new YesNoDialog("确定退出？");
                 bool? result = yesNoDialog.ShowDialog();
-
 
                 if (result.HasValue && result.Value)
                 {
@@ -1240,6 +1259,8 @@ namespace St.Meeting
 
         private void RegisterMeetingEvents()
         {
+            _eventAggregator.GetEvent<RemoveVideoControlEvent>().Subscribe(RemoveVideoControlEventHandler, ThreadOption.UIThread, true);
+
             _meetingView.LocationChanged += _meetingView_LocationChanged;
             _meetingView.Deactivated += _meetingView_Deactivated;
             _meetingView.Closing += _meetingView_Closing;
@@ -1296,6 +1317,8 @@ namespace St.Meeting
 
         private void UnRegisterMeetingEvents()
         {
+            _eventAggregator.GetEvent<RemoveVideoControlEvent>().Unsubscribe(RemoveVideoControlEventHandler);
+
             _eventAggregator.GetEvent<CommandReceivedEvent>().Unsubscribe(ExecuteCommand);
 
             _sdkService.ViewCreatedEvent -= ViewCreateEventHandler;
@@ -1311,6 +1334,13 @@ namespace St.Meeting
             _sdkService.KickedByHostEvent -= KickedByHostEventHandler;
             _sdkService.DiskSpaceNotEnoughEvent -= DiskSpaceNotEnoughEventHandler;
         }
+
+
+        private void RemoveVideoControlEventHandler()
+        {
+            _meetingView.Grid.Children.Remove(GlobalData.VideoControl);
+        }
+
 
         private void KickedByHostEventHandler()
         {
@@ -1378,7 +1408,7 @@ namespace St.Meeting
             }
         }
 
-        private void OtherExitMeetingEventHandler(Participant contactInfo)
+        private void OtherExitMeetingEventHandler(MeetingSdk.SdkWrapper.MeetingDataModel.Participant contactInfo)
         {
             //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.m_szPhoneId);
 
@@ -1397,7 +1427,7 @@ namespace St.Meeting
             }
         }
 
-        private void OtherJoinMeetingEventHandler(Participant contactInfo)
+        private void OtherJoinMeetingEventHandler(MeetingSdk.SdkWrapper.MeetingDataModel.Participant contactInfo)
         {
             var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.PhoneId);
 
@@ -1456,7 +1486,7 @@ namespace St.Meeting
         {
             //return true;
 
-            List<Participant> participants = _sdkService.GetParticipants();
+            List<MeetingSdk.SdkWrapper.MeetingDataModel.Participant> participants = _sdkService.GetParticipants();
 
             var self = participants.FirstOrDefault(p => p.PhoneId == _sdkService.SelfPhoneId);
 
@@ -1472,7 +1502,7 @@ namespace St.Meeting
         {
             //return true;
 
-            List<Participant> participants = _sdkService.GetParticipants();
+            List<MeetingSdk.SdkWrapper.MeetingDataModel.Participant> participants = _sdkService.GetParticipants();
 
             var speaker = participants.FirstOrDefault(p => p.PhoneId == speakerView.PhoneId);
 
