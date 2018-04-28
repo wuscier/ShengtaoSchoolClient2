@@ -251,6 +251,7 @@
     </Compile>
     <Compile Include="Config\MeetingSetting.cs" />
     <Compile Include="Helper\PasswordBoxHelper.cs" />
+    <Compile Include="Manager\MeetingSdkEventRegister.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Helper\RegionNames.cs" />
     <Compile Include="Config\RecordConfig.cs" />

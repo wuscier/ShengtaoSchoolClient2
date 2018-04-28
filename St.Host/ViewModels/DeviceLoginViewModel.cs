@@ -12,6 +12,9 @@ using Serilog;
 using MeetingSdk.SdkWrapper;
 using Action = System.Action;
 using RtClientManager = St.Common.RtClient.RtClientManager;
+using MeetingSdk.Wpf;
+using UserInfo = St.Common.UserInfo;
+using St.Common.Manager;
 
 namespace St.Host
 {
@@ -22,6 +25,8 @@ namespace St.Host
             _deviceLoginView = deviceLoginView;
             _userInfo = IoC.Get<UserInfo>();
             _bmsService = IoC.Get<IBms>();
+            _windowManager = IoC.Get<IMeetingWindowManager>();
+
 
             LoadCommand = DelegateCommand.FromAsyncHandler(LoadAsync);
             TopMostTriggerCommand = new DelegateCommand(TriggerTopMost);
@@ -29,6 +34,8 @@ namespace St.Host
         }
 
         private readonly DeviceLoginView _deviceLoginView;
+        private readonly IMeetingWindowManager _windowManager;
+
         private readonly UserInfo _userInfo;
         private readonly IBms _bmsService;
 
@@ -76,6 +83,20 @@ namespace St.Host
         private async Task LoadAsync()
         {
             Log.Logger.Debug("LoadAsync => DeviceLoginView");
+
+
+            _windowManager.Initialize();
+
+            MeetingSdkEventsRegister.Instance.RegisterSdkEvents();
+
+            var deviceNameAccessor = IoC.Get<IDeviceNameAccessor>();
+            var providers = IoC.GetAll<IDeviceNameProvider>();
+            foreach (var provider in providers)
+            {
+                await provider.Provider(deviceNameAccessor);
+            }
+
+
 
             DialogContent = Messages.InfoLogging;
             IsDialogOpen = true;

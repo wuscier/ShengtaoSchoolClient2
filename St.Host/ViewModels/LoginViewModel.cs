@@ -10,16 +10,19 @@ using System.Windows.Input;
 using System.Xml;
 using Caliburn.Micro;
 using MeetingSdk.SdkWrapper;
+using MeetingSdk.Wpf;
 using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Regions;
 using Serilog;
 using St.Common;
+using St.Common.Manager;
 using St.Host.Views;
 using Action = System.Action;
 using Formatting = Newtonsoft.Json.Formatting;
 using LogManager = St.Common.LogManager;
 using RtClientManager = St.Common.RtClient.RtClientManager;
+using UserInfo = St.Common.UserInfo;
 
 namespace St.Host.ViewModels
 {
@@ -27,6 +30,8 @@ namespace St.Host.ViewModels
     {
         //private fields
         private readonly Window _loginView;
+        private readonly IMeetingWindowManager _windowManager;
+
         private readonly UserInfo _userInfo;
         private readonly IBms _bmsService;
         private readonly IVisualizeShell _visualizeShellSevice;
@@ -226,6 +231,19 @@ namespace St.Host.ViewModels
 
         private async Task LoadAsync()
         {
+            _windowManager.Initialize();
+
+            MeetingSdkEventsRegister.Instance.RegisterSdkEvents();
+
+            var deviceNameAccessor = IoC.Get<IDeviceNameAccessor>();
+            var providers = IoC.GetAll<IDeviceNameProvider>();
+            foreach (var provider in providers)
+            {
+                await provider.Provider(deviceNameAccessor);
+            }
+
+
+
             Log.Logger.Debug("LoadAsync => LoginView");
             try
             {
