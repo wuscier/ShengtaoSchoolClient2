@@ -23,6 +23,7 @@ using Action = System.Action;
 using LogManager = St.Common.LogManager;
 using MeetingSdk.Wpf;
 using UserInfo = St.Common.UserInfo;
+using MeetingSdk.NetAgent;
 
 namespace St.Meeting
 {
@@ -44,6 +45,9 @@ namespace St.Meeting
 
             _sdkService = IoC.Get<IMeeting>();
             _bmsService = IoC.Get<IBms>();
+
+            _windowManager = IoC.Get<IMeetingWindowManager>();
+            _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
 
             _eventAggregator = IoC.Get<IEventAggregator>();
             _eventAggregator.GetEvent<CommandReceivedEvent>()
@@ -350,6 +354,9 @@ namespace St.Meeting
         private delegate Task TaskDelegate();
 
         private TaskDelegate _cancelSharingAction;
+
+        private readonly IMeetingWindowManager _windowManager;
+        private readonly IMeetingSdkAgent _meetingSdkAgent;
 
         private readonly IEventAggregator _eventAggregator;
         private readonly IViewLayout _viewLayoutService;
@@ -667,6 +674,13 @@ namespace St.Meeting
         public ICommand TriggerMenuCommand { get; set; }
         public ICommand WindowKeyDownCommand { get; set; }
         public ICommand ShowHelpCommand { get; set; }
+        public bool IsCreator
+        {
+            get
+            {
+                return GlobalData.TryGet(CacheKey.HostId).ToString() == _windowManager.Participant.Account.AccountId.ToString();
+            }
+        }
 
         #endregion
 
@@ -691,11 +705,42 @@ namespace St.Meeting
 
         private async Task JoinMeetingAsync()
         {
-            //GlobalData.Instance.ViewArea = new ViewArea()
-            //{
-            //    Width = _meetingView.ActualWidth,
-            //    Height = _meetingView.ActualHeight
-            //};
+            int meetingId = 0;
+            object meetingIdObj = GlobalData.TryGet(CacheKey.MeetingId);
+
+            if (meetingIdObj != null && int.TryParse(meetingIdObj.ToString(), out meetingId))
+            {
+                var joinResult = await _meetingSdkAgent.JoinMeeting(meetingId, true);
+
+                if (joinResult.StatusCode != 0)
+                {
+                    if (joinResult.StatusCode == -2014)
+                    {
+                        HasErrorMsg("-1", "该课程已经结束！");
+                    }
+                    else
+                    {
+                        HasErrorMsg("-1", "加入课程失败！");
+                    }
+                }
+            }
+            else
+            {
+                _exitByDialog = true;
+                _meetingView.Close();
+                _startMeetingCallbackEvent(false, "课程号无效！");
+            }
+
+
+            await _windowManager.Join(_meetingId, false, IsCreator);
+
+            _startMeetingCallbackEvent(true, "");
+
+            GlobalData.Instance.ViewArea = new ViewArea()
+            {
+                Width = _meetingView.ActualWidth,
+                Height = _meetingView.ActualHeight
+            };
 
             //uint[] uint32SOfNonDataArray =
             //{
