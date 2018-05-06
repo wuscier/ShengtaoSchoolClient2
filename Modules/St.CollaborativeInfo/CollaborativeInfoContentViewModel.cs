@@ -14,6 +14,8 @@ using Prism.Regions;
 using MeetingSdk.NetAgent;
 using System.Reflection;
 using MeetingSdk.NetAgent.Models;
+using Prism.Events;
+using MeetingSdk.Wpf;
 
 namespace St.CollaborativeInfo
 {
@@ -24,6 +26,7 @@ namespace St.CollaborativeInfo
             _bmsService = IoC.Get<IBms>();
             _sdkService = IoC.Get<IMeeting>();
             _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
+            _eventAggregator = IoC.Get<IEventAggregator>();
             _lessonInfo = IoC.Get<LessonInfo>();
             _regionManager = IoC.Get<IRegionManager>();
 
@@ -38,6 +41,7 @@ namespace St.CollaborativeInfo
         private readonly IBms _bmsService;
         private readonly IMeeting _sdkService;
         private readonly IMeetingSdkAgent _meetingSdkAgent;
+        private readonly IEventAggregator _eventAggregator;
         private readonly LessonInfo _lessonInfo;
         private readonly IRegionManager _regionManager;
 
@@ -128,7 +132,7 @@ namespace St.CollaborativeInfo
                 }
                 else
                 {
-                    UserInfo userInfo = IoC.Get<UserInfo>();
+                    Common.UserInfo userInfo = IoC.Get<Common.UserInfo>();
 
                     MeetingResult<LoginModel> meetingResult = await _meetingSdkAgent.LoginThirdParty(userInfo.GetNube(), userInfo.AppKey, userInfo.OpenId);
 
@@ -138,6 +142,12 @@ namespace St.CollaborativeInfo
                     }
                     else
                     {
+                        _eventAggregator.GetEvent<UserLoginEvent>().Publish(new MeetingSdk.Wpf.UserInfo()
+                        {
+                            UserId = meetingResult.Result.Account.AccountId,
+                            UserName = userInfo.UserName,
+                        });
+
                         visualizeShellService.FinishStartingSdk(true, Messages.InfoMeetingSdkStarted);
                     }
                 }

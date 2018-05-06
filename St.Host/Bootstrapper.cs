@@ -19,6 +19,7 @@ using St.Common.RtClient;
 using St.Host.Core;
 using MeetingSdk.NetAgent;
 using MeetingSdk.Wpf;
+using Prism.Events;
 
 namespace St.Host
 {
@@ -149,6 +150,8 @@ namespace St.Host
         protected override void ConfigureContainerBuilder(ContainerBuilder builder)
         {
             base.ConfigureContainerBuilder(builder);
+
+            builder.RegisterType<EventAggregator>().As<IEventAggregator>().SingleInstance();
 
             builder.RegisterType<AutofacRegister>().As<IAutofacRegister>();
             builder.RegisterType<LessonInfo>().SingleInstance();
