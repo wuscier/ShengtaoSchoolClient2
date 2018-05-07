@@ -17,7 +17,6 @@ namespace St.Discussion
         private readonly IMeeting _sdkService;
         private readonly List<UserInfo> _userInfos;
         private readonly SpecialViewType _targetSpecialViewType;
-        private readonly IViewLayout _viewLayoutService;
 
         public SelectAttendeeListViewModel(SelectAttendeeListView selectAttendeeListView, SpecialViewType specialViewType)
         {
@@ -26,7 +25,6 @@ namespace St.Discussion
 
             _sdkService = IoC.Get<IMeeting>();
             _userInfos = IoC.Get<List<UserInfo>>();
-            _viewLayoutService = IoC.Get<IViewLayout>();
 
             AttendeeItems = new ObservableCollection<AttendeeItem>();
 
@@ -56,59 +54,61 @@ namespace St.Discussion
 
         private void LoadedAsync()
         {
-            var openedViews = _viewLayoutService.ViewFrameList.Where(v => v.IsOpened);
+            //var openedViews = _viewLayoutService.ViewFrameList.Where(v => v.IsOpened);
 
-            var attendees = from openedView in openedViews
-                select new AttendeeItem()
-                {
-                    Text = openedView.ViewName,
-                    Id = openedView.PhoneId,
-                    Hwnd = openedView.Hwnd,
-                    ButtonCommand = DelegateCommand<AttendeeItem>.FromAsyncHandler(async (attendeeItem) =>
-                    {
-                        var specialView =
-                            _viewLayoutService.ViewFrameList.FirstOrDefault(
-                                v => v.PhoneId == attendeeItem.Id && v.Hwnd == attendeeItem.Hwnd);
+            //var attendees = from openedView in openedViews
+            //    select new AttendeeItem()
+            //    {
+            //        Text = openedView.ViewName,
+            //        Id = openedView.PhoneId,
+            //        Hwnd = openedView.Hwnd,
+            //        ButtonCommand = DelegateCommand<AttendeeItem>.FromAsyncHandler(async (attendeeItem) =>
+            //        {
+            //            var specialView =
+            //                _viewLayoutService.ViewFrameList.FirstOrDefault(
+            //                    v => v.PhoneId == attendeeItem.Id && v.Hwnd == attendeeItem.Hwnd);
 
-                        if (!CheckIsUserSpeaking(specialView, true))
-                        {
-                            return;
-                        }
+            //            if (!CheckIsUserSpeaking(specialView, true))
+            //            {
+            //                return;
+            //            }
 
-                        _viewLayoutService.SetSpecialView(specialView, _targetSpecialViewType);
-                        await _viewLayoutService.LaunchLayout();
-                        _selectAttendeeListView.Close();
-                    })
-                };
+            //            _viewLayoutService.SetSpecialView(specialView, _targetSpecialViewType);
+            //            await _viewLayoutService.LaunchLayout();
+            //            _selectAttendeeListView.Close();
+            //        })
+            //    };
 
-            attendees.ToList().ForEach(attendee =>
-            {
-                AttendeeItems.Add(attendee);
-            });
+            //attendees.ToList().ForEach(attendee =>
+            //{
+            //    AttendeeItems.Add(attendee);
+            //});
 
-            InputSimulatorManager.Instance.Simulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
             //InputSimulatorManager.Instance.Simulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
+            ////InputSimulatorManager.Instance.Simulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
 
         }
 
 
         private bool CheckIsUserSpeaking(ViewFrame speakerView, bool showMsgBar = false)
         {
-            //return true;
+            ////return true;
 
 
-            var speaker =
-                _viewLayoutService.ViewFrameList.FirstOrDefault(
-                    p => p.PhoneId == speakerView.PhoneId && p.Hwnd == speakerView.Hwnd && p.IsOpened);
+            //var speaker =
+            //    _viewLayoutService.ViewFrameList.FirstOrDefault(
+            //        p => p.PhoneId == speakerView.PhoneId && p.Hwnd == speakerView.Hwnd && p.IsOpened);
 
-            bool isUserNotSpeaking = speaker == null;
+            //bool isUserNotSpeaking = speaker == null;
 
-            if (isUserNotSpeaking && showMsgBar)
-            {
-                MessageQueueManager.Instance.AddInfo(Messages.WarningUserNotSpeaking);
-            }
+            //if (isUserNotSpeaking && showMsgBar)
+            //{
+            //    MessageQueueManager.Instance.AddInfo(Messages.WarningUserNotSpeaking);
+            //}
 
-            return !isUserNotSpeaking;
+            //return !isUserNotSpeaking;
+
+            return true;
         }
 
 

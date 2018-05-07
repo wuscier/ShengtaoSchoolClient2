@@ -225,7 +225,6 @@
     <Compile Include="Core\BmsService.cs" />
     <Compile Include="Core\GroupManager.cs" />
     <Compile Include="Core\TaskCallbackService.cs" />
-    <Compile Include="Core\ViewLayoutService.cs" />
     <Compile Include="Service\AverageLayoutRenderer.cs" />
     <Compile Include="Service\BigSmallsLayoutRenderer.cs" />
     <Compile Include="Service\CloseupLayoutRenderer.cs" />

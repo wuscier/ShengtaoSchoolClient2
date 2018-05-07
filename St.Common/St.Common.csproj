@@ -243,7 +243,6 @@
     <Compile Include="Bms\SchoolGroupType.cs" />
     <Compile Include="Contract\IBms.cs" />
     <Compile Include="Contract\ITaskCallback.cs" />
-    <Compile Include="Contract\IViewLayout.cs" />
     <Compile Include="Config\LoginConfig.cs" />
     <Compile Include="Config\AudioSetting.cs" />
     <Compile Include="Bms\ResponseResult.cs" />

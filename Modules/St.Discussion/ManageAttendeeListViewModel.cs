@@ -16,14 +16,12 @@ namespace St.Discussion
     {
         private readonly ManageAttendeeListView _manageAttendeeListView;
         private readonly IMeeting _sdkService;
-        private readonly IViewLayout _viewLayoutService;
         public const string SetSpeaking = "指定发言";
         public const string CancelSpeaking = "取消发言";
         private readonly List<UserInfo> _userInfos;
 
         public ManageAttendeeListViewModel(ManageAttendeeListView manageAttendeeListView)
         {
-            _viewLayoutService = IoC.Get<IViewLayout>();
             _manageAttendeeListView = manageAttendeeListView;
             _manageAttendeeListView.Closing += _manageAttendeeListView_Closing;
             _userInfos = IoC.Get<List<UserInfo>>();

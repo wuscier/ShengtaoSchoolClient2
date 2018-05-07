@@ -10,13 +10,11 @@ namespace St.Discussion
     public class LayoutViewModel
     {
         private readonly LayoutView _layoutView;
-        private readonly IViewLayout _viewLayoutService;
 
         public LayoutViewModel(LayoutView layoutView)
         {
             _layoutView = layoutView;
 
-            _viewLayoutService = IoC.Get<IViewLayout>();
 
             WindowKeyDownCommand = new DelegateCommand<object>(WindowKeyDownHandlerAsync);
             SetAverageLayoutCommand = DelegateCommand.FromAsyncHandler(SetAverageLayoutAsync);
@@ -30,21 +28,21 @@ namespace St.Discussion
 
         private void SelectAttendeeAsFull()
         {
-            SelectAttendeeListView selectAttendeeListView = new SelectAttendeeListView(SpecialViewType.FullScreen);
-            selectAttendeeListView.ShowDialog();
+            //SelectAttendeeListView selectAttendeeListView = new SelectAttendeeListView(SpecialViewType.FullScreen);
+            //selectAttendeeListView.ShowDialog();
         }
 
         private void SelectAttendeeAsBig()
         {
-            SelectAttendeeListView selectAttendeeListView = new SelectAttendeeListView(SpecialViewType.Big);
-            selectAttendeeListView.ShowDialog();
+            //SelectAttendeeListView selectAttendeeListView = new SelectAttendeeListView(SpecialViewType.Big);
+            //selectAttendeeListView.ShowDialog();
         }
 
         private async Task SetAverageLayoutAsync()
         {
-            _viewLayoutService.ChangeViewMode(ViewMode.Average);
-            await _viewLayoutService.LaunchLayout();
-            _layoutView.Close();
+            //_viewLayoutService.ChangeViewMode(ViewMode.Average);
+            //await _viewLayoutService.LaunchLayout();
+            //_layoutView.Close();
         }
 
         private void WindowKeyDownHandlerAsync(object args)

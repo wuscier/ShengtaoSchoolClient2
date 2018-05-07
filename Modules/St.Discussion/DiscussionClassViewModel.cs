@@ -61,8 +61,8 @@ namespace St.Discussion
             _eventAggregator.GetEvent<CommandReceivedEvent>()
                 .Subscribe(ExecuteCommand, ThreadOption.PublisherThread, false, command => command.IsIntoClassCommand);
 
-            _viewLayoutService = IoC.Get<IViewLayout>();
-            _viewLayoutService.ViewFrameList = InitializeViewFrameList(meetingView);
+            //_viewLayoutService = IoC.Get<IViewLayout>();
+            //_viewLayoutService.ViewFrameList = InitializeViewFrameList(meetingView);
 
             _sdkService = IoC.Get<IMeeting>();
             _bmsService = IoC.Get<IBms>();
@@ -143,83 +143,83 @@ namespace St.Discussion
             }
             else if (command.Directive == GlobalCommands.Instance.AverageCommand.Directive)
             {
-                _viewLayoutService.ChangeViewMode(ViewMode.Average);
-                await _viewLayoutService.LaunchLayout();
+                //_viewLayoutService.ChangeViewMode(ViewMode.Average);
+                //await _viewLayoutService.LaunchLayout();
             }
             else if (command.Directive == GlobalCommands.Instance.BigSmallsCommand.Directive)
             {
-                var openedVfs = _viewLayoutService.ViewFrameList.Where(vf => vf.IsOpened).ToList();
+                //var openedVfs = _viewLayoutService.ViewFrameList.Where(vf => vf.IsOpened).ToList();
 
-                int viewCount = openedVfs.Count;
+                //int viewCount = openedVfs.Count;
 
-                if (viewCount == 0)
-                {
-                    return;
-                }
+                //if (viewCount == 0)
+                //{
+                //    return;
+                //}
 
-                int bigViewIndex = -1;
-                for (int i = 0; i < viewCount; i++)
-                {
-                    if (openedVfs[i].IsBigView)
-                    {
-                        bigViewIndex = i;
-                        break;
-                    }
-                }
+                //int bigViewIndex = -1;
+                //for (int i = 0; i < viewCount; i++)
+                //{
+                //    if (openedVfs[i].IsBigView)
+                //    {
+                //        bigViewIndex = i;
+                //        break;
+                //    }
+                //}
 
-                if (bigViewIndex == -1)
-                {
-                    bigViewIndex = 0;
-                }
-                else if (bigViewIndex + 1 >= openedVfs.Count)
-                {
-                    bigViewIndex = 0;
-                }
-                else
-                {
-                    bigViewIndex += 1;
-                }
+                //if (bigViewIndex == -1)
+                //{
+                //    bigViewIndex = 0;
+                //}
+                //else if (bigViewIndex + 1 >= openedVfs.Count)
+                //{
+                //    bigViewIndex = 0;
+                //}
+                //else
+                //{
+                //    bigViewIndex += 1;
+                //}
 
-                _viewLayoutService.SetSpecialView(openedVfs[bigViewIndex], SpecialViewType.Big);
-                await _viewLayoutService.LaunchLayout();
+                //_viewLayoutService.SetSpecialView(openedVfs[bigViewIndex], SpecialViewType.Big);
+                //await _viewLayoutService.LaunchLayout();
 
             }
             else if (command.Directive == GlobalCommands.Instance.CloseupCommand.Directive)
             {
-                var openedVfs = _viewLayoutService.ViewFrameList.Where(vf => vf.IsOpened).ToList();
+                //var openedVfs = _viewLayoutService.ViewFrameList.Where(vf => vf.IsOpened).ToList();
 
-                int viewCount = openedVfs.Count;
+                //int viewCount = openedVfs.Count;
 
-                if (viewCount == 0)
-                {
-                    return;
-                }
+                //if (viewCount == 0)
+                //{
+                //    return;
+                //}
 
-                int fullViewIndex = -1;
-                for (int i = 0; i < viewCount; i++)
-                {
-                    if (openedVfs[i] == _viewLayoutService.FullScreenView)
-                    {
-                        fullViewIndex = i;
-                        break;
-                    }
-                }
+                //int fullViewIndex = -1;
+                //for (int i = 0; i < viewCount; i++)
+                //{
+                //    if (openedVfs[i] == _viewLayoutService.FullScreenView)
+                //    {
+                //        fullViewIndex = i;
+                //        break;
+                //    }
+                //}
 
-                if (fullViewIndex == -1)
-                {
-                    fullViewIndex = 0;
-                }
-                else if (fullViewIndex + 1 >= openedVfs.Count)
-                {
-                    fullViewIndex = 0;
-                }
-                else
-                {
-                    fullViewIndex += 1;
-                }
+                //if (fullViewIndex == -1)
+                //{
+                //    fullViewIndex = 0;
+                //}
+                //else if (fullViewIndex + 1 >= openedVfs.Count)
+                //{
+                //    fullViewIndex = 0;
+                //}
+                //else
+                //{
+                //    fullViewIndex += 1;
+                //}
 
-                _viewLayoutService.SetSpecialView(openedVfs[fullViewIndex], SpecialViewType.FullScreen);
-                await _viewLayoutService.LaunchLayout();
+                //_viewLayoutService.SetSpecialView(openedVfs[fullViewIndex], SpecialViewType.FullScreen);
+                //await _viewLayoutService.LaunchLayout();
             }
             else if (command.Directive == GlobalCommands.Instance.InteractionCommand.Directive)
             {
@@ -395,7 +395,6 @@ namespace St.Discussion
         private UIElement _upFocusedUiElement;
 
         private readonly IEventAggregator _eventAggregator;
-        private readonly IViewLayout _viewLayoutService;
         private readonly IMeeting _sdkService;
         private readonly IBms _bmsService;
         private readonly IPushLive _localPushLiveService;
@@ -593,56 +592,56 @@ namespace St.Discussion
 
                     switch (ClassMode)
                     {
-                        case DiscussionMode: //Goto 听课模式,禁言所有听讲教室。
+                        //case DiscussionMode: //Goto 听课模式,禁言所有听讲教室。
 
-                            ManageListenersItem.Visibility = Visibility.Collapsed;
-                            LayoutItem.Visibility = Visibility.Collapsed;
+                        //    ManageListenersItem.Visibility = Visibility.Collapsed;
+                        //    LayoutItem.Visibility = Visibility.Collapsed;
 
-                            ClassMode = ListenMode;
-                            ClassModeItem.Content = DiscussionMode;
+                        //    ClassMode = ListenMode;
+                        //    ClassModeItem.Content = DiscussionMode;
 
-                            _viewLayoutService.ChangeMeetingMode(MeetingMode.Sharing);
-
-
-                            await _viewLayoutService.LaunchLayout();
-
-                            MessageQueueManager.Instance.AddInfo(Messages.InfoGotoListenerMode);
-
-                            //foreach (var listener in listeners)
-                            //{
-                            //    _sdkService.RequireUserStopSpeak(listener);
-                            //}
-                            int listeningMode = (int) UiMessage.ListeningMode;
-                             _sdkService.SendMessage(listeningMode,
-                                listeningMode.ToString(),
-                                listeningMode.ToString().Length, null);
-
-                            break;
-                        case ListenMode: //Goto 评课模式，
-
-                            ManageListenersItem.Visibility = Visibility.Visible;
-                            LayoutItem.Visibility = Visibility.Visible;
-
-                            ClassMode = DiscussionMode;
-                            ClassModeItem.Content = ListenMode;
-
-                            _viewLayoutService.ChangeMeetingMode(MeetingMode.Interaction);
-                            await _viewLayoutService.LaunchLayout();
+                        //    _viewLayoutService.ChangeMeetingMode(MeetingMode.Sharing);
 
 
-                            MessageQueueManager.Instance.AddInfo(Messages.InfoGotoDiscussionMode);
-                            //foreach (var listener in listeners)
-                            //{
-                            //    _sdkService.RequireUserSpeak(listener);
-                            //}
+                        //    await _viewLayoutService.LaunchLayout();
 
-                            int discussionMode = (int) UiMessage.DiscussionMode;
-                             _sdkService.SendMessage(discussionMode,
-                                discussionMode.ToString(),
-                                discussionMode.ToString().Length, null);
+                        //    MessageQueueManager.Instance.AddInfo(Messages.InfoGotoListenerMode);
+
+                        //    //foreach (var listener in listeners)
+                        //    //{
+                        //    //    _sdkService.RequireUserStopSpeak(listener);
+                        //    //}
+                        //    int listeningMode = (int) UiMessage.ListeningMode;
+                        //     _sdkService.SendMessage(listeningMode,
+                        //        listeningMode.ToString(),
+                        //        listeningMode.ToString().Length, null);
+
+                        //    break;
+                        //case ListenMode: //Goto 评课模式，
+
+                        //    ManageListenersItem.Visibility = Visibility.Visible;
+                        //    LayoutItem.Visibility = Visibility.Visible;
+
+                        //    ClassMode = DiscussionMode;
+                        //    ClassModeItem.Content = ListenMode;
+
+                        //    _viewLayoutService.ChangeMeetingMode(MeetingMode.Interaction);
+                        //    await _viewLayoutService.LaunchLayout();
 
 
-                            break;
+                        //    MessageQueueManager.Instance.AddInfo(Messages.InfoGotoDiscussionMode);
+                        //    //foreach (var listener in listeners)
+                        //    //{
+                        //    //    _sdkService.RequireUserSpeak(listener);
+                        //    //}
+
+                        //    int discussionMode = (int) UiMessage.DiscussionMode;
+                        //     _sdkService.SendMessage(discussionMode,
+                        //        discussionMode.ToString(),
+                        //        discussionMode.ToString().Length, null);
+
+
+                        //    break;
                     }
 
                     _downFocusedUiElement.Focus();
@@ -948,31 +947,31 @@ namespace St.Discussion
         {
             try
             {
-                _autoHideInitialTime = DateTime.Now;
+                //_autoHideInitialTime = DateTime.Now;
 
-                await StopAllLives();
+                //await StopAllLives();
 
-                AsyncCallbackMsg exitResult = await _sdkService.ExitMeeting();
-                _viewLayoutService.ResetAsInitialStatus();
+                //AsyncCallbackMsg exitResult = await _sdkService.ExitMeeting();
+                //_viewLayoutService.ResetAsInitialStatus();
 
-                Log.Logger.Debug($"【exit meeting】：result={exitResult.Status}, msg={exitResult.Message}");
-                HasErrorMsg(exitResult.Status.ToString(), exitResult.Message);
+                //Log.Logger.Debug($"【exit meeting】：result={exitResult.Status}, msg={exitResult.Message}");
+                //HasErrorMsg(exitResult.Status.ToString(), exitResult.Message);
 
-                _AutoHideMenuTimer?.Dispose();
+                //_AutoHideMenuTimer?.Dispose();
 
-                UnRegisterMeetingEvents();
+                //UnRegisterMeetingEvents();
 
-                await UpdateExitTime();
+                //await UpdateExitTime();
 
 
-                await _discussionClassView.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    _exitByDialog = true;
-                    _discussionClassView.Close();
+                //await _discussionClassView.Dispatcher.BeginInvoke(new Action(() =>
+                //{
+                //    _exitByDialog = true;
+                //    _discussionClassView.Close();
 
-                    _exitMeetingCallbackEvent(true, "");
+                //    _exitMeetingCallbackEvent(true, "");
 
-                }));
+                //}));
 
             }
             catch (Exception ex)
@@ -1042,28 +1041,28 @@ namespace St.Discussion
             {
                 case StartRecord:
 
-                    _localRecordService.GetRecordParam();
+                    //_localRecordService.GetRecordParam();
 
-                    AsyncCallbackMsg startRecordResult =
-                        await
-                            _localRecordService.StartRecord(
-                                _viewLayoutService.GetStreamLayout(_localRecordService.RecordParam.Width,
-                                    _localRecordService.RecordParam.Height));
+                    //AsyncCallbackMsg startRecordResult =
+                    //    await
+                    //        _localRecordService.StartRecord(
+                    //            _viewLayoutService.GetStreamLayout(_localRecordService.RecordParam.Width,
+                    //                _localRecordService.RecordParam.Height));
 
-                    if (HasErrorMsg(startRecordResult.Status.ToString(), startRecordResult.Message))
-                    {
-                        RecordMsg = StartRecord;
-                    }
-                    else
-                    {
-                        RecordMsg = StopRecord;
-                        RecordTips =
-                            string.Format(
-                                $"分辨率：{_localRecordService.RecordParam.Width}*{_localRecordService.RecordParam.Height}\r\n" +
-                                $"码率：{_localRecordService.RecordParam.VideoBitrate}\r\n" +
-                                $"录制路径：{_localRecordService.RecordDirectory}");
+                    //if (HasErrorMsg(startRecordResult.Status.ToString(), startRecordResult.Message))
+                    //{
+                    //    RecordMsg = StartRecord;
+                    //}
+                    //else
+                    //{
+                    //    RecordMsg = StopRecord;
+                    //    RecordTips =
+                    //        string.Format(
+                    //            $"分辨率：{_localRecordService.RecordParam.Width}*{_localRecordService.RecordParam.Height}\r\n" +
+                    //            $"码率：{_localRecordService.RecordParam.VideoBitrate}\r\n" +
+                    //            $"录制路径：{_localRecordService.RecordDirectory}");
 
-                    }
+                    //}
 
                     break;
                 case StopRecord:
@@ -1115,8 +1114,8 @@ namespace St.Discussion
             _sdkService.CloseSharedDocEvent += _sdkService_CloseSharedDocEvent;
             _sdkService.StartSpeakEvent += StartSpeakEventHandler;
             _sdkService.StopSpeakEvent += StopSpeakEventHandler;
-            _viewLayoutService.MeetingModeChangedEvent += MeetingModeChangedEventHandler;
-            _viewLayoutService.ViewModeChangedEvent += ViewModeChangedEventHandler;
+            //_viewLayoutService.MeetingModeChangedEvent += MeetingModeChangedEventHandler;
+            //_viewLayoutService.ViewModeChangedEvent += ViewModeChangedEventHandler;
             _sdkService.OtherJoinMeetingEvent += OtherJoinMeetingEventHandler;
             _sdkService.OtherExitMeetingEvent += OtherExitMeetingEventHandler;
             _sdkService.TransparentMessageReceivedEvent += UIMessageReceivedEventHandler;
@@ -1176,8 +1175,8 @@ namespace St.Discussion
             _sdkService.CloseSharedDocEvent -= _sdkService_CloseSharedDocEvent;
             _sdkService.StartSpeakEvent -= StartSpeakEventHandler;
             _sdkService.StopSpeakEvent -= StopSpeakEventHandler;
-            _viewLayoutService.MeetingModeChangedEvent -= MeetingModeChangedEventHandler;
-            _viewLayoutService.ViewModeChangedEvent -= ViewModeChangedEventHandler;
+            //_viewLayoutService.MeetingModeChangedEvent -= MeetingModeChangedEventHandler;
+            //_viewLayoutService.ViewModeChangedEvent -= ViewModeChangedEventHandler;
             _sdkService.OtherJoinMeetingEvent -= OtherJoinMeetingEventHandler;
             _sdkService.OtherExitMeetingEvent -= OtherExitMeetingEventHandler;
             _sdkService.TransparentMessageReceivedEvent -= UIMessageReceivedEventHandler;
@@ -1204,24 +1203,24 @@ namespace St.Discussion
             }));
         }
 
-        private void ViewModeChangedEventHandler(ViewMode viewMode)
-        {
-            CurLayoutName = EnumHelper.GetDescription(typeof(ViewMode), viewMode);
-        }
+        //private void ViewModeChangedEventHandler(ViewMode viewMode)
+        //{
+        //    CurLayoutName = EnumHelper.GetDescription(typeof(ViewMode), viewMode);
+        //}
 
-        private void MeetingModeChangedEventHandler(MeetingMode meetingMode)
-        {
-            CurModeName = EnumHelper.GetDescription(typeof(MeetingMode), meetingMode);
+        //private void MeetingModeChangedEventHandler(MeetingMode meetingMode)
+        //{
+        //    CurModeName = EnumHelper.GetDescription(typeof(MeetingMode), meetingMode);
 
-            if (_sdkService.IsCreator)
-            {
-                AsyncCallbackMsg result =
-                    _sdkService.SendMessage((int) _viewLayoutService.MeetingMode,
-                        _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length,
-                        null);
-                HasErrorMsg(result.Status.ToString(), result.Message);
-            }
-        }
+        //    if (_sdkService.IsCreator)
+        //    {
+        //        AsyncCallbackMsg result =
+        //            _sdkService.SendMessage((int) _viewLayoutService.MeetingMode,
+        //                _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length,
+        //                null);
+        //        HasErrorMsg(result.Status.ToString(), result.Message);
+        //    }
+        //}
 
         private void ErrorMsgReceivedEventHandler(AsyncCallbackMsg error)
         {
@@ -1233,61 +1232,61 @@ namespace St.Discussion
             Log.Logger.Debug(
                 $"UIMessageReceivedEventHandler => msgId={message.MessageId}, senderPhoneId={message.Sender?.PhoneId}");
 
-            if (message.MessageId < 3)
-            {
-                _sdkService.CreatorPhoneId = message.Sender.PhoneId;
+            //if (message.MessageId < 3)
+            //{
+            //    _sdkService.CreatorPhoneId = message.Sender.PhoneId;
 
-                MeetingMode meetingMode = (MeetingMode) message.MessageId;
-                _viewLayoutService.ChangeMeetingMode(meetingMode);
+            //    MeetingMode meetingMode = (MeetingMode) message.MessageId;
+            //    _viewLayoutService.ChangeMeetingMode(meetingMode);
 
-                await _viewLayoutService.LaunchLayout();
-            }
-            else
-            {
-                if (message.MessageId == (int) UiMessage.BannedToSpeak)
-                {
+            //    await _viewLayoutService.LaunchLayout();
+            //}
+            //else
+            //{
+            //    if (message.MessageId == (int) UiMessage.BannedToSpeak)
+            //    {
 
-                    AsyncCallbackMsg stopSucceeded = await _sdkService.StopSpeak();
-                    return;
-                }
+            //        AsyncCallbackMsg stopSucceeded = await _sdkService.StopSpeak();
+            //        return;
+            //    }
 
-                if (message.MessageId == (int) UiMessage.AllowToSpeak)
-                {
-                    AsyncCallbackMsg result = await _sdkService.ApplyToSpeak();
-                    if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                    {
-                        // will change SpeakStatus in callback???
-                        SpeakItem.Content = IsSpeaking;
-                    }
+            //    if (message.MessageId == (int) UiMessage.AllowToSpeak)
+            //    {
+            //        AsyncCallbackMsg result = await _sdkService.ApplyToSpeak();
+            //        if (!HasErrorMsg(result.Status.ToString(), result.Message))
+            //        {
+            //            // will change SpeakStatus in callback???
+            //            SpeakItem.Content = IsSpeaking;
+            //        }
 
-                    return;
-                }
+            //        return;
+            //    }
 
-                if (message.MessageId == (int) UiMessage.ListeningMode)
-                {
-                    ClassMode = ListenMode;
-                    SpeakItem.Visibility = Visibility.Collapsed;
-                    MessageQueueManager.Instance.AddInfo(Messages.InfoGotoListenerMode);
+            //    if (message.MessageId == (int) UiMessage.ListeningMode)
+            //    {
+            //        ClassMode = ListenMode;
+            //        SpeakItem.Visibility = Visibility.Collapsed;
+            //        MessageQueueManager.Instance.AddInfo(Messages.InfoGotoListenerMode);
 
-                    await _sdkService.StopSpeak();
-                    return;
+            //        await _sdkService.StopSpeak();
+            //        return;
 
-                }
-                if (message.MessageId == (int) UiMessage.DiscussionMode)
-                {
-                   await GotoDiscussionMode();
-                }
-            }
+            //    }
+            //    if (message.MessageId == (int) UiMessage.DiscussionMode)
+            //    {
+            //       await GotoDiscussionMode();
+            //    }
+            //}
         }
 
         private async Task GotoDiscussionMode()
         {
-            _viewLayoutService.ChangeMeetingMode(MeetingMode.Interaction);
-            await _viewLayoutService.LaunchLayout();
+            //_viewLayoutService.ChangeMeetingMode(MeetingMode.Interaction);
+            //await _viewLayoutService.LaunchLayout();
 
-            ClassMode = DiscussionMode;
-            SpeakItem.Visibility = Visibility.Visible;
-            MessageQueueManager.Instance.AddInfo(Messages.InfoGotoDiscussionMode);
+            //ClassMode = DiscussionMode;
+            //SpeakItem.Visibility = Visibility.Visible;
+            //MessageQueueManager.Instance.AddInfo(Messages.InfoGotoDiscussionMode);
         }
 
         private async void OtherExitMeetingEventHandler(Participant contactInfo)
@@ -1311,82 +1310,82 @@ namespace St.Discussion
 
         private void OtherJoinMeetingEventHandler(Participant contactInfo)
         {
-            var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.PhoneId);
+            //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.PhoneId);
 
-            //string displayName = string.Empty;
-            //if (!string.IsNullOrEmpty(attendee?.Name))
+            ////string displayName = string.Empty;
+            ////if (!string.IsNullOrEmpty(attendee?.Name))
+            ////{
+            ////    displayName = attendee.Name + " - ";
+            ////}
+
+            ////string joinMsg = $"{displayName}{contactInfo.m_szPhoneId}加入会议！";
+            ////HasErrorMsg("-1", joinMsg);
+
+            ////speaker automatically sends a message(with creatorPhoneId) to nonspeakers
+            ////!!!CAREFUL!!! ONLY speaker will call this
+
+            //Log.Logger.Debug($"OtherJoinMeetingEventHandler => phoneId={contactInfo.PhoneId}, name={contactInfo.Name}");
+
+            //if (_sdkService.IsCreator)
             //{
-            //    displayName = attendee.Name + " - ";
+            //    //var newView =
+            //    //    _viewLayoutService.ViewFrameList.FirstOrDefault(
+            //    //        v => v.PhoneId == contactInfo.PhoneId && v.ViewType == 1);
+
+            //    //if (newView != null) newView.IsIntoMeeting = true;
+
+            //    //_sdkService.SendUIMessage((int) _viewLayoutService.MeetingMode,
+            //    //    _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length, null);
+
+
+            //    int meetingModeCmd = (int) _viewLayoutService.MeetingMode;
+            //    AsyncCallbackMsg sendMeetingModeMsg = _sdkService.SendMessage(meetingModeCmd,
+            //        meetingModeCmd.ToString(), meetingModeCmd.ToString().Length,
+            //        contactInfo.PhoneId);
+
+            //    Log.Logger.Debug(
+            //        $"sendMeetingModeMsg => msgId={meetingModeCmd}, targetPhoneId={contactInfo.PhoneId}, result={sendMeetingModeMsg.Status}");
+
+            //    // send a message to sync new attendee's class mode
+            //    int messageId = (int) UiMessage.DiscussionMode;
+            //    if (ClassMode == ListenMode)
+            //    {
+            //        messageId = (int) UiMessage.ListeningMode;
+            //        //_sdkService.RequireUserStopSpeak(contactInfo.PhoneId);
+
+            //    }
+            //    else if (ClassMode == DiscussionMode)
+            //    {
+            //        messageId = (int) UiMessage.DiscussionMode;
+            //    }
+
+            //    AsyncCallbackMsg sendClassModeMsg = _sdkService.SendMessage(messageId, messageId.ToString(),
+            //        messageId.ToString().Length,
+            //        contactInfo.PhoneId);
+
+            //    Log.Logger.Debug(
+            //        $"sendClassModeMsg => msgId={messageId}, targetPhoneId={contactInfo.PhoneId}, result={sendClassModeMsg.Status}");
+
             //}
-
-            //string joinMsg = $"{displayName}{contactInfo.m_szPhoneId}加入会议！";
-            //HasErrorMsg("-1", joinMsg);
-
-            //speaker automatically sends a message(with creatorPhoneId) to nonspeakers
-            //!!!CAREFUL!!! ONLY speaker will call this
-
-            Log.Logger.Debug($"OtherJoinMeetingEventHandler => phoneId={contactInfo.PhoneId}, name={contactInfo.Name}");
-
-            if (_sdkService.IsCreator)
-            {
-                //var newView =
-                //    _viewLayoutService.ViewFrameList.FirstOrDefault(
-                //        v => v.PhoneId == contactInfo.PhoneId && v.ViewType == 1);
-
-                //if (newView != null) newView.IsIntoMeeting = true;
-
-                //_sdkService.SendUIMessage((int) _viewLayoutService.MeetingMode,
-                //    _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length, null);
-
-
-                int meetingModeCmd = (int) _viewLayoutService.MeetingMode;
-                AsyncCallbackMsg sendMeetingModeMsg = _sdkService.SendMessage(meetingModeCmd,
-                    meetingModeCmd.ToString(), meetingModeCmd.ToString().Length,
-                    contactInfo.PhoneId);
-
-                Log.Logger.Debug(
-                    $"sendMeetingModeMsg => msgId={meetingModeCmd}, targetPhoneId={contactInfo.PhoneId}, result={sendMeetingModeMsg.Status}");
-
-                // send a message to sync new attendee's class mode
-                int messageId = (int) UiMessage.DiscussionMode;
-                if (ClassMode == ListenMode)
-                {
-                    messageId = (int) UiMessage.ListeningMode;
-                    //_sdkService.RequireUserStopSpeak(contactInfo.PhoneId);
-
-                }
-                else if (ClassMode == DiscussionMode)
-                {
-                    messageId = (int) UiMessage.DiscussionMode;
-                }
-
-                AsyncCallbackMsg sendClassModeMsg = _sdkService.SendMessage(messageId, messageId.ToString(),
-                    messageId.ToString().Length,
-                    contactInfo.PhoneId);
-
-                Log.Logger.Debug(
-                    $"sendClassModeMsg => msgId={messageId}, targetPhoneId={contactInfo.PhoneId}, result={sendClassModeMsg.Status}");
-
-            }
         }
 
         private async void ViewCloseEventHandler(ParticipantView speakerView)
         {
-            await _viewLayoutService.HideViewAsync(speakerView);
+            //await _viewLayoutService.HideViewAsync(speakerView);
         }
 
         private void StopSpeakEventHandler()
         {
-            //_viewLayoutService.ChangeViewMode(ViewMode.Auto);
+            ////_viewLayoutService.ChangeViewMode(ViewMode.Auto);
 
-            if (_sdkService.IsCreator)
-            {
-                _viewLayoutService.ChangeMeetingMode(MeetingMode.Interaction);
-            }
+            //if (_sdkService.IsCreator)
+            //{
+            //    _viewLayoutService.ChangeMeetingMode(MeetingMode.Interaction);
+            //}
 
-            SpeakItem.Content = IsNotSpeaking;
+            //SpeakItem.Content = IsNotSpeaking;
 
-            //reload menus
+            ////reload menus
         }
 
         private void StartSpeakEventHandler()
@@ -1396,20 +1395,22 @@ namespace St.Discussion
 
         private async void ViewCreateEventHandler(ParticipantView speakerView)
         {
-            await _viewLayoutService.ShowViewAsync(speakerView);
+            //await _viewLayoutService.ShowViewAsync(speakerView);
         }
 
         private bool CheckIsUserSpeaking(bool showMsgBar = false)
         {
-            var self =
-                _viewLayoutService.ViewFrameList.FirstOrDefault(p => p.PhoneId == _sdkService.SelfPhoneId && p.IsOpened);
+            //var self =
+            //    _viewLayoutService.ViewFrameList.FirstOrDefault(p => p.PhoneId == _sdkService.SelfPhoneId && p.IsOpened);
 
-            if (showMsgBar && self == null)
-            {
-                MessageQueueManager.Instance.AddInfo(Messages.WarningYouAreNotSpeaking);
-            }
+            //if (showMsgBar && self == null)
+            //{
+            //    MessageQueueManager.Instance.AddInfo(Messages.WarningYouAreNotSpeaking);
+            //}
 
-            return self != null;
+            //return self != null;
+
+            return true;
         }
 
         

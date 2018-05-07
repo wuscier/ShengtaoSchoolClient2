@@ -42,7 +42,7 @@ namespace St.Meeting
         {
             _meetingView = meetingView;
 
-            _viewLayoutService = IoC.Get<IViewLayout>();
+            //_viewLayoutService = IoC.Get<IViewLayout>();
             //_viewLayoutService.ViewFrameList = InitializeViewFrameList(meetingView);
 
             _sdkService = IoC.Get<IMeeting>();
@@ -173,92 +173,92 @@ namespace St.Meeting
             }
             else if (command.Directive == GlobalCommands.Instance.AverageCommand.Directive)
             {
-                await ViewModeChangedAsync(ViewMode.Average);
+                //await ViewModeChangedAsync(ViewMode.Average);
             }
             else if (command.Directive == GlobalCommands.Instance.BigSmallsCommand.Directive)
             {
-                var openedVfs = _viewLayoutService.ViewFrameList.Where(vf => vf.IsOpened).ToList();
+                //var openedVfs = _viewLayoutService.ViewFrameList.Where(vf => vf.IsOpened).ToList();
 
-                int viewCount = openedVfs.Count;
+                //int viewCount = openedVfs.Count;
 
-                if (viewCount == 0)
-                {
-                    return;
-                }
+                //if (viewCount == 0)
+                //{
+                //    return;
+                //}
 
-                int bigViewIndex = -1;
-                for (int i = 0; i < viewCount; i++)
-                {
-                    if (openedVfs[i].IsBigView)
-                    {
-                        bigViewIndex = i;
-                        break;
-                    }
-                }
+                //int bigViewIndex = -1;
+                //for (int i = 0; i < viewCount; i++)
+                //{
+                //    if (openedVfs[i].IsBigView)
+                //    {
+                //        bigViewIndex = i;
+                //        break;
+                //    }
+                //}
 
-                if (bigViewIndex == -1)
-                {
-                    bigViewIndex = 0;
-                }
-                else if (bigViewIndex + 1 >= openedVfs.Count)
-                {
-                    bigViewIndex = 0;
-                }
-                else
-                {
-                    bigViewIndex += 1;
-                }
+                //if (bigViewIndex == -1)
+                //{
+                //    bigViewIndex = 0;
+                //}
+                //else if (bigViewIndex + 1 >= openedVfs.Count)
+                //{
+                //    bigViewIndex = 0;
+                //}
+                //else
+                //{
+                //    bigViewIndex += 1;
+                //}
 
-                await BigViewChangedAsync(openedVfs[bigViewIndex]);
+                //await BigViewChangedAsync(openedVfs[bigViewIndex]);
 
             }
             else if (command.Directive == GlobalCommands.Instance.CloseupCommand.Directive)
             {
-                var openedVfs = _viewLayoutService.ViewFrameList.Where(vf => vf.IsOpened).ToList();
+                //var openedVfs = _viewLayoutService.ViewFrameList.Where(vf => vf.IsOpened).ToList();
 
-                int viewCount = openedVfs.Count;
+                //int viewCount = openedVfs.Count;
 
-                if (viewCount == 0)
-                {
-                    return;
-                }
+                //if (viewCount == 0)
+                //{
+                //    return;
+                //}
 
-                int fullViewIndex = -1;
-                for (int i = 0; i < viewCount; i++)
-                {
-                    if (openedVfs[i] == _viewLayoutService.FullScreenView)
-                    {
-                        fullViewIndex = i;
-                        break;
-                    }
-                }
+                //int fullViewIndex = -1;
+                //for (int i = 0; i < viewCount; i++)
+                //{
+                //    if (openedVfs[i] == _viewLayoutService.FullScreenView)
+                //    {
+                //        fullViewIndex = i;
+                //        break;
+                //    }
+                //}
 
-                if (fullViewIndex == -1)
-                {
-                    fullViewIndex = 0;
-                }
-                else if (fullViewIndex + 1 >= openedVfs.Count)
-                {
-                    fullViewIndex = 0;
-                }
-                else
-                {
-                    fullViewIndex += 1;
-                }
+                //if (fullViewIndex == -1)
+                //{
+                //    fullViewIndex = 0;
+                //}
+                //else if (fullViewIndex + 1 >= openedVfs.Count)
+                //{
+                //    fullViewIndex = 0;
+                //}
+                //else
+                //{
+                //    fullViewIndex += 1;
+                //}
 
-                await FullScreenViewChangedAsync(openedVfs[fullViewIndex]);
+                //await FullScreenViewChangedAsync(openedVfs[fullViewIndex]);
             }
             else if (command.Directive == GlobalCommands.Instance.InteractionCommand.Directive)
             {
-                await MeetingModeChangedAsync(Common.MeetingMode.Interaction.ToString());
+                //await MeetingModeChangedAsync(Common.MeetingMode.Interaction.ToString());
             }
             else if (command.Directive == GlobalCommands.Instance.SpeakerCommand.Directive)
             {
-                await MeetingModeChangedAsync(Common.MeetingMode.Speaker.ToString());
+                //await MeetingModeChangedAsync(Common.MeetingMode.Speaker.ToString());
             }
             else if (command.Directive == GlobalCommands.Instance.ShareCommand.Directive)
             {
-                await MeetingModeChangedAsync(Common.MeetingMode.Sharing.ToString());
+                //await MeetingModeChangedAsync(Common.MeetingMode.Sharing.ToString());
             }
         }
 
@@ -361,7 +361,6 @@ namespace St.Meeting
         private readonly IMeetingSdkAgent _meetingSdkAgent;
 
         private readonly IEventAggregator _eventAggregator;
-        private readonly IViewLayout _viewLayoutService;
         private readonly IMeeting _sdkService;
         private readonly IBms _bmsService;
         private readonly IPushLive _localPushLiveService;
@@ -851,40 +850,40 @@ namespace St.Meeting
 
         private async Task MeetingModeChangedAsync(string meetingMode)
         {
-            if (!CheckIsUserSpeaking(true))
-            {
-                return;
-            }
+            //if (!CheckIsUserSpeaking(true))
+            //{
+            //    return;
+            //}
 
-            if (meetingMode == Common.MeetingMode.Speaker.ToString() &&
-                !_viewLayoutService.ViewFrameList.Any(
-                    v => v.PhoneId == _sdkService.CreatorPhoneId && v.ViewType == 1))
-            {
-                //如果选中的模式条件不满足，则回滚到之前的模式，
-                //没有主讲者视图无法设置主讲模式，没有共享无法共享模式，没有发言无法设置任何模式
+            //if (meetingMode == Common.MeetingMode.Speaker.ToString() &&
+            //    !_viewLayoutService.ViewFrameList.Any(
+            //        v => v.PhoneId == _sdkService.CreatorPhoneId && v.ViewType == 1))
+            //{
+            //    //如果选中的模式条件不满足，则回滚到之前的模式，
+            //    //没有主讲者视图无法设置主讲模式，没有共享无法共享模式，没有发言无法设置任何模式
 
-                HasErrorMsg("-1", Messages.WarningNoSpeaderView);
-                return;
-            }
+            //    HasErrorMsg("-1", Messages.WarningNoSpeaderView);
+            //    return;
+            //}
 
-            if (meetingMode == Common.MeetingMode.Sharing.ToString() &&
-                !_viewLayoutService.ViewFrameList.Any(
-                    v => v.PhoneId == _sdkService.CreatorPhoneId && v.ViewType == 2))
-            {
-                //如果选中的模式条件不满足，则回滚到之前的模式，
-                //没有主讲者视图无法设置主讲模式，没有共享无法共享模式，没有发言无法设置任何模式
+            //if (meetingMode == Common.MeetingMode.Sharing.ToString() &&
+            //    !_viewLayoutService.ViewFrameList.Any(
+            //        v => v.PhoneId == _sdkService.CreatorPhoneId && v.ViewType == 2))
+            //{
+            //    //如果选中的模式条件不满足，则回滚到之前的模式，
+            //    //没有主讲者视图无法设置主讲模式，没有共享无法共享模式，没有发言无法设置任何模式
 
-                HasErrorMsg("-1", Messages.WarningNoSharingView);
-                return;
-            }
+            //    HasErrorMsg("-1", Messages.WarningNoSharingView);
+            //    return;
+            //}
 
-            var newMeetingMode = (Common.MeetingMode) Enum.Parse(typeof(Common.MeetingMode), meetingMode);
+            //var newMeetingMode = (Common.MeetingMode) Enum.Parse(typeof(Common.MeetingMode), meetingMode);
 
-            _viewLayoutService.ChangeMeetingMode(newMeetingMode);
+            //_viewLayoutService.ChangeMeetingMode(newMeetingMode);
 
-            _viewLayoutService.ResetAsAutoLayout();
+            //_viewLayoutService.ResetAsAutoLayout();
 
-            await _viewLayoutService.LaunchLayout();
+            //await _viewLayoutService.LaunchLayout();
         }
 
         private async Task SpeakingStatusChangedAsync()
@@ -965,31 +964,31 @@ namespace St.Meeting
         {
             try
             {
-                await StopAllLives();
+                //await StopAllLives();
 
-                AsyncCallbackMsg exitResult = await _sdkService.ExitMeeting();
-                _viewLayoutService.ResetAsInitialStatus();
-
-
-                _meetingView.Grid.Children.Remove(GlobalData.VideoControl);
+                //AsyncCallbackMsg exitResult = await _sdkService.ExitMeeting();
+                //_viewLayoutService.ResetAsInitialStatus();
 
 
+                //_meetingView.Grid.Children.Remove(GlobalData.VideoControl);
 
-                Log.Logger.Debug($"【exit meeting】：result={exitResult.Status}, msg={exitResult.Message}");
-                HasErrorMsg(exitResult.Status.ToString(), exitResult.Message);
 
-                UnRegisterMeetingEvents();
 
-                await UpdateExitTime();
+                //Log.Logger.Debug($"【exit meeting】：result={exitResult.Status}, msg={exitResult.Message}");
+                //HasErrorMsg(exitResult.Status.ToString(), exitResult.Message);
 
-                await _meetingView.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    _exitByDialog = true;
-                    _meetingView.Close();
+                //UnRegisterMeetingEvents();
 
-                    _exitMeetingCallbackEvent(true, "");
+                //await UpdateExitTime();
 
-                }));
+                //await _meetingView.Dispatcher.BeginInvoke(new Action(() =>
+                //{
+                //    _exitByDialog = true;
+                //    _meetingView.Close();
+
+                //    _exitMeetingCallbackEvent(true, "");
+
+                //}));
 
             }
             catch (Exception ex)
@@ -1149,26 +1148,26 @@ namespace St.Meeting
         {
             if (PushLiveChecked)
             {
-                _localPushLiveService.GetLiveParam();
+                //_localPushLiveService.GetLiveParam();
 
-                AsyncCallbackMsg result =
-                    await
-                        _localPushLiveService.StartPushLiveStream(
-                            _viewLayoutService.GetStreamLayout(_localPushLiveService.LiveParam.Width,
-                                _localPushLiveService.LiveParam.Height));
+                //AsyncCallbackMsg result =
+                //    await
+                //        _localPushLiveService.StartPushLiveStream(
+                //            _viewLayoutService.GetStreamLayout(_localPushLiveService.LiveParam.Width,
+                //                _localPushLiveService.LiveParam.Height));
 
-                if (HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    PushLiveChecked = false;
-                }
-                else
-                {
-                    PushLiveStreamTips =
-                        string.Format(
-                            $"分辨率：{_localPushLiveService.LiveParam.Width}*{_localPushLiveService.LiveParam.Height}\r\n" +
-                            $"码率：{_localPushLiveService.LiveParam.VideoBitrate}\r\n" +
-                            $"推流地址：{_localPushLiveService.LiveParam.Url1}");
-                }
+                //if (HasErrorMsg(result.Status.ToString(), result.Message))
+                //{
+                //    PushLiveChecked = false;
+                //}
+                //else
+                //{
+                //    PushLiveStreamTips =
+                //        string.Format(
+                //            $"分辨率：{_localPushLiveService.LiveParam.Width}*{_localPushLiveService.LiveParam.Height}\r\n" +
+                //            $"码率：{_localPushLiveService.LiveParam.VideoBitrate}\r\n" +
+                //            $"推流地址：{_localPushLiveService.LiveParam.Url1}");
+                //}
             }
             else
             {
@@ -1184,26 +1183,26 @@ namespace St.Meeting
         {
             if (RecordChecked)
             {
-                _localRecordService.GetRecordParam();
+                //_localRecordService.GetRecordParam();
 
-                AsyncCallbackMsg result =
-                    await
-                        _localRecordService.StartRecord(
-                            _viewLayoutService.GetStreamLayout(_localRecordService.RecordParam.Width,
-                                _localRecordService.RecordParam.Height));
+                //AsyncCallbackMsg result =
+                //    await
+                //        _localRecordService.StartRecord(
+                //            _viewLayoutService.GetStreamLayout(_localRecordService.RecordParam.Width,
+                //                _localRecordService.RecordParam.Height));
 
-                if (HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    RecordChecked = false;
-                }
-                else
-                {
-                    RecordTips =
-                        string.Format(
-                            $"分辨率：{_localRecordService.RecordParam.Width}*{_localRecordService.RecordParam.Height}\r\n" +
-                            $"码率：{_localRecordService.RecordParam.VideoBitrate}\r\n" +
-                            $"录制路径：{_localRecordService.RecordDirectory}");
-                }
+                //if (HasErrorMsg(result.Status.ToString(), result.Message))
+                //{
+                //    RecordChecked = false;
+                //}
+                //else
+                //{
+                //    RecordTips =
+                //        string.Format(
+                //            $"分辨率：{_localRecordService.RecordParam.Width}*{_localRecordService.RecordParam.Height}\r\n" +
+                //            $"码率：{_localRecordService.RecordParam.VideoBitrate}\r\n" +
+                //            $"录制路径：{_localRecordService.RecordDirectory}");
+                //}
             }
             else
             {
@@ -1217,67 +1216,67 @@ namespace St.Meeting
 
 
         //dynamic commands
-        private async Task ViewModeChangedAsync(ViewMode viewMode)
-        {
-            if (!CheckIsUserSpeaking(true))
-            {
-                return;
-            }
+        //private async Task ViewModeChangedAsync(ViewMode viewMode)
+        //{
+            //if (!CheckIsUserSpeaking(true))
+            //{
+            //    return;
+            //}
 
-            _viewLayoutService.ChangeViewMode(viewMode);
-            await _viewLayoutService.LaunchLayout();
-        }
+            //_viewLayoutService.ChangeViewMode(viewMode);
+            //await _viewLayoutService.LaunchLayout();
+        //}
 
-        private async Task FullScreenViewChangedAsync(ViewFrame fullScreenView)
-        {
-            if (!CheckIsUserSpeaking(true))
-            {
-                return;
-            }
+        //private async Task FullScreenViewChangedAsync(ViewFrame fullScreenView)
+        //{
+            //if (!CheckIsUserSpeaking(true))
+            //{
+            //    return;
+            //}
 
 
-            if (!CheckIsUserSpeaking(fullScreenView, true))
-            {
-                return;
-            }
+            //if (!CheckIsUserSpeaking(fullScreenView, true))
+            //{
+            //    return;
+            //}
 
-            _viewLayoutService.SetSpecialView(fullScreenView, SpecialViewType.FullScreen);
+            //_viewLayoutService.SetSpecialView(fullScreenView, SpecialViewType.FullScreen);
 
-            await _viewLayoutService.LaunchLayout();
-        }
+            //await _viewLayoutService.LaunchLayout();
+        //}
 
         private async Task BigViewChangedAsync(ViewFrame bigView)
         {
-            if (!CheckIsUserSpeaking(true))
-            {
-                return;
-            }
+            //if (!CheckIsUserSpeaking(true))
+            //{
+            //    return;
+            //}
 
-            if (_viewLayoutService.ViewFrameList.Count(viewFrame => viewFrame.IsOpened) < 2)
-            {
-                //一大多小至少有两个视图，否则不予设置
+            //if (_viewLayoutService.ViewFrameList.Count(viewFrame => viewFrame.IsOpened) < 2)
+            //{
+            //    //一大多小至少有两个视图，否则不予设置
 
-                HasErrorMsg("-1", Messages.WarningBigSmallLayoutNeedsTwoAboveViews);
-                return;
-            }
+            //    HasErrorMsg("-1", Messages.WarningBigSmallLayoutNeedsTwoAboveViews);
+            //    return;
+            //}
 
-            if (!CheckIsUserSpeaking(bigView, true))
-            {
-                return;
-            }
+            //if (!CheckIsUserSpeaking(bigView, true))
+            //{
+            //    return;
+            //}
 
-            var bigSpeakerView =
-                _viewLayoutService.ViewFrameList.FirstOrDefault(
-                    v => v.PhoneId == bigView.PhoneId && v.Hwnd == bigView.Hwnd);
+            //var bigSpeakerView =
+            //    _viewLayoutService.ViewFrameList.FirstOrDefault(
+            //        v => v.PhoneId == bigView.PhoneId && v.Hwnd == bigView.Hwnd);
 
-            if (bigSpeakerView == null)
-            {
-                //LOG ViewFrameList may change during this period.
-            }
+            //if (bigSpeakerView == null)
+            //{
+            //    //LOG ViewFrameList may change during this period.
+            //}
 
-            _viewLayoutService.SetSpecialView(bigSpeakerView, SpecialViewType.Big);
+            //_viewLayoutService.SetSpecialView(bigSpeakerView, SpecialViewType.Big);
 
-            await _viewLayoutService.LaunchLayout();
+            //await _viewLayoutService.LaunchLayout();
         }
 
         #endregion
@@ -1431,6 +1430,7 @@ namespace St.Meeting
         {
         }
 
+        //-----------------------------------------------------------------------------------------------------------------------------------------------------------
         private void _meetingView_Deactivated(object sender, EventArgs e)
         {
             IsMenuOpen = false;
@@ -1461,6 +1461,7 @@ namespace St.Meeting
 
         private async void _meetingView_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            UnRegisterMeetingEvents();
             if (GlobalData.Instance.RunMode == RunMode.Development && !_exitByDialog)
             {
                 e.Cancel = true;
@@ -1470,22 +1471,53 @@ namespace St.Meeting
 
         private void UnRegisterMeetingEvents()
         {
-            _eventAggregator.GetEvent<RemoveVideoControlEvent>().Unsubscribe(RemoveVideoControlEventHandler);
 
             _eventAggregator.GetEvent<CommandReceivedEvent>().Unsubscribe(ExecuteCommand);
 
-            _sdkService.ViewCreatedEvent -= ViewCreateEventHandler;
-            _sdkService.ViewClosedEvent -= ViewCloseEventHandler;
-            _sdkService.StartSpeakEvent -= StartSpeakEventHandler;
-            _sdkService.StopSpeakEvent -= StopSpeakEventHandler;
-            _viewLayoutService.MeetingModeChangedEvent -= MeetingModeChangedEventHandler;
-            _viewLayoutService.ViewModeChangedEvent -= ViewModeChangedEventHandler;
-            _sdkService.OtherJoinMeetingEvent -= OtherJoinMeetingEventHandler;
-            _sdkService.OtherExitMeetingEvent -= OtherExitMeetingEventHandler;
-            _sdkService.TransparentMessageReceivedEvent -= UIMessageReceivedEventHandler;
-            _sdkService.ErrorMsgReceivedEvent -= ErrorMsgReceivedEventHandler;
-            _sdkService.KickedByHostEvent -= KickedByHostEventHandler;
-            _sdkService.DiskSpaceNotEnoughEvent -= DiskSpaceNotEnoughEventHandler;
+
+            _eventAggregator.GetEvent<StartSpeakEvent>().Unsubscribe(StartSpeakEventHandler);
+            _eventAggregator.GetEvent<StopSpeakEvent>().Unsubscribe(StopSpeakEventHandler);
+
+            //CurrentLayoutInfo.Instance.ClassModeChangedEvent -= MeetingModeChangedEventHandler;
+            //CurrentLayoutInfo.Instance.PictureModeChangedEvent -= ViewModeChangedEventHandler;
+            //CurrentLayoutInfo.Instance.LayoutChangedEvent -= _viewLayoutService_LayoutChangedEvent;
+
+
+            _eventAggregator.GetEvent<UserJoinEvent>().Unsubscribe(OtherJoinMeetingEventHandler);
+            _eventAggregator.GetEvent<UserLeaveEvent>().Unsubscribe(OtherExitMeetingEventHandler);
+            _eventAggregator.GetEvent<TransparentMsgReceivedEvent>().Unsubscribe(UIMessageReceivedEventHandler);
+            _eventAggregator.GetEvent<HostKickoutUserEvent>().Unsubscribe(KickedByHostEventHandler);
+
+            _eventAggregator.GetEvent<DeviceLostNoticeEvent>().Unsubscribe(DeviceLostNoticeEventHandler);
+            _eventAggregator.GetEvent<DeviceStatusChangedEvent>().Unsubscribe(DeviceStatusChangedEventHandler);
+            _eventAggregator.GetEvent<LockStatusChangedEvent>().Unsubscribe(LockStatusChangedEventHandler);
+            _eventAggregator.GetEvent<MeetingManageExceptionEvent>().Unsubscribe(MeetingManageExceptionEventHandler);
+            _eventAggregator.GetEvent<SdkCallbackEvent>().Unsubscribe(SdkCallbackEventHandler);
+            _eventAggregator.GetEvent<UiTransparentMsgReceivedEvent>().Unsubscribe(UiTransparentMsgReceivedEventHandler);
+
+            _eventAggregator.GetEvent<ModeDisplayerTypeChangedEvent>().Unsubscribe(ClassModeChangedEventHandler);
+            _eventAggregator.GetEvent<LayoutChangedEvent>().Unsubscribe(LayoutChangedEventHandler);
+            _eventAggregator.GetEvent<RefreshCanvasEvent>().Unsubscribe(RefreshViewContainerBackground);
+
+
+            _eventAggregator.GetEvent<ParticipantCollectionChangeEvent>().Unsubscribe(ParticipantCollectionChangeEventHandler);
+
+            _eventAggregator.GetEvent<RemoveVideoControlEvent>().Unsubscribe(RemoveVideoControlEventHandler);
+
+
+
+            //_sdkService.ViewCreatedEvent -= ViewCreateEventHandler;
+            //_sdkService.ViewClosedEvent -= ViewCloseEventHandler;
+            //_sdkService.StartSpeakEvent -= StartSpeakEventHandler;
+            //_sdkService.StopSpeakEvent -= StopSpeakEventHandler;
+            //_viewLayoutService.MeetingModeChangedEvent -= MeetingModeChangedEventHandler;
+            //_viewLayoutService.ViewModeChangedEvent -= ViewModeChangedEventHandler;
+            //_sdkService.OtherJoinMeetingEvent -= OtherJoinMeetingEventHandler;
+            //_sdkService.OtherExitMeetingEvent -= OtherExitMeetingEventHandler;
+            //_sdkService.TransparentMessageReceivedEvent -= UIMessageReceivedEventHandler;
+            //_sdkService.ErrorMsgReceivedEvent -= ErrorMsgReceivedEventHandler;
+            //_sdkService.KickedByHostEvent -= KickedByHostEventHandler;
+            //_sdkService.DiskSpaceNotEnoughEvent -= DiskSpaceNotEnoughEventHandler;
         }
 
 
@@ -1513,24 +1545,24 @@ namespace St.Meeting
             }));
         }
 
-        private void ViewModeChangedEventHandler(ViewMode viewMode)
-        {
-            CurLayoutName = EnumHelper.GetDescription(typeof(ViewMode), viewMode);
-        }
+        //private void ViewModeChangedEventHandler(ViewMode viewMode)
+        //{
+        //    CurLayoutName = EnumHelper.GetDescription(typeof(ViewMode), viewMode);
+        //}
 
-        private void MeetingModeChangedEventHandler(Common.MeetingMode meetingMode)
-        {
-            CurModeName = EnumHelper.GetDescription(typeof(Common.MeetingMode), meetingMode);
+        //private void MeetingModeChangedEventHandler(Common.MeetingMode meetingMode)
+        //{
+        //    CurModeName = EnumHelper.GetDescription(typeof(Common.MeetingMode), meetingMode);
 
-            if (_sdkService.IsCreator)
-            {
-                AsyncCallbackMsg result =
-                        _sdkService.SendMessage((int) _viewLayoutService.MeetingMode,
-                            _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length,
-                            null);
-                HasErrorMsg(result.Status.ToString(), result.Message);
-            }
-        }
+        //    if (_sdkService.IsCreator)
+        //    {
+        //        AsyncCallbackMsg result =
+        //                _sdkService.SendMessage((int) _viewLayoutService.MeetingMode,
+        //                    _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length,
+        //                    null);
+        //        HasErrorMsg(result.Status.ToString(), result.Message);
+        //    }
+        //}
 
         private void ErrorMsgReceivedEventHandler(AsyncCallbackMsg error)
         {
@@ -1539,26 +1571,26 @@ namespace St.Meeting
 
         private void UIMessageReceivedEventHandler(TransparentMessage message)
         {
-            if (message.MessageId < 3)
-            {
-                _sdkService.CreatorPhoneId = message.Sender.PhoneId;
+            //if (message.MessageId < 3)
+            //{
+            //    _sdkService.CreatorPhoneId = message.Sender.PhoneId;
 
-                Common.MeetingMode meetingMode = (Common.MeetingMode) message.MessageId;
-                _viewLayoutService.ChangeMeetingMode(meetingMode);
+            //    Common.MeetingMode meetingMode = (Common.MeetingMode) message.MessageId;
+            //    _viewLayoutService.ChangeMeetingMode(meetingMode);
 
-                _viewLayoutService.LaunchLayout();
-            }
-            else
-            {
-                if (message.MessageId == (int) UiMessage.BannedToSpeak)
-                {
-                    AllowedToSpeak = false;
-                }
-                if (message.MessageId == (int) UiMessage.AllowToSpeak)
-                {
-                    AllowedToSpeak = true;
-                }
-            }
+            //    _viewLayoutService.LaunchLayout();
+            //}
+            //else
+            //{
+            //    if (message.MessageId == (int) UiMessage.BannedToSpeak)
+            //    {
+            //        AllowedToSpeak = false;
+            //    }
+            //    if (message.MessageId == (int) UiMessage.AllowToSpeak)
+            //    {
+            //        AllowedToSpeak = true;
+            //    }
+            //}
         }
 
         private void OtherExitMeetingEventHandler(MeetingSdk.SdkWrapper.MeetingDataModel.Participant contactInfo)
@@ -1582,46 +1614,46 @@ namespace St.Meeting
 
         private void OtherJoinMeetingEventHandler(MeetingSdk.SdkWrapper.MeetingDataModel.Participant contactInfo)
         {
-            var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.PhoneId);
+            //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.PhoneId);
 
-            //string displayName = string.Empty;
-            //if (!string.IsNullOrEmpty(attendee?.Name))
+            ////string displayName = string.Empty;
+            ////if (!string.IsNullOrEmpty(attendee?.Name))
+            ////{
+            ////    displayName = attendee.Name + " - ";
+            ////}
+
+            ////string joinMsg = $"{displayName}{contactInfo.m_szPhoneId}加入会议！";
+            ////HasErrorMsg("-1", joinMsg);
+
+            ////speaker automatically sends a message(with creatorPhoneId) to nonspeakers
+            ////!!!CAREFUL!!! ONLY speaker will call this
+            //if (_sdkService.IsCreator)
             //{
-            //    displayName = attendee.Name + " - ";
+            //    _sdkService.SendMessage((int) _viewLayoutService.MeetingMode,
+            //        _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length, null);
             //}
-
-            //string joinMsg = $"{displayName}{contactInfo.m_szPhoneId}加入会议！";
-            //HasErrorMsg("-1", joinMsg);
-
-            //speaker automatically sends a message(with creatorPhoneId) to nonspeakers
-            //!!!CAREFUL!!! ONLY speaker will call this
-            if (_sdkService.IsCreator)
-            {
-                _sdkService.SendMessage((int) _viewLayoutService.MeetingMode,
-                    _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length, null);
-            }
         }
 
         private async void ViewCloseEventHandler(ParticipantView speakerView)
         {
-            await _viewLayoutService.HideViewAsync(speakerView);
+            //await _viewLayoutService.HideViewAsync(speakerView);
         }
 
         private void StopSpeakEventHandler()
         {
-            _viewLayoutService.ChangeViewMode(ViewMode.Auto);
+            //_viewLayoutService.ChangeViewMode(ViewMode.Auto);
 
-            if (_sdkService.IsCreator)
-            {
-                _viewLayoutService.ChangeMeetingMode(Common.MeetingMode.Interaction);
-            }
+            //if (_sdkService.IsCreator)
+            //{
+            //    _viewLayoutService.ChangeMeetingMode(Common.MeetingMode.Interaction);
+            //}
 
-            SpeakingStatus = IsNotSpeaking;
-            SharingVisibility = Visibility.Visible;
-            CancelSharingVisibility = Visibility.Collapsed;
+            //SpeakingStatus = IsNotSpeaking;
+            //SharingVisibility = Visibility.Visible;
+            //CancelSharingVisibility = Visibility.Collapsed;
 
-            _meetingView.Dispatcher.BeginInvoke(new Action(RefreshExternalData));
-            //reload menus
+            //_meetingView.Dispatcher.BeginInvoke(new Action(RefreshExternalData));
+            ////reload menus
         }
 
         private void StartSpeakEventHandler()
@@ -1631,7 +1663,7 @@ namespace St.Meeting
 
         private async void ViewCreateEventHandler(ParticipantView speakerView)
         {
-            await _viewLayoutService.ShowViewAsync(speakerView);
+            //await _viewLayoutService.ShowViewAsync(speakerView);
         }
 
 
@@ -1725,91 +1757,91 @@ namespace St.Meeting
                 ModeMenuItems.Clear();
             }
 
-            var modes = Enum.GetNames(typeof(Common.MeetingMode));
+            var modes = Enum.GetNames(typeof(ModeDisplayerType));
             foreach (var mode in modes)
             {
                 var newModeMenu = new MenuItem();
-                newModeMenu.Header = EnumHelper.GetDescription(typeof(Common.MeetingMode),
-                    Enum.Parse(typeof(Common.MeetingMode), mode));
+                newModeMenu.Header = EnumHelper.GetDescription(typeof(ModeDisplayerType),
+                    Enum.Parse(typeof(ModeDisplayerType), mode));
                 newModeMenu.Command = ModeChangedCommand;
                 newModeMenu.CommandParameter = mode;
 
                 ModeMenuItems.Add(newModeMenu);
             }
-            CurModeName = EnumHelper.GetDescription(typeof(Common.MeetingMode), _viewLayoutService.MeetingMode);
+            CurModeName = EnumHelper.GetDescription(typeof(ModeDisplayerType), _windowManager.ModeDisplayerStore.CurrentModeDisplayerType);
 
         }
 
         private void RefreshLayoutMenuItems()
         {
-            if (LayoutMenuItems == null)
-            {
-                LayoutMenuItems = new ObservableCollection<MenuItem>();
-            }
-            else
-            {
-                LayoutMenuItems.Clear();
-            }
+            //if (LayoutMenuItems == null)
+            //{
+            //    LayoutMenuItems = new ObservableCollection<MenuItem>();
+            //}
+            //else
+            //{
+            //    LayoutMenuItems.Clear();
+            //}
 
-            var layouts = Enum.GetNames(typeof(ViewMode));
-            foreach (var layout in layouts)
-            {
-                var newLayoutMenu = new MenuItem();
-                newLayoutMenu.Header = EnumHelper.GetDescription(typeof(ViewMode), Enum.Parse(typeof(ViewMode), layout));
-                newLayoutMenu.Tag = layout;
+            //var layouts = Enum.GetNames(typeof(ViewMode));
+            //foreach (var layout in layouts)
+            //{
+            //    var newLayoutMenu = new MenuItem();
+            //    newLayoutMenu.Header = EnumHelper.GetDescription(typeof(ViewMode), Enum.Parse(typeof(ViewMode), layout));
+            //    newLayoutMenu.Tag = layout;
 
-                if (layout == ViewMode.BigSmalls.ToString() || layout == ViewMode.Closeup.ToString())
-                {
-                    foreach (var speakerView in _viewLayoutService.ViewFrameList)
-                    {
-                        if (speakerView.IsOpened)
-                        {
-                            newLayoutMenu.Items.Add(new MenuItem()
-                            {
-                                Header =
-                                    string.IsNullOrEmpty(speakerView.ViewName)
-                                        ? speakerView.PhoneId
-                                        : (speakerView.ViewName + " - " + speakerView.PhoneId),
-                                Tag = speakerView
-                            });
-                        }
-                    }
-                }
+            //    if (layout == ViewMode.BigSmalls.ToString() || layout == ViewMode.Closeup.ToString())
+            //    {
+            //        foreach (var speakerView in _viewLayoutService.ViewFrameList)
+            //        {
+            //            if (speakerView.IsOpened)
+            //            {
+            //                newLayoutMenu.Items.Add(new MenuItem()
+            //                {
+            //                    Header =
+            //                        string.IsNullOrEmpty(speakerView.ViewName)
+            //                            ? speakerView.PhoneId
+            //                            : (speakerView.ViewName + " - " + speakerView.PhoneId),
+            //                    Tag = speakerView
+            //                });
+            //            }
+            //        }
+            //    }
 
-                newLayoutMenu.Click += LayoutChangedEventHandler;
+            //    newLayoutMenu.Click += LayoutChangedEventHandler;
 
-                LayoutMenuItems.Add(newLayoutMenu);
-            }
+            //    LayoutMenuItems.Add(newLayoutMenu);
+            //}
 
-            CurLayoutName = EnumHelper.GetDescription(typeof(ViewMode), _viewLayoutService.ViewMode);
+            //CurLayoutName = EnumHelper.GetDescription(typeof(ViewMode), _viewLayoutService.ViewMode);
         }
 
         private async void LayoutChangedEventHandler(object sender, RoutedEventArgs e)
         {
-            MenuItem menuItem = sender as MenuItem;
-            MenuItem sourceMenuItem = e.OriginalSource as MenuItem;
+            //MenuItem menuItem = sender as MenuItem;
+            //MenuItem sourceMenuItem = e.OriginalSource as MenuItem;
 
-            string header = menuItem.Tag.ToString();
+            //string header = menuItem.Tag.ToString();
 
-            ViewMode viewMode = (ViewMode) Enum.Parse(typeof(ViewMode), header);
+            //ViewMode viewMode = (ViewMode) Enum.Parse(typeof(ViewMode), header);
 
-            switch (viewMode)
-            {
-                case ViewMode.Auto:
-                case ViewMode.Average:
-                    await ViewModeChangedAsync(viewMode);
-                    break;
-                case ViewMode.BigSmalls:
-                    ViewFrame bigView = sourceMenuItem.Tag as ViewFrame;
-                    await BigViewChangedAsync(bigView);
-                    break;
-                case ViewMode.Closeup:
-                    ViewFrame fullView = sourceMenuItem.Tag as ViewFrame;
-                    await FullScreenViewChangedAsync(fullView);
-                    break;
-                default:
-                    break;
-            }
+            //switch (viewMode)
+            //{
+            //    case ViewMode.Auto:
+            //    case ViewMode.Average:
+            //        await ViewModeChangedAsync(viewMode);
+            //        break;
+            //    case ViewMode.BigSmalls:
+            //        ViewFrame bigView = sourceMenuItem.Tag as ViewFrame;
+            //        await BigViewChangedAsync(bigView);
+            //        break;
+            //    case ViewMode.Closeup:
+            //        ViewFrame fullView = sourceMenuItem.Tag as ViewFrame;
+            //        await FullScreenViewChangedAsync(fullView);
+            //        break;
+            //    default:
+            //        break;
+            //}
         }
 
         #endregion

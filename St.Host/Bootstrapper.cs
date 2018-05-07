@@ -203,7 +203,7 @@ namespace St.Host
 
 
 
-            builder.RegisterType<ViewLayoutService>().As<IViewLayout>().SingleInstance();
+            //builder.RegisterType<ViewLayoutService>().As<IViewLayout>().SingleInstance();
             builder.RegisterType<GroupManager>().As<IGroupManager>().SingleInstance();
             builder.RegisterType<DialogHelper>().As<IDialogHelper>().SingleInstance();
         }
