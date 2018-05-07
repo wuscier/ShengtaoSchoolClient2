@@ -24,6 +24,7 @@ using LogManager = St.Common.LogManager;
 using MeetingSdk.Wpf;
 using UserInfo = St.Common.UserInfo;
 using MeetingSdk.NetAgent;
+using St.Common.Helper;
 
 namespace St.Meeting
 {
@@ -814,6 +815,15 @@ namespace St.Meeting
         //command handlers
         private async Task LoadAsync()
         {
+            if (!string.IsNullOrEmpty(IsDeviceSettingsValid()))
+            {
+                _exitByDialog = true;
+                _meetingView.Close();
+                _startMeetingCallbackEvent(false, "课程号无效！");
+
+                return;
+            }
+
             if (GlobalData.VideoControl == null)
             {
                 GlobalData.VideoControl = new VideoControl();
@@ -826,6 +836,13 @@ namespace St.Meeting
 
             ChangeWindowStyleInDevMode();
             await JoinMeetingAsync();
+        }
+
+        private string IsDeviceSettingsValid()
+        {
+            string errMsg = DeviceSettingsChecker.Instance.IsVideoAudioSettingsValid();
+
+            return errMsg;
         }
 
         private async Task MeetingModeChangedAsync(string meetingMode)

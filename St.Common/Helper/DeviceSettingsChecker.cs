@@ -24,8 +24,6 @@ namespace St.Common.Helper
 
         public string IsVideoAudioSettingsValid()
         {
-            string errorMsg = string.Empty;
-
             MeetingResult<IList<VideoDeviceModel>> videoDeviceResult = _meetingSdkAgent.GetVideoDevices();
 
             MeetingResult<IList<string>> micResult = _meetingSdkAgent.GetMicrophones();
@@ -37,51 +35,42 @@ namespace St.Common.Helper
             IEnumerable<string> cameraDeviceName;
             if (videoDeviceResult.Result.Count == 0 || string.IsNullOrEmpty(_configManager.MainVideoInfo?.VideoDevice) || !deviceNameAccessor.TryGetName(DeviceName.Camera, new Func<DeviceName, bool>(d => { return d.Option == "first"; }), out cameraDeviceName) || !videoDeviceResult.Result.Any(vdm => vdm.DeviceName == cameraDeviceName.FirstOrDefault()))
             {
-                errorMsg = "人像采集未设置！";
-                return errorMsg;
+                return Messages.WarningNoCamera;
             }
 
             if (_configManager.MainVideoInfo?.DisplayWidth == 0 || _configManager.MainVideoInfo?.DisplayHeight == 0 || _configManager.MainVideoInfo?.VideoBitRate == 0)
             {
-                errorMsg = "人像采集参数未设置！";
-                return errorMsg;
+                return Messages.WarningWrongVideoParams;
             }
 
             IEnumerable<string> micDeviceName;
             if (micResult.Result.Count == 0 || string.IsNullOrEmpty(_configManager.AudioInfo?.AudioSammpleDevice) || !deviceNameAccessor.TryGetName(DeviceName.Microphone, new Func<DeviceName, bool>(d => { return d.Option == "first"; }), out micDeviceName) || !micResult.Result.Any(mic => mic == micDeviceName.FirstOrDefault()))
             {
-                errorMsg = "人声音源未设置！";
-                return errorMsg;
+                return Messages.WarningNoMicrophone;
             }
 
             if (_configManager.AudioInfo?.SampleRate == 0 || _configManager.AudioInfo?.AAC == 0)
             {
-                errorMsg = "人声音源参数未设置！";
-                return errorMsg;
+                return Messages.WarningWrongMicParams;
             }
 
             string audioOutputDeviceName;
             if (speakerResult.Result.Count == 0 || string.IsNullOrEmpty(_configManager.AudioInfo?.AudioOutPutDevice) || !deviceNameAccessor.TryGetSingleName(DeviceName.Speaker, out audioOutputDeviceName) || !speakerResult.Result.Any(speaker => speaker == audioOutputDeviceName))
             {
-                errorMsg = "放音设备未设置！";
-                return errorMsg;
+                return Messages.WarningNoSpeaker;
             }
 
             if (string.IsNullOrEmpty(_configManager.RecordInfo.RecordDirectory))
             {
-                errorMsg ="录制路径未设置！";
-
-                return errorMsg;
+                return Messages.WarningRecordDirectoryNotSet;
             }
 
             if (!Directory.Exists(_configManager.RecordInfo.RecordDirectory))
             {
-                errorMsg ="录制路径不存在！";
-
-                return errorMsg;
+                return Messages.WarningRecordDirectoryNotExist;
             }
 
-            return errorMsg;
+            return "";
         }
     }
 }

@@ -31,9 +31,13 @@
 
         public const string WarningGetMeetingListFailed = "加载可参会列表失败！";
 
-        public const string WarningNoMicrophone = "麦克风未设置！";
-        public const string WarningNoSpeaker = "扬声器未设置！";
-        public const string WarningNoCamera = "视频采集未设置！";
+        public const string WarningNoMicrophone = "人声音源未设置！";
+        public const string WarningNoSpeaker = "放音设备未设置！";
+        public const string WarningNoCamera = "人像采集未设置！";
+
+        public const string WarningWrongVideoParams = "人像采集参数未设置！";
+        public const string WarningWrongMicParams = "人声音源参数未设置！";
+
 
         public const string WarningSetFillModeFailed = "设置视频窗口绘制填充模式失败！";
 
@@ -44,6 +48,8 @@
         public const string ErrorSetWorkingDirectoryFailed = "设置SDK的工作路径失败！";
 
         public const string WarningRecordDirectoryNotSet = "录制路径未设置！";
+        public const string WarningRecordDirectoryNotExist = "录制路径不存在！";
+
         public const string WarningRecordResolutionNotSet = "录制分辨率或码率未设置！";
         public const string WarningRecordParamWrongFormat = "录制参数格式设置有误！";
 

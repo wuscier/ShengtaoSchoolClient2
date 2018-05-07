@@ -205,6 +205,7 @@
     <Compile Include="Converter\BoolToStringConverter.cs" />
     <Compile Include="Helper\CacheKey.cs" />
     <Compile Include="Helper\DataGridPlus.cs" />
+    <Compile Include="Helper\DeviceSettingsChecker.cs" />
     <Compile Include="Helper\HotKeyApi.cs" />
     <Compile Include="Helper\InputSimulatorManager.cs" />
     <Compile Include="Helper\RunMode.cs" />
