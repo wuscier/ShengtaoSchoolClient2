@@ -20,6 +20,7 @@ using St.Host.Core;
 using MeetingSdk.NetAgent;
 using MeetingSdk.Wpf;
 using Prism.Events;
+using St.Host.Service;
 
 namespace St.Host
 {
@@ -180,6 +181,17 @@ namespace St.Host
             builder.RegisterType<DeviceNameAccessor>().As<IDeviceNameAccessor>().SingleInstance();
             builder.RegisterType<DeviceNameProvider>().As<IDeviceNameProvider>().SingleInstance();
             builder.RegisterType<VideoBoxManager>().As<IVideoBoxManager>();
+
+
+            builder.RegisterType<PublishMicStreamParameterProvider>().As<IStreamParameterProvider<PublishMicStreamParameter>>().SingleInstance();
+            builder.RegisterType<PublishCameraStreamParameterProvider>().As<IStreamParameterProvider<PublishCameraStreamParameter>>().SingleInstance();
+            builder.RegisterType<PublishDataCardStreamParameterProvider>().As<IStreamParameterProvider<PublishDataCardStreamParameter>>().SingleInstance();
+            builder.RegisterType<PublishWinCaptureStreamParameterProvider>().As<IStreamParameterProvider<PublishWinCaptureStreamParameter>>().SingleInstance();
+            builder.RegisterType<SubscribeMicStreamParameterProvider>().As<IStreamParameterProvider<SubscribeMicStreamParameter>>().SingleInstance();
+            builder.RegisterType<SubscribeCameraStreamParameterProvider>().As<IStreamParameterProvider<SubscribeCameraStreamParameter>>().SingleInstance();
+            builder.RegisterType<SubscribeDataCardStreamParameterProvider>().As<IStreamParameterProvider<SubscribeDataCardStreamParameter>>().SingleInstance();
+            builder.RegisterType<SubscribeWinCaptureStreamParameterProvider>().As<IStreamParameterProvider<SubscribeWinCaptureStreamParameter>>().SingleInstance();
+
 
 
             builder.RegisterType<ViewLayoutService>().As<IViewLayout>().SingleInstance();

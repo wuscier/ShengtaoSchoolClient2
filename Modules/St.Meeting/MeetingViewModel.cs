@@ -64,7 +64,7 @@ namespace St.Meeting
             _startMeetingCallbackEvent = startMeetingCallback;
             _exitMeetingCallbackEvent = exitMeetingCallback;
 
-            MeetingId = _sdkService.MeetingId;
+            //MeetingId = _sdkService.MeetingId;
             SpeakingStatus = IsNotSpeaking;
             //SelfDescription = $"{_sdkService.SelfName}-{_sdkService.SelfPhoneId}";
 
@@ -711,6 +711,8 @@ namespace St.Meeting
 
             if (meetingIdObj != null && int.TryParse(meetingIdObj.ToString(), out meetingId))
             {
+                MeetingId = meetingId;
+
                 var joinResult = await _meetingSdkAgent.JoinMeeting(meetingId, true);
 
                 if (joinResult.StatusCode != 0)
@@ -733,7 +735,7 @@ namespace St.Meeting
             }
 
 
-            await _windowManager.Join(_meetingId, false, IsCreator);
+            await _windowManager.Join(meetingId, false, IsCreator);
 
             _startMeetingCallbackEvent(true, "");
 
@@ -815,11 +817,12 @@ namespace St.Meeting
         //command handlers
         private async Task LoadAsync()
         {
-            if (!string.IsNullOrEmpty(IsDeviceSettingsValid()))
+            string errMsg = DeviceSettingsChecker.Instance.IsVideoAudioSettingsValid();
+            if (!string.IsNullOrEmpty(errMsg))
             {
                 _exitByDialog = true;
                 _meetingView.Close();
-                _startMeetingCallbackEvent(false, "课程号无效！");
+                _startMeetingCallbackEvent(false, errMsg);
 
                 return;
             }
@@ -836,13 +839,6 @@ namespace St.Meeting
 
             ChangeWindowStyleInDevMode();
             await JoinMeetingAsync();
-        }
-
-        private string IsDeviceSettingsValid()
-        {
-            string errMsg = DeviceSettingsChecker.Instance.IsVideoAudioSettingsValid();
-
-            return errMsg;
         }
 
         private async Task MeetingModeChangedAsync(string meetingMode)

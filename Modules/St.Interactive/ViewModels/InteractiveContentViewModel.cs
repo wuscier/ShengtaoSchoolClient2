@@ -466,6 +466,12 @@ namespace St.Interactive
                 case Messages.WarningNoMicrophone:
                 case Messages.WarningNoSpeaker:
                 case Messages.WarningNoCamera:
+
+                case Messages.WarningWrongVideoParams:
+                case Messages.WarningWrongMicParams:
+                case Messages.WarningRecordDirectoryNotSet:
+                case Messages.WarningRecordDirectoryNotExist:
+
                     bool value = _dialogHelper.Show(msg);
                     if (value)
                     {
