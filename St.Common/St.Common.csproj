@@ -212,6 +212,7 @@
     <Compile Include="Helper\SscDialog.xaml.cs">
       <DependentUpon>SscDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helper\WindowNames.cs" />
     <Compile Include="Helper\YesNoDialog.xaml.cs">
       <DependentUpon>YesNoDialog.xaml</DependentUpon>
     </Compile>

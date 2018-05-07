@@ -1223,66 +1223,66 @@ namespace St.Meeting
         //dynamic commands
         //private async Task ViewModeChangedAsync(ViewMode viewMode)
         //{
-            //if (!CheckIsUserSpeaking(true))
-            //{
-            //    return;
-            //}
+        //if (!CheckIsUserSpeaking(true))
+        //{
+        //    return;
+        //}
 
-            //_viewLayoutService.ChangeViewMode(viewMode);
-            //await _viewLayoutService.LaunchLayout();
+        //_viewLayoutService.ChangeViewMode(viewMode);
+        //await _viewLayoutService.LaunchLayout();
         //}
 
         //private async Task FullScreenViewChangedAsync(ViewFrame fullScreenView)
         //{
-            //if (!CheckIsUserSpeaking(true))
-            //{
-            //    return;
-            //}
+        //    if (!CheckIsUserSpeaking(true))
+        //    {
+        //        return;
+        //    }
 
 
-            //if (!CheckIsUserSpeaking(fullScreenView, true))
-            //{
-            //    return;
-            //}
+        //    if (!CheckIsUserSpeaking(fullScreenView, true))
+        //    {
+        //        return;
+        //    }
 
-            //_viewLayoutService.SetSpecialView(fullScreenView, SpecialViewType.FullScreen);
+        //    _viewLayoutService.SetSpecialView(fullScreenView, SpecialViewType.FullScreen);
 
-            //await _viewLayoutService.LaunchLayout();
+        //    await _viewLayoutService.LaunchLayout();
         //}
 
-        private async Task BigViewChangedAsync(ViewFrame bigView)
-        {
-            //if (!CheckIsUserSpeaking(true))
-            //{
-            //    return;
-            //}
+        //private async Task BigViewChangedAsync(ViewFrame bigView)
+        //{
+        //    if (!CheckIsUserSpeaking(true))
+        //    {
+        //        return;
+        //    }
 
-            //if (_viewLayoutService.ViewFrameList.Count(viewFrame => viewFrame.IsOpened) < 2)
-            //{
-            //    //一大多小至少有两个视图，否则不予设置
+        //    if (_viewLayoutService.ViewFrameList.Count(viewFrame => viewFrame.IsOpened) < 2)
+        //    {
+        //        //一大多小至少有两个视图，否则不予设置
 
-            //    HasErrorMsg("-1", Messages.WarningBigSmallLayoutNeedsTwoAboveViews);
-            //    return;
-            //}
+        //        HasErrorMsg("-1", Messages.WarningBigSmallLayoutNeedsTwoAboveViews);
+        //        return;
+        //    }
 
-            //if (!CheckIsUserSpeaking(bigView, true))
-            //{
-            //    return;
-            //}
+        //    if (!CheckIsUserSpeaking(bigView, true))
+        //    {
+        //        return;
+        //    }
 
-            //var bigSpeakerView =
-            //    _viewLayoutService.ViewFrameList.FirstOrDefault(
-            //        v => v.PhoneId == bigView.PhoneId && v.Hwnd == bigView.Hwnd);
+        //    var bigSpeakerView =
+        //        _viewLayoutService.ViewFrameList.FirstOrDefault(
+        //            v => v.PhoneId == bigView.PhoneId && v.Hwnd == bigView.Hwnd);
 
-            //if (bigSpeakerView == null)
-            //{
-            //    //LOG ViewFrameList may change during this period.
-            //}
+        //    if (bigSpeakerView == null)
+        //    {
+        //        //LOG ViewFrameList may change during this period.
+        //    }
 
-            //_viewLayoutService.SetSpecialView(bigSpeakerView, SpecialViewType.Big);
+        //    _viewLayoutService.SetSpecialView(bigSpeakerView, SpecialViewType.Big);
 
-            //await _viewLayoutService.LaunchLayout();
-        }
+        //    await _viewLayoutService.LaunchLayout();
+        //}
 
         #endregion
 
@@ -1381,6 +1381,9 @@ namespace St.Meeting
 
         private void LayoutChangedEventHandler(LayoutRenderType obj)
         {
+            CurLayoutName = EnumHelper.GetDescription(typeof(LayoutRenderType), obj);
+            CurModeName = EnumHelper.GetDescription(typeof(ModeDisplayerType), _windowManager.ModeDisplayerStore.CurrentModeDisplayerType);
+
         }
 
         private async void ClassModeChangedEventHandler(ModeDisplayerType obj)
@@ -1391,11 +1394,13 @@ namespace St.Meeting
             }
 
             CurModeName = EnumHelper.GetDescription(typeof(ModeDisplayerType), obj);
+            CurLayoutName = EnumHelper.GetDescription(typeof(LayoutRenderType), _windowManager.LayoutRendererStore.CurrentLayoutRenderType);
         }
 
         private async Task SyncClassMode()
         {
             MeetingResult sendUiMsgResult = await _meetingSdkAgent.AsynSendUIMsg((int)_windowManager.ModeDisplayerStore.CurrentModeDisplayerType, 0, "");
+            HasErrorMsg(sendUiMsgResult.StatusCode.ToString(), sendUiMsgResult.Message);
         }
 
         private void UiTransparentMsgReceivedEventHandler(UiTransparentMsg obj)
@@ -1542,7 +1547,6 @@ namespace St.Meeting
             _meetingView.Grid.Children.Remove(GlobalData.VideoControl);
         }
 
-
         private void KickedByHostEventHandler()
         {
             _meetingView.Dispatcher.BeginInvoke(new Action(() =>
@@ -1560,25 +1564,6 @@ namespace St.Meeting
                 //mainView.Visibility = Visibility.Visible;
             }));
         }
-
-        //private void ViewModeChangedEventHandler(ViewMode viewMode)
-        //{
-        //    CurLayoutName = EnumHelper.GetDescription(typeof(ViewMode), viewMode);
-        //}
-
-        //private void MeetingModeChangedEventHandler(Common.MeetingMode meetingMode)
-        //{
-        //    CurModeName = EnumHelper.GetDescription(typeof(Common.MeetingMode), meetingMode);
-
-        //    if (_sdkService.IsCreator)
-        //    {
-        //        AsyncCallbackMsg result =
-        //                _sdkService.SendMessage((int) _viewLayoutService.MeetingMode,
-        //                    _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length,
-        //                    null);
-        //        HasErrorMsg(result.Status.ToString(), result.Message);
-        //    }
-        //}
 
         private void ErrorMsgReceivedEventHandler(AsyncCallbackMsg error)
         {
@@ -1790,74 +1775,95 @@ namespace St.Meeting
 
         private void RefreshLayoutMenuItems()
         {
-            //if (LayoutMenuItems == null)
-            //{
-            //    LayoutMenuItems = new ObservableCollection<MenuItem>();
-            //}
-            //else
-            //{
-            //    LayoutMenuItems.Clear();
-            //}
+            if (LayoutMenuItems == null)
+            {
+                LayoutMenuItems = new ObservableCollection<MenuItem>();
+            }
+            else
+            {
+                LayoutMenuItems.Clear();
+            }
 
-            //var layouts = Enum.GetNames(typeof(ViewMode));
-            //foreach (var layout in layouts)
-            //{
-            //    var newLayoutMenu = new MenuItem();
-            //    newLayoutMenu.Header = EnumHelper.GetDescription(typeof(ViewMode), Enum.Parse(typeof(ViewMode), layout));
-            //    newLayoutMenu.Tag = layout;
+            var layouts = Enum.GetNames(typeof(LayoutRenderType));
+            foreach (var layout in layouts)
+            {
+                var newLayoutMenu = new MenuItem();
+                newLayoutMenu.Header = EnumHelper.GetDescription(typeof(LayoutRenderType), Enum.Parse(typeof(LayoutRenderType), layout));
+                newLayoutMenu.Tag = layout;
 
-            //    if (layout == ViewMode.BigSmalls.ToString() || layout == ViewMode.Closeup.ToString())
-            //    {
-            //        foreach (var speakerView in _viewLayoutService.ViewFrameList)
-            //        {
-            //            if (speakerView.IsOpened)
-            //            {
-            //                newLayoutMenu.Items.Add(new MenuItem()
-            //                {
-            //                    Header =
-            //                        string.IsNullOrEmpty(speakerView.ViewName)
-            //                            ? speakerView.PhoneId
-            //                            : (speakerView.ViewName + " - " + speakerView.PhoneId),
-            //                    Tag = speakerView
-            //                });
-            //            }
-            //        }
-            //    }
+                if (layout == LayoutRenderType.BigSmallsLayout.ToString() || layout == LayoutRenderType.CloseupLayout.ToString())
+                {
+                    foreach (var speakerView in _windowManager.VideoBoxManager.Items)
+                    {
+                        if (speakerView.Visible)
+                        {
+                            newLayoutMenu.Items.Add(new MenuItem()
+                            {
+                                Header =
+                                    string.IsNullOrEmpty(speakerView.Name)
+                                        ? speakerView.AccountResource.AccountModel.AccountId.ToString()
+                                        : (speakerView.AccountResource.AccountModel.AccountName + " - " + speakerView.AccountResource.AccountModel.AccountId),
+                                Tag = speakerView
+                            });
+                        }
+                    }
+                }
 
-            //    newLayoutMenu.Click += LayoutChangedEventHandler;
+                newLayoutMenu.Click += LayoutChangedEventHandler;
 
-            //    LayoutMenuItems.Add(newLayoutMenu);
-            //}
+                LayoutMenuItems.Add(newLayoutMenu);
+            }
 
-            //CurLayoutName = EnumHelper.GetDescription(typeof(ViewMode), _viewLayoutService.ViewMode);
+            CurLayoutName = EnumHelper.GetDescription(typeof(LayoutRenderType), _windowManager.LayoutRendererStore.CurrentLayoutRenderType);
         }
 
-        private async void LayoutChangedEventHandler(object sender, RoutedEventArgs e)
+        private void LayoutChangedEventHandler(object sender, RoutedEventArgs e)
         {
-            //MenuItem menuItem = sender as MenuItem;
-            //MenuItem sourceMenuItem = e.OriginalSource as MenuItem;
+            MenuItem menuItem = sender as MenuItem;
+            MenuItem sourceMenuItem = e.OriginalSource as MenuItem;
 
-            //string header = menuItem.Tag.ToString();
+            string header = menuItem.Tag.ToString();
 
-            //ViewMode viewMode = (ViewMode) Enum.Parse(typeof(ViewMode), header);
+            LayoutRenderType layout = (LayoutRenderType)Enum.Parse(typeof(LayoutRenderType), header);
 
-            //switch (viewMode)
-            //{
-            //    case ViewMode.Auto:
-            //    case ViewMode.Average:
-            //        await ViewModeChangedAsync(viewMode);
-            //        break;
-            //    case ViewMode.BigSmalls:
-            //        ViewFrame bigView = sourceMenuItem.Tag as ViewFrame;
-            //        await BigViewChangedAsync(bigView);
-            //        break;
-            //    case ViewMode.Closeup:
-            //        ViewFrame fullView = sourceMenuItem.Tag as ViewFrame;
-            //        await FullScreenViewChangedAsync(fullView);
-            //        break;
-            //    default:
-            //        break;
-            //}
+
+            switch (layout)
+            {
+                case LayoutRenderType.AutoLayout:
+                case LayoutRenderType.AverageLayout:
+
+                    if (_windowManager.LayoutChange(WindowNames.MainWindow, layout))
+                    {
+                    }
+
+                    break;
+                case LayoutRenderType.CloseupLayout:
+                case LayoutRenderType.BigSmallsLayout:
+
+                    VideoBox videoBox = sourceMenuItem.Tag as VideoBox;
+
+                    var specialView = _windowManager.VideoBoxManager.Items.FirstOrDefault(v => v.AccountResource != null && v.AccountResource.AccountModel.AccountId == videoBox.AccountResource.AccountModel.AccountId && v.Handle == videoBox.Handle);
+
+                    if (specialView == null)
+                    {
+                        HasErrorMsg("-1", "找不到该视图！");
+                        return;
+                    }
+
+                    _windowManager.VideoBoxManager.SetProperty(layout.ToString(), specialView.Name);
+
+                    if (!_windowManager.LayoutChange(WindowNames.MainWindow, layout))
+                    {
+                        HasErrorMsg("-1", "无法设置一大一小画面模式！");
+                    }
+
+                    break;
+            }
+
+            if (layout != _windowManager.LayoutRendererStore.CurrentLayoutRenderType)
+            {
+                CurLayoutName = EnumHelper.GetDescription(typeof(LayoutRenderType), layout);
+            }
         }
 
         #endregion
