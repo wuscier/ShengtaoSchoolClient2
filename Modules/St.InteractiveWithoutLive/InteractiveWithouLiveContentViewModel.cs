@@ -10,7 +10,6 @@ using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
 using MeetingSdk.SdkWrapper;
-using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Prism.Events;
 using Prism.Regions;
 using Serilog;

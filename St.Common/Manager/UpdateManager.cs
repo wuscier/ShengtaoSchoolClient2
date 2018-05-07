@@ -1,7 +1,6 @@
 ﻿using Serilog;
 using System;
 using System.IO;
-using System.Text;
 
 namespace St.Common
 {

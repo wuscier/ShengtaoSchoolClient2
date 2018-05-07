@@ -3,11 +3,6 @@ using MeetingSdk.NetAgent;
 using MeetingSdk.NetAgent.Models;
 using MeetingSdk.Wpf;
 using Prism.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace St.Common.Manager
 {

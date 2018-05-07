@@ -8,7 +8,6 @@ using System.Windows.Input;
 using Caliburn.Micro;
 using MeetingSdk.NetAgent;
 using MeetingSdk.SdkWrapper;
-using MeetingSdk.SdkWrapper.MeetingDataModel;
 using MeetingSdk.Wpf;
 using Prism.Commands;
 using Prism.Events;

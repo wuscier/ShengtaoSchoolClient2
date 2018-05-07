@@ -1,5 +1,4 @@
-﻿using WindowsInput;
-using WindowsInput.Native;
+﻿using WindowsInput.Native;
 using St.Common;
 
 namespace St.CommandListener

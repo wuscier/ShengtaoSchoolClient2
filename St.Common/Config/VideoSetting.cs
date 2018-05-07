@@ -1,5 +1,4 @@
-﻿using MeetingSdk.NetAgent.Models;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace St.Common
 {

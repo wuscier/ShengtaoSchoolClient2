@@ -9,7 +9,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using Caliburn.Micro;
 using MeetingSdk.SdkWrapper;
-using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Prism.Regions;
 using MeetingSdk.NetAgent;
 using System.Reflection;

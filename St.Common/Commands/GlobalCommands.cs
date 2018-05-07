@@ -3,10 +3,8 @@ using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using Newtonsoft.Json;
 using Serilog;
-using Squirrel.Json;
 
 namespace St.Common.Commands
 {

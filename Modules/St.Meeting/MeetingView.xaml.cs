@@ -1,8 +1,5 @@
 ﻿using System.Windows;
 using System;
-using System.Drawing;
-using System.Windows.Forms;
-using Label = System.Windows.Forms.Label;
 
 namespace St.Meeting
 {

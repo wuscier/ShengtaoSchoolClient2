@@ -1,6 +1,4 @@
-﻿using Prism.Mvvm;
-
-namespace St.Common
+﻿namespace St.Common
 {
     public class AudioInfo
     {
