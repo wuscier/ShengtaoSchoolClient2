@@ -84,7 +84,7 @@ namespace St.Meeting
 
 
             LoadCommand = DelegateCommand.FromAsyncHandler(LoadAsync);
-            ModeChangedCommand = DelegateCommand<string>.FromAsyncHandler(MeetingModeChangedAsync);
+            ModeChangedCommand = new DelegateCommand<string>(MeetingModeChangedAsync);
             SpeakingStatusChangedCommand = DelegateCommand.FromAsyncHandler(SpeakingStatusChangedAsync);
             ExternalDataChangedCommand = DelegateCommand<string>.FromAsyncHandler(ExternalDataChangedAsync);
             SharingDesktopCommand = DelegateCommand.FromAsyncHandler(SharingDesktopAsync);
@@ -848,8 +848,13 @@ namespace St.Meeting
             await JoinMeetingAsync();
         }
 
-        private async Task MeetingModeChangedAsync(string meetingMode)
+        private void MeetingModeChangedAsync(string meetingMode)
         {
+
+            var targetMode = (ModeDisplayerType)Enum.Parse(typeof(ModeDisplayerType), meetingMode);
+
+            _windowManager.ModeChange(targetMode);
+
             //if (!CheckIsUserSpeaking(true))
             //{
             //    return;
@@ -1378,8 +1383,19 @@ namespace St.Meeting
         {
         }
 
-        private void ClassModeChangedEventHandler(ModeDisplayerType obj)
+        private async void ClassModeChangedEventHandler(ModeDisplayerType obj)
         {
+            if (IsCreator)
+            {
+                await SyncClassMode();
+            }
+
+            CurModeName = EnumHelper.GetDescription(typeof(ModeDisplayerType), obj);
+        }
+
+        private async Task SyncClassMode()
+        {
+            MeetingResult sendUiMsgResult = await _meetingSdkAgent.AsynSendUIMsg((int)_windowManager.ModeDisplayerStore.CurrentModeDisplayerType, 0, "");
         }
 
         private void UiTransparentMsgReceivedEventHandler(UiTransparentMsg obj)
