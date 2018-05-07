@@ -25,6 +25,7 @@ using MeetingSdk.Wpf;
 using UserInfo = St.Common.UserInfo;
 using MeetingSdk.NetAgent;
 using St.Common.Helper;
+using MeetingSdk.NetAgent.Models;
 
 namespace St.Meeting
 {
@@ -249,15 +250,15 @@ namespace St.Meeting
             }
             else if (command.Directive == GlobalCommands.Instance.InteractionCommand.Directive)
             {
-                await MeetingModeChangedAsync(MeetingMode.Interaction.ToString());
+                await MeetingModeChangedAsync(Common.MeetingMode.Interaction.ToString());
             }
             else if (command.Directive == GlobalCommands.Instance.SpeakerCommand.Directive)
             {
-                await MeetingModeChangedAsync(MeetingMode.Speaker.ToString());
+                await MeetingModeChangedAsync(Common.MeetingMode.Speaker.ToString());
             }
             else if (command.Directive == GlobalCommands.Instance.ShareCommand.Directive)
             {
-                await MeetingModeChangedAsync(MeetingMode.Sharing.ToString());
+                await MeetingModeChangedAsync(Common.MeetingMode.Sharing.ToString());
             }
         }
 
@@ -848,7 +849,7 @@ namespace St.Meeting
                 return;
             }
 
-            if (meetingMode == MeetingMode.Speaker.ToString() &&
+            if (meetingMode == Common.MeetingMode.Speaker.ToString() &&
                 !_viewLayoutService.ViewFrameList.Any(
                     v => v.PhoneId == _sdkService.CreatorPhoneId && v.ViewType == 1))
             {
@@ -859,7 +860,7 @@ namespace St.Meeting
                 return;
             }
 
-            if (meetingMode == MeetingMode.Sharing.ToString() &&
+            if (meetingMode == Common.MeetingMode.Sharing.ToString() &&
                 !_viewLayoutService.ViewFrameList.Any(
                     v => v.PhoneId == _sdkService.CreatorPhoneId && v.ViewType == 2))
             {
@@ -870,7 +871,7 @@ namespace St.Meeting
                 return;
             }
 
-            var newMeetingMode = (MeetingMode) Enum.Parse(typeof(MeetingMode), meetingMode);
+            var newMeetingMode = (Common.MeetingMode) Enum.Parse(typeof(Common.MeetingMode), meetingMode);
 
             _viewLayoutService.ChangeMeetingMode(newMeetingMode);
 
@@ -1317,23 +1318,126 @@ namespace St.Meeting
 
         private void RegisterMeetingEvents()
         {
+            _eventAggregator.GetEvent<StartSpeakEvent>().Subscribe(StartSpeakEventHandler);
+            _eventAggregator.GetEvent<StopSpeakEvent>().Subscribe(StopSpeakEventHandler);
+            _eventAggregator.GetEvent<UserJoinEvent>().Subscribe(OtherJoinMeetingEventHandler);
+            _eventAggregator.GetEvent<UserLeaveEvent>().Subscribe(OtherExitMeetingEventHandler);
+            _eventAggregator.GetEvent<TransparentMsgReceivedEvent>().Subscribe(UIMessageReceivedEventHandler);
+            _eventAggregator.GetEvent<HostKickoutUserEvent>().Subscribe(KickedByHostEventHandler);
+
+            _eventAggregator.GetEvent<DeviceLostNoticeEvent>().Subscribe(DeviceLostNoticeEventHandler);
+            _eventAggregator.GetEvent<DeviceStatusChangedEvent>().Subscribe(DeviceStatusChangedEventHandler);
+            _eventAggregator.GetEvent<LockStatusChangedEvent>().Subscribe(LockStatusChangedEventHandler);
+            _eventAggregator.GetEvent<MeetingManageExceptionEvent>().Subscribe(MeetingManageExceptionEventHandler);
+            _eventAggregator.GetEvent<SdkCallbackEvent>().Subscribe(SdkCallbackEventHandler);
+            _eventAggregator.GetEvent<UiTransparentMsgReceivedEvent>().Subscribe(UiTransparentMsgReceivedEventHandler);
+
+            _eventAggregator.GetEvent<ModeDisplayerTypeChangedEvent>().Subscribe(ClassModeChangedEventHandler);
+            _eventAggregator.GetEvent<LayoutChangedEvent>().Subscribe(LayoutChangedEventHandler);
+            _eventAggregator.GetEvent<RefreshCanvasEvent>().Subscribe(RefreshViewContainerBackground);
+
+
+            _eventAggregator.GetEvent<ParticipantCollectionChangeEvent>().Subscribe(ParticipantCollectionChangeEventHandler);
+
             _eventAggregator.GetEvent<RemoveVideoControlEvent>().Subscribe(RemoveVideoControlEventHandler, ThreadOption.UIThread, true);
 
             _meetingView.LocationChanged += _meetingView_LocationChanged;
             _meetingView.Deactivated += _meetingView_Deactivated;
             _meetingView.Closing += _meetingView_Closing;
-            _sdkService.ViewCreatedEvent += ViewCreateEventHandler;
-            _sdkService.ViewClosedEvent += ViewCloseEventHandler;
-            _sdkService.StartSpeakEvent += StartSpeakEventHandler;
-            _sdkService.StopSpeakEvent += StopSpeakEventHandler;
-            _viewLayoutService.MeetingModeChangedEvent += MeetingModeChangedEventHandler;
-            _viewLayoutService.ViewModeChangedEvent += ViewModeChangedEventHandler;
-            _sdkService.OtherJoinMeetingEvent += OtherJoinMeetingEventHandler;
-            _sdkService.OtherExitMeetingEvent += OtherExitMeetingEventHandler;
-            _sdkService.TransparentMessageReceivedEvent += UIMessageReceivedEventHandler;
-            _sdkService.ErrorMsgReceivedEvent += ErrorMsgReceivedEventHandler;
-            _sdkService.KickedByHostEvent += KickedByHostEventHandler;
-            _sdkService.DiskSpaceNotEnoughEvent += DiskSpaceNotEnoughEventHandler;
+
+
+            //_sdkService.ViewCreatedEvent += ViewCreateEventHandler;
+            //_sdkService.ViewClosedEvent += ViewCloseEventHandler;
+            //_sdkService.StartSpeakEvent += StartSpeakEventHandler;
+            //_sdkService.StopSpeakEvent += StopSpeakEventHandler;
+            //_viewLayoutService.MeetingModeChangedEvent += MeetingModeChangedEventHandler;
+            //_viewLayoutService.ViewModeChangedEvent += ViewModeChangedEventHandler;
+            //_sdkService.OtherJoinMeetingEvent += OtherJoinMeetingEventHandler;
+            //_sdkService.OtherExitMeetingEvent += OtherExitMeetingEventHandler;
+            //_sdkService.TransparentMessageReceivedEvent += UIMessageReceivedEventHandler;
+            //_sdkService.ErrorMsgReceivedEvent += ErrorMsgReceivedEventHandler;
+            //_sdkService.KickedByHostEvent += KickedByHostEventHandler;
+            //_sdkService.DiskSpaceNotEnoughEvent += DiskSpaceNotEnoughEventHandler;
+        }
+
+        private void ParticipantCollectionChangeEventHandler(IEnumerable<MeetingSdk.Wpf.Participant> obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RefreshViewContainerBackground()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void LayoutChangedEventHandler(LayoutRenderType obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ClassModeChangedEventHandler(ModeDisplayerType obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void UiTransparentMsgReceivedEventHandler(UiTransparentMsg obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SdkCallbackEventHandler(SdkCallbackModel obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void MeetingManageExceptionEventHandler(ExceptionModel obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void LockStatusChangedEventHandler(MeetingResult obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DeviceStatusChangedEventHandler(DeviceStatusModel obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DeviceLostNoticeEventHandler(ResourceModel obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void KickedByHostEventHandler(KickoutUserModel obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void UIMessageReceivedEventHandler(TransparentMsg obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OtherExitMeetingEventHandler(AccountModel obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OtherJoinMeetingEventHandler(AccountModel obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void StopSpeakEventHandler(SpeakModel obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void StartSpeakEventHandler(SpeakModel obj)
+        {
+            throw new NotImplementedException();
         }
 
         private void _meetingView_Deactivated(object sender, EventArgs e)
@@ -1423,9 +1527,9 @@ namespace St.Meeting
             CurLayoutName = EnumHelper.GetDescription(typeof(ViewMode), viewMode);
         }
 
-        private void MeetingModeChangedEventHandler(MeetingMode meetingMode)
+        private void MeetingModeChangedEventHandler(Common.MeetingMode meetingMode)
         {
-            CurModeName = EnumHelper.GetDescription(typeof(MeetingMode), meetingMode);
+            CurModeName = EnumHelper.GetDescription(typeof(Common.MeetingMode), meetingMode);
 
             if (_sdkService.IsCreator)
             {
@@ -1448,7 +1552,7 @@ namespace St.Meeting
             {
                 _sdkService.CreatorPhoneId = message.Sender.PhoneId;
 
-                MeetingMode meetingMode = (MeetingMode) message.MessageId;
+                Common.MeetingMode meetingMode = (Common.MeetingMode) message.MessageId;
                 _viewLayoutService.ChangeMeetingMode(meetingMode);
 
                 _viewLayoutService.LaunchLayout();
@@ -1518,7 +1622,7 @@ namespace St.Meeting
 
             if (_sdkService.IsCreator)
             {
-                _viewLayoutService.ChangeMeetingMode(MeetingMode.Interaction);
+                _viewLayoutService.ChangeMeetingMode(Common.MeetingMode.Interaction);
             }
 
             SpeakingStatus = IsNotSpeaking;
@@ -1630,18 +1734,18 @@ namespace St.Meeting
                 ModeMenuItems.Clear();
             }
 
-            var modes = Enum.GetNames(typeof(MeetingMode));
+            var modes = Enum.GetNames(typeof(Common.MeetingMode));
             foreach (var mode in modes)
             {
                 var newModeMenu = new MenuItem();
-                newModeMenu.Header = EnumHelper.GetDescription(typeof(MeetingMode),
-                    Enum.Parse(typeof(MeetingMode), mode));
+                newModeMenu.Header = EnumHelper.GetDescription(typeof(Common.MeetingMode),
+                    Enum.Parse(typeof(Common.MeetingMode), mode));
                 newModeMenu.Command = ModeChangedCommand;
                 newModeMenu.CommandParameter = mode;
 
                 ModeMenuItems.Add(newModeMenu);
             }
-            CurModeName = EnumHelper.GetDescription(typeof(MeetingMode), _viewLayoutService.MeetingMode);
+            CurModeName = EnumHelper.GetDescription(typeof(Common.MeetingMode), _viewLayoutService.MeetingMode);
 
         }
 
