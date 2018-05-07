@@ -895,19 +895,23 @@ namespace St.Meeting
         {
             if (SpeakingStatus == IsSpeaking)
             {
-                AsyncCallbackMsg stopSucceeded = await _sdkService.StopSpeak();
+                var stopSpeakMsg = await _meetingSdkAgent.AskForStopSpeak();
+                HasErrorMsg(stopSpeakMsg.StatusCode.ToString(), stopSpeakMsg.Message);
                 return;
                 //will change SpeakStatus in StopSpeakCallbackEventHandler.
             }
 
             if (SpeakingStatus == IsNotSpeaking)
             {
-                AsyncCallbackMsg result = await _sdkService.ApplyToSpeak();
-                if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    // will change SpeakStatus in callback???
-                    SpeakingStatus = IsSpeaking;
-                }
+                var applyToSpeakMsg = await _meetingSdkAgent.AskForSpeak();
+
+                HasErrorMsg(applyToSpeakMsg.StatusCode.ToString(), applyToSpeakMsg.Message);
+
+                //if (!HasErrorMsg(result.Status.ToString(), result.Message))
+                //{
+                //    // will change SpeakStatus in callback???
+                //    SpeakingStatus = IsSpeaking;
+                //}
             }
         }
 
@@ -1445,10 +1449,20 @@ namespace St.Meeting
 
         private void StopSpeakEventHandler(SpeakModel obj)
         {
+            if (IsCreator)
+            {
+                if (_windowManager.ModeChange(ModeDisplayerType.InteractionMode))
+                {
+                }
+            }
+
+            SpeakingStatus = IsNotSpeaking;
         }
+
 
         private void StartSpeakEventHandler(SpeakModel obj)
         {
+            SpeakingStatus = IsSpeaking;
         }
 
         //-----------------------------------------------------------------------------------------------------------------------------------------------------------
