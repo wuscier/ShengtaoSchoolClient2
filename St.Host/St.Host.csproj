@@ -226,8 +226,14 @@
     <Compile Include="Core\GroupManager.cs" />
     <Compile Include="Core\TaskCallbackService.cs" />
     <Compile Include="Core\ViewLayoutService.cs" />
+    <Compile Include="Service\AverageLayoutRenderer.cs" />
+    <Compile Include="Service\BigSmallsLayoutRenderer.cs" />
+    <Compile Include="Service\CloseupLayoutRenderer.cs" />
     <Compile Include="Service\DeviceConfigLoader.cs" />
     <Compile Include="Service\DialogHelper.cs" />
+    <Compile Include="Service\InteractionModeDisplayer.cs" />
+    <Compile Include="Service\ShareModeDisplayer.cs" />
+    <Compile Include="Service\SpeakerModeDisplayer.cs" />
     <Compile Include="Service\StreamParameterProvider.cs" />
     <Compile Include="Service\TimerManager.cs" />
     <Compile Include="ViewModels\UpdatingViewModel.cs" />

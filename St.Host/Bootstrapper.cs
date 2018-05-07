@@ -183,6 +183,15 @@ namespace St.Host
             builder.RegisterType<VideoBoxManager>().As<IVideoBoxManager>();
 
 
+            builder.RegisterType<AverageLayoutRenderer>().Named<ILayoutRenderer>("AverageLayout");
+            builder.RegisterType<BigSmallsLayoutRenderer>().Named<ILayoutRenderer>("BigSmallsLayout");
+            builder.RegisterType<CloseupLayoutRenderer>().Named<ILayoutRenderer>("CloseupLayout");
+
+            builder.RegisterType<SpeakerModeDisplayer>().Named<IModeDisplayer>("SpeakerMode");
+            builder.RegisterType<ShareModeDisplayer>().Named<IModeDisplayer>("ShareMode");
+            builder.RegisterType<InteractionModeDisplayer>().Named<IModeDisplayer>("InteractionMode");
+
+
             builder.RegisterType<PublishMicStreamParameterProvider>().As<IStreamParameterProvider<PublishMicStreamParameter>>().SingleInstance();
             builder.RegisterType<PublishCameraStreamParameterProvider>().As<IStreamParameterProvider<PublishCameraStreamParameter>>().SingleInstance();
             builder.RegisterType<PublishDataCardStreamParameterProvider>().As<IStreamParameterProvider<PublishDataCardStreamParameter>>().SingleInstance();
