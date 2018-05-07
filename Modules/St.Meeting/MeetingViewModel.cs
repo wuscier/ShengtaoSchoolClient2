@@ -735,6 +735,7 @@ namespace St.Meeting
                 _startMeetingCallbackEvent(false, "课程号无效！");
             }
 
+            SetScreenSize();
 
             await _windowManager.Join(meetingId, false, IsCreator);
 
@@ -813,6 +814,12 @@ namespace St.Meeting
             //    }
             //}
 
+        }
+
+        private void SetScreenSize()
+        {
+            MeetingSdk.Wpf.IScreen screen = _windowManager.VideoBoxManager as MeetingSdk.Wpf.IScreen;
+            screen.Size = new System.Windows.Size(_meetingView.ActualWidth, _meetingView.ActualHeight);
         }
 
         //command handlers
@@ -1362,82 +1369,66 @@ namespace St.Meeting
 
         private void ParticipantCollectionChangeEventHandler(IEnumerable<MeetingSdk.Wpf.Participant> obj)
         {
-            throw new NotImplementedException();
         }
 
         private void RefreshViewContainerBackground()
         {
-            throw new NotImplementedException();
         }
 
         private void LayoutChangedEventHandler(LayoutRenderType obj)
         {
-            throw new NotImplementedException();
         }
 
         private void ClassModeChangedEventHandler(ModeDisplayerType obj)
         {
-            throw new NotImplementedException();
         }
 
         private void UiTransparentMsgReceivedEventHandler(UiTransparentMsg obj)
         {
-            throw new NotImplementedException();
         }
 
         private void SdkCallbackEventHandler(SdkCallbackModel obj)
         {
-            throw new NotImplementedException();
         }
 
         private void MeetingManageExceptionEventHandler(ExceptionModel obj)
         {
-            throw new NotImplementedException();
         }
 
         private void LockStatusChangedEventHandler(MeetingResult obj)
         {
-            throw new NotImplementedException();
         }
 
         private void DeviceStatusChangedEventHandler(DeviceStatusModel obj)
         {
-            throw new NotImplementedException();
         }
 
         private void DeviceLostNoticeEventHandler(ResourceModel obj)
         {
-            throw new NotImplementedException();
         }
 
         private void KickedByHostEventHandler(KickoutUserModel obj)
         {
-            throw new NotImplementedException();
         }
 
         private void UIMessageReceivedEventHandler(TransparentMsg obj)
         {
-            throw new NotImplementedException();
         }
 
         private void OtherExitMeetingEventHandler(AccountModel obj)
         {
-            throw new NotImplementedException();
         }
 
         private void OtherJoinMeetingEventHandler(AccountModel obj)
         {
-            throw new NotImplementedException();
         }
 
         private void StopSpeakEventHandler(SpeakModel obj)
         {
-            throw new NotImplementedException();
         }
 
         private void StartSpeakEventHandler(SpeakModel obj)
         {
-            throw new NotImplementedException();
         }
 
         private void _meetingView_Deactivated(object sender, EventArgs e)
