@@ -52,6 +52,7 @@ namespace St.Host.ViewModels
 
         public LoginViewModel(Window loginView)
         {
+            _windowManager = IoC.Get<IMeetingWindowManager>();
             _loginView = loginView;
             _userInfo = IoC.Get<UserInfo>();
             _bmsService = IoC.Get<IBms>();
