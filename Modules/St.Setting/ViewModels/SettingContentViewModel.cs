@@ -560,6 +560,7 @@ namespace St.Setting
             _configManager.LocalLiveStreamInfo.LiveStreamBitRate = SelectedLiveRate;
             _configManager.LocalLiveStreamInfo.LiveStreamDisplayHeight = int.Parse(SelectedLiveDisplay.Split('*')[1]);
             _configManager.LocalLiveStreamInfo.LiveStreamDisplayWidth = int.Parse(SelectedLiveDisplay.Split('*')[0]);
+            _configManager.LocalLiveStreamInfo.PushLiveStreamUrl = ManualPushLiveStreamUrl;
 
             _configManager.RemoteLiveStreamInfo.LiveStreamBitRate = SelectedRemoteRate;
             _configManager.RemoteLiveStreamInfo.LiveStreamDisplayHeight =
