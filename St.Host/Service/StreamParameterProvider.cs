@@ -45,6 +45,8 @@ namespace St.Host.Service
 
             if (sourceName == "DesktopCapture")
             {
+                videoInfo = new VideoInfo();
+
                 videoInfo.DisplayWidth = 1280;
                 videoInfo.DisplayHeight = 720;
                 videoInfo.VideoBitRate = 1200;

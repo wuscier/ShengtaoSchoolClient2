@@ -690,7 +690,8 @@ namespace St.Meeting
         {
             get
             {
-                return GlobalData.TryGet(CacheKey.HostId).ToString() == _windowManager.Participant.Account.AccountId.ToString();
+                return _userInfo.UserId == _lessonDetail.MasterUserId;
+                //return GlobalData.TryGet(CacheKey.HostId).ToString() == _windowManager.Participant.Account.AccountId.ToString();
             }
         }
 
