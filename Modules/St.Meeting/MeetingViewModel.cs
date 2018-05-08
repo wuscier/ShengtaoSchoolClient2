@@ -58,10 +58,13 @@ namespace St.Meeting
             _eventAggregator.GetEvent<CommandReceivedEvent>()
                 .Subscribe(ExecuteCommand, ThreadOption.PublisherThread, false, command => command.IsIntoClassCommand);
 
-            _localPushLiveService = IoC.Get<IPushLive>(GlobalResources.LocalPushLive);
-            _localPushLiveService.ResetStatus();
+            _manualPushLive = IoC.Get<IPushLive>(GlobalResources.LocalPushLive);
+            _manualPushLive.ResetStatus();
+
             _serverPushLiveService = IoC.Get<IPushLive>(GlobalResources.RemotePushLive);
             _serverPushLiveService.ResetStatus();
+
+
             _localRecordService = IoC.Get<IRecord>();
             _localRecordService.ResetStatus();
 
@@ -371,7 +374,7 @@ namespace St.Meeting
         private readonly IEventAggregator _eventAggregator;
         private readonly IMeeting _sdkService;
         private readonly IBms _bmsService;
-        private readonly IPushLive _localPushLiveService;
+        private readonly IPushLive _manualPushLive;
         private readonly IPushLive _serverPushLiveService;
         private readonly IRecord _localRecordService;
         private readonly LessonDetail _lessonDetail;
@@ -1109,10 +1112,10 @@ namespace St.Meeting
             }
         }
 
-        private async Task StopAllLives()
+        private void StopAllLives()
         {
-            await _localPushLiveService.StopPushLiveStream();
-            await _serverPushLiveService.StopPushLiveStream();
+            _manualPushLive.StopPushLiveStream();
+            _serverPushLiveService.StopPushLiveStream();
             _localRecordService.StopMp4Record();
         }
 
@@ -1258,36 +1261,74 @@ namespace St.Meeting
 
         private async Task PushLiveAsync()
         {
-            if (PushLiveChecked)
+            try
             {
-                //_localPushLiveService.GetLiveParam();
-
-                //AsyncCallbackMsg result =
-                //    await
-                //        _localPushLiveService.StartPushLiveStream(
-                //            _viewLayoutService.GetStreamLayout(_localPushLiveService.LiveParam.Width,
-                //                _localPushLiveService.LiveParam.Height));
-
-                //if (HasErrorMsg(result.Status.ToString(), result.Message))
-                //{
-                //    PushLiveChecked = false;
-                //}
-                //else
-                //{
-                //    PushLiveStreamTips =
-                //        string.Format(
-                //            $"分辨率：{_localPushLiveService.LiveParam.Width}*{_localPushLiveService.LiveParam.Height}\r\n" +
-                //            $"码率：{_localPushLiveService.LiveParam.VideoBitrate}\r\n" +
-                //            $"推流地址：{_localPushLiveService.LiveParam.Url1}");
-                //}
-            }
-            else
-            {
-                AsyncCallbackMsg result = await _localPushLiveService.StopPushLiveStream();
-                if (HasErrorMsg(result.Status.ToString(), result.Message))
+                if (!HasStreams())
                 {
-                    PushLiveChecked = true;
+                    HasErrorMsg("-1", "当前没有音视频流，无法推流！");
+                    PushLiveChecked = !PushLiveChecked;
+                    return;
                 }
+
+                if (PushLiveChecked)
+                {
+                    var pushrt = _manualPushLive.GetLiveParam();
+
+                    if (!pushrt)
+                    {
+                        HasErrorMsg("-1", "推流参数未正确配置！");
+
+                        PushLiveChecked = false;
+                        PushLiveStreamTips = null;
+
+                        return;
+                    }
+
+                    IGetLiveVideoCoordinate liveVideoCoordinate = _windowManager as IGetLiveVideoCoordinate;
+                    System.Windows.Size size = new System.Windows.Size()
+                    {
+                        Width = _manualPushLive.LiveParam.LiveParameter.Width,
+                        Height = _manualPushLive.LiveParam.LiveParameter.Height,
+                    };
+
+                    VideoStreamModel[] videoStreamModels = liveVideoCoordinate.GetVideoStreamModels(size);
+
+                    MeetingResult result =
+                            _manualPushLive.StartPushLiveStream(videoStreamModels, GetAudioStreamModels(),
+                            _manualPushLive.LiveParam.LiveParameter.Url1);
+
+                    if (result.StatusCode != 0)
+                    {
+                        HasErrorMsg("-1", result.Message);
+
+                        PushLiveChecked = false;
+                        PushLiveStreamTips = null;
+                    }
+                    else
+                    {
+                        PushLiveStreamTips =
+                            string.Format(
+                                $"分辨率：{_manualPushLive.LiveParam.LiveParameter.Width}*{_manualPushLive.LiveParam.LiveParameter.Height}\r\n" +
+                                $"码率：{_manualPushLive.LiveParam.LiveParameter.VideoBitrate}\r\n" +
+                                $"推流地址：{_manualPushLive.LiveParam.LiveParameter.Url1}");
+                    }
+                }
+                else
+                {
+                    MeetingResult result = _manualPushLive.StopPushLiveStream();
+                    PushLiveStreamTips = null;
+
+                    if (result.StatusCode != 0)
+                    {
+                        HasErrorMsg("-1", result.Message);
+
+                        PushLiveChecked = true;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
             }
         }
 

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using St.Common;
 using System.IO;
 using Caliburn.Micro;
-using MeetingSdk.SdkWrapper;
-using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Serilog;
 using MeetingSdk.NetAgent;
 using MeetingSdk.NetAgent.Models;

@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Input;
-using WindowsInput.Native;
 using Caliburn.Micro;
-using Common;
 using MeetingSdk.SdkWrapper;
 using Prism.Commands;
 using St.Common;

@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Windows.Input;
 using WindowsInput.Native;
-using Caliburn.Micro;
 using Prism.Commands;
 using St.Common;
 

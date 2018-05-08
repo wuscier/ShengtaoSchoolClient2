@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Threading;
 using Caliburn.Micro;
+using MeetingSdk.NetAgent;
+using MeetingSdk.NetAgent.Models;
 using MeetingSdk.SdkWrapper;
-using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Serilog;
 using St.Common;
 
@@ -16,17 +17,19 @@ namespace St.Meeting
             GlobalResources.ConfigPath);
 
         private readonly IMeeting _sdkService;
+        private readonly IMeetingSdkAgent _meetingService;
+        private readonly object _syncRoot = new object();
 
         public LocalPushLiveService()
         {
-            _sdkService = IoC.Get<IMeeting>();
+            _meetingService = IoC.Get<IMeetingSdkAgent>();
         }
 
         public bool HasPushLiveSuccessfully { get; set; }
 
         public int LiveId { get; set; }
 
-        public LiveVideoParameter LiveParam { get; private set; }
+        public PublishLiveStreamParameter LiveParam { get; private set; }
 
         public void ResetStatus()
         {
@@ -34,128 +37,176 @@ namespace St.Meeting
             HasPushLiveSuccessfully = false;
         }
 
-        public LiveVideoParameter GetLiveParam()
+        public bool GetLiveParam()
         {
-            return null;
+            AggregatedConfig configManager = GlobalData.Instance.AggregatedConfig;
 
-            //// get live configuration from local xml file
-            //if (!File.Exists(ConfigFile))
-            //{
-            //    LiveParam = new LiveVideoParameter();
-            //    return new LiveVideoParameter();
-            //}
-            //try
-            //{
-            //    LiveVideoParameter liveParam = new LiveVideoParameter
-            //    {
-            //        AudioBitrate = 64,
-            //        BitsPerSample = 16,
-            //        Channels = 1,
-            //        IsLive = true,
-            //        IsRecord = false,
-            //        SampleRate = 8000,
-            //        RecordFilePath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-
-            //        Url1 = GlobalData.Instance.AggregatedConfig.LocalLiveConfig.PushLiveStreamUrl,
-            //        VideoBitrate = int.Parse(GlobalData.Instance.AggregatedConfig.LocalLiveConfig.CodeRate)
-            //    };
-
-            //    string[] resolutionStrings =
-            //        GlobalData.Instance.AggregatedConfig.LocalLiveConfig.Resolution.Split(new[] {'*'},
-            //            StringSplitOptions.RemoveEmptyEntries);
-
-            //    liveParam.Width = int.Parse(resolutionStrings[0]);
-            //    liveParam.Height = int.Parse(resolutionStrings[1]);
-
-
-            //    LiveParam = liveParam;
-            //    return liveParam;
-            //}
-            //catch (Exception ex)
-            //{
-            //    Log.Logger.Error($"【get local push live param exception】：{ex}");
-            //    LiveParam = new LiveVideoParameter();
-            //    return new LiveVideoParameter();
-            //}
-        }
-
-        public AsyncCallbackMsg RefreshLiveStream(List<LiveVideoStream> openedStreamInfos)
-        {
-            if (LiveId != 0)
+            try
             {
-                Log.Logger.Debug($"【local push live refresh begins】：liveId={LiveId}, videos={openedStreamInfos.Count}");
-                for (int i = 0; i < openedStreamInfos.Count; i++)
+                if (configManager?.LocalLiveStreamInfo == null) return false;
+                LiveParam = new PublishLiveStreamParameter
                 {
-                    Log.Logger.Debug(
-                        $"video{i + 1}：x={openedStreamInfos[i].X}, y={openedStreamInfos[i].Y}, width={openedStreamInfos[i].Width}, height={openedStreamInfos[i].Height}");
-                }
-
-                AsyncCallbackMsg updateAsynCallResult = _sdkService.UpdateLiveVideoStreams(LiveId,
-                    openedStreamInfos.ToArray(), openedStreamInfos.Count);
-                Log.Logger.Debug(
-                    $"【local push live refresh result】：result={updateAsynCallResult.Status}, msg={updateAsynCallResult.Message}");
-                return updateAsynCallResult;
+                    LiveParameter = new LiveParameter()
+                    {
+                        AudioBitrate = 64,
+                        BitsPerSample = 16,
+                        Channels = 2,
+                        IsLive = true,
+                        IsRecord = false,
+                        SampleRate = 48000,
+                        VideoBitrate = configManager.LocalLiveStreamInfo.LiveStreamBitRate,
+                        Width = configManager.LocalLiveStreamInfo.LiveStreamDisplayWidth,
+                        Height = configManager.LocalLiveStreamInfo.LiveStreamDisplayHeight,
+                        Url1 = GlobalData.Instance.AggregatedConfig.LocalLiveStreamInfo.PushLiveStreamUrl,
+                    }
+                };
             }
-
-            return AsyncCallbackMsg.GenerateMsg(Messages.WarningNoLiveToRefresh);
+            catch (Exception ex)
+            {
+                Log.Logger.Error($"【get server push live param exception】：{ex}");
+                return false;
+            }
+            return true;
         }
 
-        public async Task<AsyncCallbackMsg> StartPushLiveStream(List<LiveVideoStream> liveVideoStreamInfos,
-            string pushLiveUrl)
+        public MeetingResult RefreshLiveStream(VideoStreamModel[] videoStreamModels, AudioStreamModel[] audioStreamModels)
         {
-            if (string.IsNullOrEmpty(LiveParam.Url1))
+            if (LiveId == 0)
             {
-                return AsyncCallbackMsg.GenerateMsg(Messages.WarningLivePushLiveUrlNotSet);
+                return new MeetingResult()
+                {
+                    Message = "没有可更新的流！",
+                    StatusCode = -1,
+                };
             }
 
-            if (LiveParam.Width == 0 || LiveParam.Height == 0 || LiveParam.VideoBitrate == 0)
+            Monitor.Enter(_syncRoot);
+
+            MeetingResult updateVideoResult = _meetingService.UpdateLiveStreamVideoInfo(LiveId, videoStreamModels.ToArray());
+            MeetingResult updateAudioResult = _meetingService.UpdateLiveStreamAudioInfo(LiveId, audioStreamModels.ToArray());
+
+            MeetingResult mergedResult = new MeetingResult()
             {
-                return AsyncCallbackMsg.GenerateMsg(Messages.WarningLiveResolutionNotSet);
+                Message = "更新推流成功！",
+                StatusCode = 0
+            };
+
+            if (updateAudioResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message = updateAudioResult.Message;
             }
 
-            Log.Logger.Debug(
-                $"【local push live begins】：width={LiveParam.Width}, height={LiveParam.Height}, bitrate={LiveParam.VideoBitrate}, url={LiveParam.Url1}, videos={liveVideoStreamInfos.Count}");
-
-            for (int i = 0; i < liveVideoStreamInfos.Count; i++)
+            if (updateVideoResult.StatusCode != 0)
             {
-                Log.Logger.Debug(
-                    $"video{i + 1}：x={liveVideoStreamInfos[i].X}, y={liveVideoStreamInfos[i].Y}, width={liveVideoStreamInfos[i].Width}, height={liveVideoStreamInfos[i].Height}");
+                mergedResult.StatusCode = -1;
+                mergedResult.Message += $" {updateVideoResult.Message}";
             }
 
+            Monitor.Exit(_syncRoot);
 
-            AsyncCallbackMsg startLiveStreamResult =
-                await _sdkService.StartLiveStream(LiveParam, liveVideoStreamInfos.ToArray(), liveVideoStreamInfos.Count);
-
-
-            if (startLiveStreamResult.Status == 0)
-            {
-                LiveId = int.Parse(startLiveStreamResult.Data.ToString());
-
-                HasPushLiveSuccessfully = true;
-                Log.Logger.Debug($"【local push live succeeded】：liveId={LiveId}");
-            }
-            else
-            {
-                Log.Logger.Error($"【local push live failed】：{startLiveStreamResult.Message}");
-            }
-
-            return startLiveStreamResult;
+            return mergedResult;
         }
 
-        public async Task<AsyncCallbackMsg> StopPushLiveStream()
+        public MeetingResult StartPushLiveStream(VideoStreamModel[] videoStreamModels, AudioStreamModel[] audioStreamModels, string pushLiveUrl = "")
         {
-            if (LiveId != 0)
+            if (string.IsNullOrEmpty(pushLiveUrl))
             {
-                Log.Logger.Debug($"【local push live stop begins】：liveId={LiveId}");
-                AsyncCallbackMsg stopAsynCallResult = await _sdkService.StopLiveStream(LiveId);
-                LiveId = 0;
-
-                Log.Logger.Debug(
-                    $"【local push live stop result】：result={stopAsynCallResult}, msg={stopAsynCallResult.Message}");
-                return stopAsynCallResult;
+                return new MeetingResult()
+                {
+                    Message = "推流地址为空！",
+                    StatusCode = -1,
+                };
             }
 
-            return AsyncCallbackMsg.GenerateMsg(Messages.WarningNoLiveToStop);
+            LiveParam.LiveParameter.Url1 = pushLiveUrl;
+
+            if (LiveParam.LiveParameter.Width == 0 || LiveParam.LiveParameter.Height == 0 || LiveParam.LiveParameter.VideoBitrate == 0)
+            {
+                return new MeetingResult()
+                {
+                    Message = "推流分辨率或码率未设置！",
+                    StatusCode = -1,
+                };
+            }
+
+            MeetingResult<int> startPushLiveStreamResult = _meetingService.PublishLiveStream(LiveParam);
+
+            if (startPushLiveStreamResult.StatusCode != 0)
+            {
+                return startPushLiveStreamResult;
+            }
+
+            LiveId = startPushLiveStreamResult.Result;
+
+            MeetingResult updateVideoResult = _meetingService.UpdateLiveStreamVideoInfo(LiveId, videoStreamModels.ToArray());
+            MeetingResult updateAudioResult = _meetingService.UpdateLiveStreamAudioInfo(LiveId, audioStreamModels.ToArray());
+
+            MeetingResult startLiveStreamResult = _meetingService.StartLiveRecord(LiveId, pushLiveUrl);
+
+            MeetingResult mergedResult = new MeetingResult()
+            {
+                Message = "推流成功！",
+                StatusCode = 0
+            };
+
+            if (updateVideoResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message = updateVideoResult.Message;
+            }
+
+            if (updateAudioResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message += $" {updateAudioResult.Message}";
+            }
+
+            if (startLiveStreamResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message += $" {startLiveStreamResult.Message}";
+            }
+
+            HasPushLiveSuccessfully = mergedResult.StatusCode == 0;
+
+            return mergedResult;
+        }
+
+        public MeetingResult StopPushLiveStream()
+        {
+            if (LiveId == 0)
+            {
+                return new MeetingResult()
+                {
+                    Message = "没有可停止的流！",
+                    StatusCode = -1,
+                };
+            }
+
+            MeetingResult stopRecordResult = _meetingService.StopLiveRecord(LiveId);
+            MeetingResult unpublishLiveResult = _meetingService.UnpublishLiveStream(LiveId);
+            LiveId = 0;
+
+            MeetingResult mergedResult = new MeetingResult()
+            {
+                Message = "停止推流成功！",
+                StatusCode = 0
+            };
+
+            if (stopRecordResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message = stopRecordResult.Message;
+            }
+
+            if (unpublishLiveResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message += $" {unpublishLiveResult.Message}";
+            }
+
+            return mergedResult;
         }
     }
 }

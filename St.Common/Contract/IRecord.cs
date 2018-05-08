@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MeetingSdk.NetAgent;
+﻿using MeetingSdk.NetAgent;
 using MeetingSdk.NetAgent.Models;
-using MeetingSdk.SdkWrapper.MeetingDataModel;
 
 namespace St.Common
 {

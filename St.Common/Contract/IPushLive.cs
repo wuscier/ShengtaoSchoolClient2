@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MeetingSdk.SdkWrapper.MeetingDataModel;
+﻿using MeetingSdk.NetAgent;
+using MeetingSdk.NetAgent.Models;
 
 namespace St.Common
 {
@@ -12,14 +11,14 @@ namespace St.Common
 
         int LiveId { get; }
 
-        LiveVideoParameter LiveParam { get; }
+        PublishLiveStreamParameter LiveParam { get; }
 
-        LiveVideoParameter GetLiveParam();
+        bool GetLiveParam();
 
-        Task<AsyncCallbackMsg> StartPushLiveStream(List<LiveVideoStream> liveVideoStreamInfos,
+        MeetingResult StartPushLiveStream(VideoStreamModel[] videoStreamModels, AudioStreamModel[] audioStreamModels,
             string pushLiveUrl = "");
 
-        AsyncCallbackMsg RefreshLiveStream(List<LiveVideoStream> liveVideoStreamInfos);
-        Task<AsyncCallbackMsg> StopPushLiveStream();
+        MeetingResult RefreshLiveStream(VideoStreamModel[] videoStreamModels, AudioStreamModel[] audioStreamModels);
+        MeetingResult StopPushLiveStream();
     }
 }

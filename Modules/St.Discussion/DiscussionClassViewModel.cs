@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Controls;
@@ -980,10 +979,10 @@ namespace St.Discussion
             }
         }
 
-        private async Task StopAllLives()
+        private void StopAllLives()
         {
-            await _localPushLiveService.StopPushLiveStream();
-            await _serverPushLiveService.StopPushLiveStream();
+            _localPushLiveService.StopPushLiveStream();
+            _serverPushLiveService.StopPushLiveStream();
             _localRecordService.StopMp4Record();
         }
 
