@@ -984,7 +984,7 @@ namespace St.Discussion
         {
             await _localPushLiveService.StopPushLiveStream();
             await _serverPushLiveService.StopPushLiveStream();
-            await _localRecordService.StopRecord();
+            _localRecordService.StopMp4Record();
         }
 
         private async Task UpdateExitTime()
@@ -1067,13 +1067,13 @@ namespace St.Discussion
                     break;
                 case StopRecord:
 
-                    AsyncCallbackMsg stopRecrodResult = await _localRecordService.StopRecord();
-                    if (HasErrorMsg(stopRecrodResult.Status.ToString(), stopRecrodResult.Message))
-                    {
-                        RecordMsg = StopRecord;
-                    }
+                    //AsyncCallbackMsg stopRecrodResult = await _localRecordService.StopRecord();
+                    //if (HasErrorMsg(stopRecrodResult.Status.ToString(), stopRecrodResult.Message))
+                    //{
+                    //    RecordMsg = StopRecord;
+                    //}
 
-                    RecordMsg = StartRecord;
+                    //RecordMsg = StartRecord;
 
                     break;
             }

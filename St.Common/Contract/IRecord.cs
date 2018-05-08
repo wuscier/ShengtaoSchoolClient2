@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using MeetingSdk.NetAgent;
+using MeetingSdk.NetAgent.Models;
 using MeetingSdk.SdkWrapper.MeetingDataModel;
 
 namespace St.Common
@@ -8,14 +10,14 @@ namespace St.Common
     {
         int RecordId { get; }
         string RecordDirectory { get; }
-        RecordParameter RecordParam { get; }
+        PublishLiveStreamParameter RecordParam { get; }
 
         void ResetStatus();
 
         bool GetRecordParam();
 
-        Task<AsyncCallbackMsg> StartRecord(List<LiveVideoStream> liveVideoStreamInfos);
-        Task<AsyncCallbackMsg> StopRecord();
-        AsyncCallbackMsg RefreshLiveStream(List<LiveVideoStream> liveVideoStreamInfos);
+        MeetingResult RefreshLiveStream(VideoStreamModel[] videoStreamModels, AudioStreamModel[] audioStreamModels);
+        MeetingResult StartMp4Record(VideoStreamModel[] videoStreamModels, AudioStreamModel[] audioStreamModels);
+        MeetingResult StopMp4Record();
     }
 }

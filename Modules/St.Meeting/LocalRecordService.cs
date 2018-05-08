@@ -7,26 +7,28 @@ using Caliburn.Micro;
 using MeetingSdk.SdkWrapper;
 using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Serilog;
+using MeetingSdk.NetAgent;
+using MeetingSdk.NetAgent.Models;
+using System.Threading;
 
 namespace St.Meeting
 {
     public class LocalRecordService : IRecord
     {
-        private static readonly string ConfigFile = Path.Combine(Environment.CurrentDirectory,
-            GlobalResources.ConfigPath);
+        private readonly IMeetingSdkAgent _meetingService;
+        private readonly object _syncRoot = new object();
 
-        private readonly IMeeting _sdkService;
 
         public LocalRecordService()
         {
-            _sdkService = IoC.Get<IMeeting>();
+            _meetingService = IoC.Get<IMeetingSdkAgent>();
         }
 
         public string RecordDirectory { get; private set; }
 
         public int RecordId { get; set; }
 
-        public RecordParameter RecordParam { get; private set; }
+        public PublishLiveStreamParameter RecordParam { get; private set; }
 
         public void ResetStatus()
         {
@@ -37,126 +39,172 @@ namespace St.Meeting
         public bool GetRecordParam()
         {
 
+            AggregatedConfig configManager = GlobalData.Instance.AggregatedConfig;
 
-            return true;
-
-            //if (!File.Exists(ConfigFile))
-            //{
-            //    return false;
-            //}
-
-            //try
-            //{
-            //    RecordParameter recordParam = new RecordParameter()
-            //    {
-            //        AudioBitrate = 64,
-            //        BitsPerSample = 16,
-            //        Channels = 1,
-            //        SampleRate = 8000,
-            //        VideoBitrate = int.Parse(GlobalData.Instance.AggregatedConfig.RecordConfig.CodeRate)
-            //    };
-
-            //    string[] resolutionStrings =
-            //        GlobalData.Instance.AggregatedConfig.RecordConfig.Resolution.Split(new[] {'*'},
-            //            StringSplitOptions.RemoveEmptyEntries);
-
-            //    recordParam.Width = int.Parse(resolutionStrings[0]);
-            //    recordParam.Height = int.Parse(resolutionStrings[1]);
-
-            //    RecordParam = recordParam;
-            //    RecordDirectory = GlobalData.Instance.AggregatedConfig.RecordConfig.RecordPath;
-
-            //    return true;
-            //}
-            //catch (Exception ex)
-            //{
-            //    Log.Logger.Error($"【get record param exception】：{ex}");
-            //    return false;
-            //}
-        }
-
-        public AsyncCallbackMsg RefreshLiveStream(List<LiveVideoStream> openedStreamInfos)
-        {
-            if (RecordId != 0)
+            try
             {
-                Log.Logger.Debug(
-                    $"【local record live refresh begins】：liveId={RecordId}, videos={openedStreamInfos.Count}");
-                for (int i = 0; i < openedStreamInfos.Count; i++)
+                if (configManager?.RecordInfo == null) return false;
+                RecordParam = new PublishLiveStreamParameter()
                 {
-                    Log.Logger.Debug(
-                        $"video{i + 1}：x={openedStreamInfos[i].X}, y={openedStreamInfos[i].Y}, width={openedStreamInfos[i].Width}, height={openedStreamInfos[i].Height}");
-                }
+                    LiveParameter = new LiveParameter()
+                    {
+                        AudioBitrate = 64,
+                        BitsPerSample = 16,
+                        Channels = 2,
+                        SampleRate = configManager.AudioInfo.SampleRate,
+                        VideoBitrate = configManager.RecordInfo.RecordBitRate,
+                        Width = configManager.RecordInfo.RecordDisplayWidth,
+                        Height = configManager.RecordInfo.RecordDisplayHeight,
+                        IsRecord = true,
+                        IsLive = false,
+                        FilePath = configManager.RecordInfo.RecordDirectory,
+                    },
+                    MediaType = MediaType.StreamMedia,
+                    StreamType = StreamType.Live,
 
-                AsyncCallbackMsg updateAsynCallResult =
-                    _sdkService.UpdateLiveVideoStreams(RecordId, openedStreamInfos.ToArray(),
-                        openedStreamInfos.Count);
-                Log.Logger.Debug(
-                    $"【local record live refresh result】：result={updateAsynCallResult.Status}, msg={updateAsynCallResult.Message}");
-                return updateAsynCallResult;
+                };
+
+                RecordDirectory = configManager.RecordInfo.RecordDirectory;
+
+                return true;
             }
-
-            return AsyncCallbackMsg.GenerateMsg(Messages.WarningNoLiveToRefresh);
+            catch (Exception ex)
+            {
+                Log.Logger.Error($"【get record param exception】：{ex}");
+                return false;
+            }
         }
 
-        public async Task<AsyncCallbackMsg> StartRecord(List<LiveVideoStream> liveVideoStreamInfos)
+        public MeetingResult RefreshLiveStream(VideoStreamModel[] videoStreamModels, AudioStreamModel[] audioStreamModels)
         {
-            if (string.IsNullOrEmpty(RecordDirectory))
+            if (RecordId == 0)
             {
-                return AsyncCallbackMsg.GenerateMsg(Messages.WarningRecordDirectoryNotSet);
+                return new MeetingResult()
+                {
+                    Message = "没有可更新的流！",
+                    StatusCode = -1,
+                };
             }
 
+            Monitor.Enter(_syncRoot);
 
-            if (RecordParam.Width == 0 || RecordParam.Height == 0 || RecordParam.VideoBitrate == 0)
+            MeetingResult updateVideoResult = _meetingService.UpdateLiveStreamVideoInfo(RecordId, videoStreamModels);
+            MeetingResult updateAudioResult = _meetingService.UpdateLiveStreamAudioInfo(RecordId, audioStreamModels);
+
+            MeetingResult mergedResult = new MeetingResult()
             {
-                return AsyncCallbackMsg.GenerateMsg(Messages.WarningRecordResolutionNotSet);
+                Message = "更新录制成功！",
+                StatusCode = 0
+            };
+
+            if (updateAudioResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message = updateAudioResult.Message;
             }
 
-            AsyncCallbackMsg result = await _sdkService.SetRecordDirectory(RecordDirectory);
-            AsyncCallbackMsg setRecordParamResult = await _sdkService.SetRecordParameter(RecordParam);
-
-            string recordFileName = $"{DateTime.Now:yyyy_MM_dd_HH_mm_ss}.mp4";
-
-            Log.Logger.Debug(
-                $"【local record live begins】：width={RecordParam.Width}, height={RecordParam.Height}, bitrate={RecordParam.VideoBitrate}, path={Path.Combine(RecordDirectory, recordFileName)}, videos={liveVideoStreamInfos.Count}");
-
-            for (int i = 0; i < liveVideoStreamInfos.Count; i++)
+            if (updateVideoResult.StatusCode != 0)
             {
-                Log.Logger.Debug(
-                    $"video{i + 1}：x={liveVideoStreamInfos[i].X}, y={liveVideoStreamInfos[i].Y}, width={liveVideoStreamInfos[i].Width}, height={liveVideoStreamInfos[i].Height}");
+                mergedResult.StatusCode = -1;
+                mergedResult.Message += $" {updateVideoResult.Message}";
             }
 
-            AsyncCallbackMsg localRecordResult =
-                await
-                    _sdkService.StartRecord(recordFileName, liveVideoStreamInfos.ToArray(), liveVideoStreamInfos.Count);
+            Monitor.Exit(_syncRoot);
 
-            if (localRecordResult.Status == 0)
-            {
-                RecordId = int.Parse(localRecordResult.Data.ToString());
-
-                Log.Logger.Debug($"【local record live succeeded】：liveId={RecordId}");
-            }
-            else
-            {
-                Log.Logger.Error($"【local record live failed】：{localRecordResult.Message}");
-            }
-
-            return localRecordResult;
+            return mergedResult;
         }
 
-        public async Task<AsyncCallbackMsg> StopRecord()
+        public MeetingResult StartMp4Record(VideoStreamModel[] videoStreamModels, AudioStreamModel[] audioStreamModels)
         {
-            if (RecordId != 0)
+            if (string.IsNullOrEmpty(RecordDirectory) || !Directory.Exists(RecordDirectory))
             {
-                Log.Logger.Debug($"【local record live stop begins】：liveId={RecordId}");
-                AsyncCallbackMsg stopAsynCallResult = await _sdkService.StopRecord();
-                RecordId = 0;
-
-                Log.Logger.Debug(
-                    $"【local record live stop result】：result={stopAsynCallResult.Status}, msg={stopAsynCallResult.Message}");
-                return stopAsynCallResult;
+                return new MeetingResult()
+                {
+                    Message = "录制路径未设置！",
+                    StatusCode = -1,
+                };
             }
 
-            return AsyncCallbackMsg.GenerateMsg(Messages.WarningNoLiveToStop);
+            MeetingResult<int> publishLiveResult = _meetingService.PublishLiveStream(RecordParam);
+
+            if (publishLiveResult.StatusCode != 0)
+            {
+                return publishLiveResult;
+            }
+
+            RecordId = publishLiveResult.Result;
+
+            MeetingResult updateVideoResult = _meetingService.UpdateLiveStreamVideoInfo(publishLiveResult.Result, videoStreamModels);
+            MeetingResult updateAudioResult = _meetingService.UpdateLiveStreamAudioInfo(publishLiveResult.Result, audioStreamModels);
+
+
+            string filename = Path.Combine(RecordDirectory, DateTime.Now.ToString("yyyy-MM-dd_HH_mm_ss") + ".mp4");
+
+            MeetingResult startRecordResult = _meetingService.StartMp4Record(publishLiveResult.Result, filename);
+
+
+            MeetingResult mergedResult = new MeetingResult()
+            {
+                Message = "录制成功！",
+                StatusCode = 0
+            };
+
+            if (updateVideoResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message = updateVideoResult.Message;
+            }
+
+            if (updateAudioResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message += $" {updateAudioResult.Message}";
+            }
+
+            if (startRecordResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message += $" {startRecordResult.Message}";
+            }
+
+            return mergedResult;
+        }
+
+        public MeetingResult StopMp4Record()
+        {
+            if (RecordId == 0)
+            {
+                return new MeetingResult()
+                {
+                    Message = "没有可停止的流！",
+                    StatusCode = -1,
+                };
+            }
+
+            MeetingResult stopRecordResult = _meetingService.StopMp4Record(RecordId);
+            MeetingResult unpublishLiveResult = _meetingService.UnpublishLiveStream(RecordId);
+            RecordId = 0;
+
+
+            MeetingResult mergedResult = new MeetingResult()
+            {
+                Message = "停止录制成功！",
+                StatusCode = 0
+            };
+
+            if (stopRecordResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message = stopRecordResult.Message;
+            }
+
+            if (unpublishLiveResult.StatusCode != 0)
+            {
+                mergedResult.StatusCode = -1;
+                mergedResult.Message += $" {unpublishLiveResult.Message}";
+            }
+
+            return mergedResult;
         }
     }
 }

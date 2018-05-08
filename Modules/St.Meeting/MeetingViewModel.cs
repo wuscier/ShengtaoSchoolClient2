@@ -26,6 +26,7 @@ using UserInfo = St.Common.UserInfo;
 using MeetingSdk.NetAgent;
 using St.Common.Helper;
 using MeetingSdk.NetAgent.Models;
+using MeetingSdk.Wpf.Interfaces;
 
 namespace St.Meeting
 {
@@ -103,7 +104,7 @@ namespace St.Meeting
             ScreenShareCommand = DelegateCommand.FromAsyncHandler(ScreenShareAsync);
             StartSpeakCommand = new DelegateCommand<string>(StartSpeakAsync);
             StopSpeakCommand = new DelegateCommand<string>(StopSpeakAsync);
-            RecordCommand = DelegateCommand.FromAsyncHandler(RecordAsync);
+            RecordCommand = new DelegateCommand(RecordAsync);
             PushLiveCommand = DelegateCommand.FromAsyncHandler(PushLiveAsync);
             WindowKeyDownCommand = new DelegateCommand<object>(WindowKeyDownHandler);
 
@@ -142,7 +143,7 @@ namespace St.Meeting
             {
                 // monitor click operation
                 RecordChecked = !RecordChecked;
-                await RecordAsync();
+                RecordAsync();
             }
             else if (command.Directive == GlobalCommands.Instance.PushLiveCommand.Directive)
             {
@@ -1112,7 +1113,7 @@ namespace St.Meeting
         {
             await _localPushLiveService.StopPushLiveStream();
             await _serverPushLiveService.StopPushLiveStream();
-            await _localRecordService.StopRecord();
+            _localRecordService.StopMp4Record();
         }
 
         private async Task UpdateExitTime()
@@ -1290,39 +1291,118 @@ namespace St.Meeting
             }
         }
 
-        private async Task RecordAsync()
+
+        private void RecordAsync()
         {
+            if (!HasStreams())
+            {
+                HasErrorMsg("-1", "当前没有音视频流，无法录制！");
+                RecordChecked = false;
+                return;
+            }
+
             if (RecordChecked)
             {
-                //_localRecordService.GetRecordParam();
+                var recordRt = _localRecordService.GetRecordParam();
 
-                //AsyncCallbackMsg result =
-                //    await
-                //        _localRecordService.StartRecord(
-                //            _viewLayoutService.GetStreamLayout(_localRecordService.RecordParam.Width,
-                //                _localRecordService.RecordParam.Height));
+                if (!recordRt)
+                {
+                    HasErrorMsg("-1", "录制参数未正确配置！");
+                    RecordTips = null;
+                    RecordChecked = false;
+                    return;
+                }
 
-                //if (HasErrorMsg(result.Status.ToString(), result.Message))
-                //{
-                //    RecordChecked = false;
-                //}
-                //else
-                //{
-                //    RecordTips =
-                //        string.Format(
-                //            $"分辨率：{_localRecordService.RecordParam.Width}*{_localRecordService.RecordParam.Height}\r\n" +
-                //            $"码率：{_localRecordService.RecordParam.VideoBitrate}\r\n" +
-                //            $"录制路径：{_localRecordService.RecordDirectory}");
-                //}
+                IGetLiveVideoCoordinate liveVideoCoordinate = _windowManager as IGetLiveVideoCoordinate;
+
+                System.Windows.Size size = new System.Windows.Size()
+                {
+                    Width = _localRecordService.RecordParam.LiveParameter.Width,
+                    Height = _localRecordService.RecordParam.LiveParameter.Height,
+                };
+
+                VideoStreamModel[] videoStreamModels = liveVideoCoordinate.GetVideoStreamModels(size);
+
+                AudioStreamModel[] audioStreamModels = GetAudioStreamModels();
+                MeetingResult result = _localRecordService.StartMp4Record(videoStreamModels, audioStreamModels);
+
+                if (result.StatusCode != 0)
+                {
+                    HasErrorMsg("-1", result.Message);
+                    RecordTips = null;
+                    RecordChecked = false;
+                }
+                else
+                {
+                    RecordTips =
+                            string.Format(
+                                $"分辨率：{_localRecordService.RecordParam.LiveParameter.Width}*{_localRecordService.RecordParam.LiveParameter.Height}\r\n" +
+                                $"码率：{_localRecordService.RecordParam.LiveParameter.VideoBitrate}\r\n" +
+                                $"录制路径：{_localRecordService.RecordDirectory}");
+                }
             }
             else
             {
-                AsyncCallbackMsg result = await _localRecordService.StopRecord();
-                if (HasErrorMsg(result.Status.ToString(), result.Message))
+                MeetingResult result = _localRecordService.StopMp4Record();
+                RecordTips = null;
+
+                if (result.StatusCode != 0)
                 {
+                    HasErrorMsg("-1", result.Message);
                     RecordChecked = true;
                 }
             }
+        }
+
+        private AudioStreamModel[] GetAudioStreamModels()
+        {
+            List<AudioStreamModel> audioStreamModels = new List<AudioStreamModel>();
+
+            var selfAudioResources = _windowManager.Participant.Resources.Where(res => res.IsUsed = true &&
+            (res.MediaType == MediaType.AudioCaptureCard || res.MediaType == MediaType.AudioDoc || res.MediaType == MediaType.Microphone));
+
+            foreach (var selfAudioRes in selfAudioResources)
+            {
+                AudioStreamModel audioStreamModel = new AudioStreamModel()
+                {
+                    AccountId = _windowManager.Participant.Account.AccountId.ToString(),
+                    StreamId = selfAudioRes.ResourceId,
+                    BitsPerSameple = 16,
+                    Channels = 2,
+                    SampleRate = 48000,
+                };
+
+                audioStreamModels.Add(audioStreamModel);
+            }
+
+
+            foreach (var participant in _windowManager.Participants)
+            {
+                var otherAudioResources = participant.Resources.Where(res => res.IsUsed &&
+                (res.MediaType == MediaType.AudioCaptureCard || res.MediaType == MediaType.AudioDoc || res.MediaType == MediaType.Microphone));
+
+                foreach (var otherAudioRes in otherAudioResources)
+                {
+                    AudioStreamModel audioStreamModel = new AudioStreamModel()
+                    {
+                        AccountId = participant.Account.AccountId.ToString(),
+                        StreamId = otherAudioRes.ResourceId,
+                        BitsPerSameple = 16,
+                        Channels = 2,
+                        SampleRate = 48000,
+                    };
+
+                    audioStreamModels.Add(audioStreamModel);
+                }
+            }
+
+            return audioStreamModels.ToArray();
+        }
+
+
+        private bool HasStreams()
+        {
+            return _windowManager.VideoBoxManager.Items.Any(v => v.Visible);
         }
 
 
