@@ -48,6 +48,8 @@ namespace St.Meeting
             _sdkService = IoC.Get<IMeeting>();
             _bmsService = IoC.Get<IBms>();
 
+            _deviceNameAccessor = IoC.Get<IDeviceNameAccessor>();
+
             _windowManager = IoC.Get<IMeetingWindowManager>();
             _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
 
@@ -86,7 +88,7 @@ namespace St.Meeting
             LoadCommand = DelegateCommand.FromAsyncHandler(LoadAsync);
             ModeChangedCommand = new DelegateCommand<string>(MeetingModeChangedAsync);
             SpeakingStatusChangedCommand = DelegateCommand.FromAsyncHandler(SpeakingStatusChangedAsync);
-            ExternalDataChangedCommand = DelegateCommand<string>.FromAsyncHandler(ExternalDataChangedAsync);
+            ExternalDataChangedCommand = DelegateCommand.FromAsyncHandler(ExternalDataChangedAsync);
             SharingDesktopCommand = DelegateCommand.FromAsyncHandler(SharingDesktopAsync);
             CancelSharingCommand = DelegateCommand.FromAsyncHandler(CancelSharingAsync);
             ExitCommand = DelegateCommand.FromAsyncHandler(ExitAsync);
@@ -152,19 +154,23 @@ namespace St.Meeting
                 if (SharingVisibility == Visibility.Visible)
                 {
                     var docItem = SharingMenuItems.First(menu => menu.Header.ToString() != "桌面");
-                    if (docItem != null && docItem.HasItems)
-                    {
-                        MenuItem docMenuItem = docItem.Items[0] as MenuItem;
-                        if (docMenuItem == null)
-                        {
-                            return;
-                        }
-                        await ExternalDataChangedAsync(docMenuItem.Header.ToString());
-                    }
-                    else
-                    {
-                        MessageQueueManager.Instance.AddInfo("没有可共享的外接设备！");
-                    }
+
+
+                    await ExternalDataChangedAsync();
+
+                    //if (docItem != null && docItem.HasItems)
+                    //{
+                    //    MenuItem docMenuItem = docItem.Items[0] as MenuItem;
+                    //    if (docMenuItem == null)
+                    //    {
+                    //        return;
+                    //    }
+                    //    await ExternalDataChangedAsync(docMenuItem.Header.ToString());
+                    //}
+                    //else
+                    //{
+                    //    MessageQueueManager.Instance.AddInfo("没有可共享的外接设备！");
+                    //}
                 }
                 else
                 {
@@ -360,6 +366,7 @@ namespace St.Meeting
         private readonly IMeetingWindowManager _windowManager;
         private readonly IMeetingSdkAgent _meetingSdkAgent;
 
+        private readonly IDeviceNameAccessor _deviceNameAccessor;
         private readonly IEventAggregator _eventAggregator;
         private readonly IMeeting _sdkService;
         private readonly IBms _bmsService;
@@ -850,6 +857,12 @@ namespace St.Meeting
 
         private void MeetingModeChangedAsync(string meetingMode)
         {
+            if (!_windowManager.Participant.IsSpeaking)
+            {
+                HasErrorMsg("-1", Messages.WarningYouAreNotSpeaking);
+
+                return;
+            }
 
             var targetMode = (ModeDisplayerType)Enum.Parse(typeof(ModeDisplayerType), meetingMode);
 
@@ -915,16 +928,60 @@ namespace St.Meeting
             }
         }
 
-        private async Task ExternalDataChangedAsync(string sourceName)
+        private async Task ExternalDataChangedAsync()
         {
-            if (!CheckIsUserSpeaking(true))
+            if (!_windowManager.Participant.IsSpeaking)
             {
+                HasErrorMsg("-1", Messages.WarningYouAreNotSpeaking);
                 return;
             }
 
-            AsyncCallbackMsg openDataResult = await _sdkService.OpenSharedCamera(sourceName);
-            if (!HasErrorMsg(openDataResult.Status.ToString(), openDataResult.Message))
+
+            try
             {
+                MeetingResult<IList<VideoDeviceModel>> videoDeviceResult = _meetingSdkAgent.GetVideoDevices();
+
+                MeetingResult<IList<string>> micResult = _meetingSdkAgent.GetMicrophones();
+
+                AggregatedConfig configManager = GlobalData.Instance.AggregatedConfig;
+
+                IEnumerable<string> docCameras;
+                if (!_deviceNameAccessor.TryGetName(DeviceName.Camera, (devName) => { return devName.Option == "second"; }, out docCameras) || !videoDeviceResult.Result.Any(vdm => vdm.DeviceName == docCameras.FirstOrDefault()))
+                {
+                    HasErrorMsg("-1", "课件摄像头未配置！");
+                    return;
+                }
+
+
+                if (configManager.DocVideoInfo?.DisplayWidth == 0 || configManager.DocVideoInfo?.DisplayHeight == 0 || configManager.DocVideoInfo?.VideoBitRate == 0)
+                {
+                    HasErrorMsg("-1", "课件采集参数未设置！");
+                    return;
+                }
+
+
+                IEnumerable<string> docMics;
+                if (!_deviceNameAccessor.TryGetName(DeviceName.Microphone, (devName) => { return devName.Option == "second"; }, out docMics) || !micResult.Result.Any(mic => mic == docMics.FirstOrDefault()))
+                {
+                    HasErrorMsg("-1", "课件麦克风未配置！");
+                    return;
+                }
+
+                if (!_windowManager.Participant.IsSpeaking)
+                {
+                    HasErrorMsg("-1", "发言状态才可以进行课件分享！");
+                    return;
+                }
+
+                MeetingResult<int> publishDocCameraResult = await _windowManager.Publish(MeetingSdk.NetAgent.Models.MediaType.VideoDoc, docCameras.FirstOrDefault());
+                MeetingResult<int> publishDocMicResult = await _windowManager.Publish(MeetingSdk.NetAgent.Models.MediaType.AudioDoc, docMics.FirstOrDefault());
+
+                if (publishDocCameraResult.StatusCode != 0 || publishDocMicResult.StatusCode != 0)
+                {
+                    HasErrorMsg("-1", "打开课件失败！");
+                    return;
+                }
+
                 _cancelSharingAction = async () =>
                 {
                     AsyncCallbackMsg result = await _sdkService.CloseSharedCamera();
@@ -937,13 +994,23 @@ namespace St.Meeting
 
                 SharingVisibility = Visibility.Collapsed;
                 CancelSharingVisibility = Visibility.Visible;
+
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                _eventAggregator.GetEvent<LayoutChangedEvent>().Publish(_windowManager.LayoutRendererStore.CurrentLayoutRenderType);
             }
         }
 
         private async Task SharingDesktopAsync()
         {
-            if (!CheckIsUserSpeaking(true))
+            if (!_windowManager.Participant.IsSpeaking)
             {
+                HasErrorMsg("-1", Messages.WarningYouAreNotSpeaking);
+
                 return;
             }
 
@@ -1682,39 +1749,41 @@ namespace St.Meeting
         }
 
 
-        private bool CheckIsUserSpeaking(bool showMsgBar = false)
-        {
-            //return true;
+        //private bool CheckIsUserSpeaking(bool showMsgBar = false)
+        //{
+        //    //return true;
 
-            List<MeetingSdk.SdkWrapper.MeetingDataModel.Participant> participants = _sdkService.GetParticipants();
+        //    _windowManager.Participant.is
 
-            var self = participants.FirstOrDefault(p => p.PhoneId == _sdkService.SelfPhoneId);
+        //    List<MeetingSdk.SdkWrapper.MeetingDataModel.Participant> participants = _sdkService.GetParticipants();
 
-            if (self != null && (showMsgBar && !self.IsSpeaking))
-            {
-                HasErrorMsg("-1", Messages.WarningYouAreNotSpeaking);
-            }
+        //    var self = participants.FirstOrDefault(p => p.PhoneId == _sdkService.SelfPhoneId);
 
-            return self != null && self.IsSpeaking;
-        }
+        //    if (self != null && (showMsgBar && !self.IsSpeaking))
+        //    {
+        //        HasErrorMsg("-1", Messages.WarningYouAreNotSpeaking);
+        //    }
 
-        private bool CheckIsUserSpeaking(ViewFrame speakerView, bool showMsgBar = false)
-        {
-            //return true;
+        //    return self != null && self.IsSpeaking;
+        //}
 
-            List<MeetingSdk.SdkWrapper.MeetingDataModel.Participant> participants = _sdkService.GetParticipants();
+        //private bool CheckIsUserSpeaking(ViewFrame speakerView, bool showMsgBar = false)
+        //{
+        //    //return true;
 
-            var speaker = participants.FirstOrDefault(p => p.PhoneId == speakerView.PhoneId);
+        //    List<MeetingSdk.SdkWrapper.MeetingDataModel.Participant> participants = _sdkService.GetParticipants();
 
-            bool isUserNotSpeaking = string.IsNullOrEmpty(speaker.PhoneId) || !speaker.IsSpeaking;
+        //    var speaker = participants.FirstOrDefault(p => p.PhoneId == speakerView.PhoneId);
 
-            if (isUserNotSpeaking && showMsgBar)
-            {
-                HasErrorMsg("-1", Messages.WarningUserNotSpeaking);
-            }
+        //    bool isUserNotSpeaking = string.IsNullOrEmpty(speaker.PhoneId) || !speaker.IsSpeaking;
 
-            return !isUserNotSpeaking;
-        }
+        //    if (isUserNotSpeaking && showMsgBar)
+        //    {
+        //        HasErrorMsg("-1", Messages.WarningUserNotSpeaking);
+        //    }
+
+        //    return !isUserNotSpeaking;
+        //}
 
         private void RefreshExternalData()
         {
@@ -1741,20 +1810,22 @@ namespace St.Meeting
 
                 if (sharing == Sharing.ExternalData.ToString())
                 {
-                    MeetingSdk.SdkWrapper.MeetingDataModel.Device[] cameras = _sdkService.GetDevices(1);
-                    foreach (var camera in cameras)
-                    {
-                        if (!string.IsNullOrEmpty(camera.Name) && !camera.IsDefault)
-                        {
-                            newSharingMenu.Items.Add(
-                                new MenuItem()
-                                {
-                                    Header = camera.Name,
-                                    Command = ExternalDataChangedCommand,
-                                    CommandParameter = camera.Name
-                                });
-                        }
-                    }
+                    newSharingMenu.Command = ExternalDataChangedCommand;
+
+                    //var videoDevices = _meetingSdkAgent.GetVideoDevices();
+                    //foreach (var camera in videoDevices.Result)
+                    //{
+                    //    if (!string.IsNullOrEmpty(camera.DeviceName) && camera.DeviceName != GlobalData.Instance.AggregatedConfig.MainVideoInfo.VideoDevice)
+                    //    {
+                    //        newSharingMenu.Items.Add(
+                    //            new MenuItem()
+                    //            {
+                    //                Header = camera.DeviceName,
+                    //                Command = ExternalDataChangedCommand,
+                    //                CommandParameter = camera.DeviceName
+                    //            });
+                    //    }
+                    //}
                 }
 
                 SharingMenuItems.Add(newSharingMenu);
