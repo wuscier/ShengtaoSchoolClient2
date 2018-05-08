@@ -1014,21 +1014,25 @@ namespace St.Meeting
                 return;
             }
 
-            AsyncCallbackMsg startResult = await _sdkService.StartScreenSharing();
-            if (!HasErrorMsg(startResult.Status.ToString(), startResult.Message))
+            MeetingResult<int> publishDocCameraResult = await _windowManager.Publish(MeetingSdk.NetAgent.Models.MediaType.VideoCaptureCard, "DesktopCapture");
+
+            if (publishDocCameraResult.StatusCode != 0)
             {
-                _cancelSharingAction = async () =>
-                {
-                    AsyncCallbackMsg result = await _sdkService.StopScreenSharing();
-                    if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                    {
-                        SharingVisibility = Visibility.Visible;
-                        CancelSharingVisibility = Visibility.Collapsed;
-                    }
-                };
-                SharingVisibility = Visibility.Collapsed;
-                CancelSharingVisibility = Visibility.Visible;
+                HasErrorMsg("-1", "共享桌面失败！");
+                return;
             }
+
+            _cancelSharingAction = async () =>
+            {
+                AsyncCallbackMsg result = await _sdkService.StopScreenSharing();
+                if (!HasErrorMsg(result.Status.ToString(), result.Message))
+                {
+                    SharingVisibility = Visibility.Visible;
+                    CancelSharingVisibility = Visibility.Collapsed;
+                }
+            };
+            SharingVisibility = Visibility.Collapsed;
+            CancelSharingVisibility = Visibility.Visible;
         }
 
         private async Task CancelSharingAsync()
