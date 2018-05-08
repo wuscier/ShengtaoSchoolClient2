@@ -1570,7 +1570,26 @@ namespace St.Meeting
             CurLayoutName = EnumHelper.GetDescription(typeof(LayoutRenderType), obj);
             CurModeName = EnumHelper.GetDescription(typeof(ModeDisplayerType), _windowManager.ModeDisplayerStore.CurrentModeDisplayerType);
 
+            RefreshLocalRecordLive();
         }
+
+        private void RefreshLocalRecordLive()
+        {
+            if (_localRecordService.RecordId != 0)
+            {
+                IGetLiveVideoCoordinate liveVideoCoordinate = _windowManager as IGetLiveVideoCoordinate;
+                System.Windows.Size size = new System.Windows.Size()
+                {
+                    Width = _localRecordService.RecordParam.LiveParameter.Width,
+                    Height = _localRecordService.RecordParam.LiveParameter.Height,
+                };
+
+                VideoStreamModel[] videoStreamModels = liveVideoCoordinate.GetVideoStreamModels(size);
+
+                _localRecordService.RefreshLiveStream(videoStreamModels, GetAudioStreamModels());
+            }
+        }
+
 
         private async void ClassModeChangedEventHandler(ModeDisplayerType obj)
         {
