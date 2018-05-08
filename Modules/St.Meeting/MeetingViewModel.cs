@@ -108,7 +108,7 @@ namespace St.Meeting
             StartSpeakCommand = new DelegateCommand<string>(StartSpeakAsync);
             StopSpeakCommand = new DelegateCommand<string>(StopSpeakAsync);
             RecordCommand = new DelegateCommand(RecordAsync);
-            PushLiveCommand = DelegateCommand.FromAsyncHandler(PushLiveAsync);
+            PushLiveCommand = new DelegateCommand(PushLiveAsync);
             WindowKeyDownCommand = new DelegateCommand<object>(WindowKeyDownHandler);
 
             TopMostTriggerCommand = new DelegateCommand(() =>
@@ -151,7 +151,7 @@ namespace St.Meeting
             else if (command.Directive == GlobalCommands.Instance.PushLiveCommand.Directive)
             {
                 PushLiveChecked = !PushLiveChecked;
-                await PushLiveAsync();
+                PushLiveAsync();
             }
             else if (command.Directive == GlobalCommands.Instance.DocCommand.Directive)
             {
@@ -1067,7 +1067,7 @@ namespace St.Meeting
                 _meetingView.Grid.Children.Remove(GlobalData.VideoControl);
 
 
-
+                StopAllLives();
 
                 await UpdateExitTime();
 
@@ -1079,32 +1079,6 @@ namespace St.Meeting
                     _exitMeetingCallbackEvent(true, "");
 
                 }));
-
-                //await StopAllLives();
-
-                //AsyncCallbackMsg exitResult = await _sdkService.ExitMeeting();
-                //_viewLayoutService.ResetAsInitialStatus();
-
-
-                //_meetingView.Grid.Children.Remove(GlobalData.VideoControl);
-
-
-                //Log.Logger.Debug($"【exit meeting】：result={exitResult.Status}, msg={exitResult.Message}");
-                //HasErrorMsg(exitResult.Status.ToString(), exitResult.Message);
-
-                //UnRegisterMeetingEvents();
-
-                //await UpdateExitTime();
-
-                //await _meetingView.Dispatcher.BeginInvoke(new Action(() =>
-                //{
-                //    _exitByDialog = true;
-                //    _meetingView.Close();
-
-                //    _exitMeetingCallbackEvent(true, "");
-
-                //}));
-
             }
             catch (Exception ex)
             {
@@ -1259,7 +1233,7 @@ namespace St.Meeting
             _sdkService.RequireUserStopSpeak(userPhoneId);
         }
 
-        private async Task PushLiveAsync()
+        private void PushLiveAsync()
         {
             try
             {
@@ -1612,6 +1586,77 @@ namespace St.Meeting
             CurModeName = EnumHelper.GetDescription(typeof(ModeDisplayerType), _windowManager.ModeDisplayerStore.CurrentModeDisplayerType);
 
             RefreshLocalRecordLive();
+
+            RefreshRemotePushLive();
+            RefreshPushLive();
+
+            StartAutoLiveAsync();
+        }
+
+
+        private void RefreshPushLive()
+        {
+            if (_manualPushLive.LiveId != 0)
+            {
+                IGetLiveVideoCoordinate liveVideoCoordinate = _windowManager as IGetLiveVideoCoordinate;
+                System.Windows.Size size = new System.Windows.Size()
+                {
+                    Width = _manualPushLive.LiveParam.LiveParameter.Width,
+                    Height = _manualPushLive.LiveParam.LiveParameter.Height,
+                };
+
+                VideoStreamModel[] videoStreamModels = liveVideoCoordinate.GetVideoStreamModels(size);
+
+                _manualPushLive.RefreshLiveStream(videoStreamModels, GetAudioStreamModels());
+            }
+        }
+
+        private void StartAutoLiveAsync()
+        {
+            if (_windowManager.VideoBoxManager.Items.Count(viewFrame => viewFrame.Visible) > 0)
+            {
+                if (IsCreator && !_serverPushLiveService.HasPushLiveSuccessfully&&_lessonDetail.Live)
+                {
+                    _serverPushLiveService.HasPushLiveSuccessfully = true;
+
+                    var pushRt = _serverPushLiveService.GetLiveParam();
+
+                    if (!string.IsNullOrEmpty(_userInfo.PushStreamUrl) && pushRt)
+                    {
+                        IGetLiveVideoCoordinate liveVideoCoordinate = _windowManager as IGetLiveVideoCoordinate;
+                        System.Windows.Size size = new System.Windows.Size()
+                        {
+                            Width = _serverPushLiveService.LiveParam.LiveParameter.Width,
+                            Height = _serverPushLiveService.LiveParam.LiveParameter.Height,
+                        };
+
+                        VideoStreamModel[] videoStreamModels = liveVideoCoordinate.GetVideoStreamModels(size);
+
+                        MeetingResult result =
+                                _serverPushLiveService.StartPushLiveStream(videoStreamModels, GetAudioStreamModels(),
+                                _userInfo.PushStreamUrl);
+                    }
+                }
+            }
+        }
+
+
+        private void RefreshRemotePushLive()
+        {
+            if (_serverPushLiveService.LiveId != 0)
+            {
+                IGetLiveVideoCoordinate liveVideoCoordinate = _windowManager as IGetLiveVideoCoordinate;
+                System.Windows.Size size = new System.Windows.Size()
+                {
+                    Width = _serverPushLiveService.LiveParam.LiveParameter.Width,
+                    Height = _serverPushLiveService.LiveParam.LiveParameter.Height,
+                };
+
+                VideoStreamModel[] videoStreamModels = liveVideoCoordinate.GetVideoStreamModels(size);
+
+                _serverPushLiveService.RefreshLiveStream(videoStreamModels, GetAudioStreamModels());
+            }
+
         }
 
         private void RefreshLocalRecordLive()
