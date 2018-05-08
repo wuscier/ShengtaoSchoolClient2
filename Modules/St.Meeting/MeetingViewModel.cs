@@ -1044,6 +1044,38 @@ namespace St.Meeting
         {
             try
             {
+
+                UnRegisterMeetingEvents();
+
+
+                MeetingResult meetingResult = await _meetingSdkAgent.LeaveMeeting();
+
+                await _windowManager.Leave();
+
+                if (meetingResult.StatusCode != 0)
+                {
+                    HasErrorMsg("-1", meetingResult.Message);
+                    Log.Logger.Error(meetingResult.Message);
+                }
+
+
+
+                _meetingView.Grid.Children.Remove(GlobalData.VideoControl);
+
+
+
+
+                await UpdateExitTime();
+
+                await _meetingView.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    _exitByDialog = true;
+                    _meetingView.Close();
+
+                    _exitMeetingCallbackEvent(true, "");
+
+                }));
+
                 //await StopAllLives();
 
                 //AsyncCallbackMsg exitResult = await _sdkService.ExitMeeting();
@@ -1051,7 +1083,6 @@ namespace St.Meeting
 
 
                 //_meetingView.Grid.Children.Remove(GlobalData.VideoControl);
-
 
 
                 //Log.Logger.Debug($"【exit meeting】：result={exitResult.Status}, msg={exitResult.Message}");
@@ -1567,7 +1598,7 @@ namespace St.Meeting
 
         private async void _meetingView_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            UnRegisterMeetingEvents();
+            //UnRegisterMeetingEvents();
             if (GlobalData.Instance.RunMode == RunMode.Development && !_exitByDialog)
             {
                 e.Cancel = true;
