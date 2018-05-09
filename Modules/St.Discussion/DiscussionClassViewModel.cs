@@ -874,11 +874,13 @@ namespace St.Discussion
         {
             string errMsg = DeviceSettingsChecker.Instance.IsVideoAudioSettingsValid();
 
-            if (string.IsNullOrEmpty(errMsg))
+            if (!string.IsNullOrEmpty(errMsg))
             {
                 _exitByDialog = true;
                 _discussionClassView.Close();
                 _startMeetingCallbackEvent(false, errMsg);
+
+                return;
             }
 
             if (GlobalData.VideoControl == null)

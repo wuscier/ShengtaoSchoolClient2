@@ -78,7 +78,7 @@
 
     <Grid x:Name="Grid">
 
-        <Popup x:Name="TopMenu" IsOpen="{Binding IsMenuOpen}" Placement="Top" PlacementTarget="{Binding ElementName=Grid}" Height="110" Width="{Binding ElementName=ViewItemsContainer,Path=ActualWidth}" VerticalOffset="110">
+        <Popup x:Name="TopMenu" IsOpen="{Binding IsMenuOpen}" Placement="Top" PlacementTarget="{Binding ElementName=Grid}" Height="110" Width="{Binding ElementName=Grid,Path=ActualWidth}" VerticalOffset="110">
                 <DockPanel Background="{StaticResource MaterialDesignPaper}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Center" Margin="20 20 5 20" Text="{Binding MeetingOrLesson}"></TextBlock>
@@ -123,7 +123,7 @@
             </Popup>
 
 
-        <Popup x:Name="BottomMenu" IsOpen="{Binding IsMenuOpen}" Placement="Bottom" PlacementTarget="{Binding ElementName=Grid}" Height="110" Width="{Binding ElementName=ViewItemsContainer,Path=ActualWidth}" VerticalOffset="-110">
+        <Popup x:Name="BottomMenu" IsOpen="{Binding IsMenuOpen}" Placement="Bottom" PlacementTarget="{Binding ElementName=Grid}" Height="110" Width="{Binding ElementName=Grid,Path=ActualWidth}" VerticalOffset="-110">
                 <DockPanel Background="{StaticResource MaterialDesignPaper}">
                     <Viewbox HorizontalAlignment="Left">
                         <StackPanel Orientation="Horizontal">
