@@ -1748,10 +1748,28 @@ namespace St.Meeting
 
         private void OtherExitMeetingEventHandler(AccountModel obj)
         {
+            object hostIdObj = GlobalData.TryGet(CacheKey.HostId);
+
+            int hostId;
+            if (hostIdObj != null && int.TryParse(hostIdObj.ToString(), out hostId))
+            {
+                if (hostId == obj.AccountId)
+                {
+                    if (_windowManager.ModeChange(ModeDisplayerType.InteractionMode))
+                    {
+
+                    }
+                }
+            }
+
         }
 
         private void OtherJoinMeetingEventHandler(AccountModel obj)
         {
+            if (IsCreator)
+            {
+                _meetingSdkAgent.AsynSendUIMsg((int)_windowManager.ModeDisplayerStore.CurrentModeDisplayerType, obj.AccountId, "");
+            }
         }
 
         private void StopSpeakEventHandler(SpeakModel obj)
