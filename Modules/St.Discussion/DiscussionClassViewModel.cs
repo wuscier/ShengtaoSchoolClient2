@@ -25,6 +25,7 @@ using UserInfo = St.Common.UserInfo;
 using MeetingSdk.NetAgent.Models;
 using System.Linq;
 using MeetingSdk.Wpf.Interfaces;
+using St.Common.Helper;
 
 namespace St.Discussion
 {
@@ -60,6 +61,8 @@ namespace St.Discussion
 
             InitMenuButtonItems();
 
+            _windowManager = IoC.Get<IMeetingWindowManager>();
+            _deviceNameAccessor = IoC.Get<IDeviceNameAccessor>();
             _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
             _eventAggregator = IoC.Get<IEventAggregator>();
             _eventAggregator.GetEvent<CommandReceivedEvent>()
@@ -869,6 +872,23 @@ namespace St.Discussion
         //command handlers
         private async Task LoadAsync()
         {
+            string errMsg = DeviceSettingsChecker.Instance.IsVideoAudioSettingsValid();
+
+            if (string.IsNullOrEmpty(errMsg))
+            {
+                _exitByDialog = true;
+                _discussionClassView.Close();
+                _startMeetingCallbackEvent(false, errMsg);
+            }
+
+            if (GlobalData.VideoControl == null)
+            {
+                GlobalData.VideoControl = new VideoControl();
+            }
+
+            _discussionClassView.Grid.Children.Add(GlobalData.VideoControl);
+
+
             GlobalData.Instance.CurWindowHwnd = new WindowInteropHelper(_discussionClassView).Handle;
             ChangeWindowStyleInDevMode();
             await JoinMeetingAsync();
@@ -1490,8 +1510,10 @@ namespace St.Discussion
         }
 
 
-        private void UiTransparentMsgReceivedEventHandler(UiTransparentMsg obj)
+        private async void UiTransparentMsgReceivedEventHandler(UiTransparentMsg obj)
         {
+
+
             if (obj.MsgId < 3)
             {
                 GlobalData.AddOrUpdate(CacheKey.HostId, obj.TargetAccountId);
@@ -1503,6 +1525,43 @@ namespace St.Discussion
                 {
                 }
             }
+            else
+            {
+                if (obj.MsgId == (int)UiMessage.BannedToSpeak)
+                {
+
+                   await _meetingSdkAgent.AskForStopSpeak();
+                    return;
+                }
+
+                if (obj.MsgId == (int)UiMessage.AllowToSpeak)
+                {
+                    var result = await _meetingSdkAgent.AskForSpeak();
+                    if (!HasErrorMsg(result.StatusCode.ToString(), result.Message))
+                    {
+                        // will change SpeakStatus in callback???
+                        SpeakItem.Content = IsSpeaking;
+                    }
+
+                    return;
+                }
+
+                if (obj.MsgId == (int)UiMessage.ListeningMode)
+                {
+                    ClassMode = ListenMode;
+                    SpeakItem.Visibility = Visibility.Collapsed;
+                    MessageQueueManager.Instance.AddInfo(Messages.InfoGotoListenerMode);
+
+                    await _meetingSdkAgent.AskForStopSpeak();
+                    return;
+
+                }
+                if (obj.MsgId == (int)UiMessage.DiscussionMode)
+                {
+                    GotoDiscussionMode();
+                }
+            }
+
         }
 
         private void SdkCallbackEventHandler(SdkCallbackModel obj)
@@ -1542,10 +1601,11 @@ namespace St.Discussion
             {
                 if (hostId == obj.AccountId)
                 {
-                    if (_windowManager.ModeChange(ModeDisplayerType.InteractionMode))
-                    {
+                    GotoDiscussionMode();
+                    //if (_windowManager.ModeChange(ModeDisplayerType.InteractionMode))
+                    //{
 
-                    }
+                    //}
                 }
             }
 
@@ -1556,6 +1616,22 @@ namespace St.Discussion
             if (IsCreator)
             {
                 _meetingSdkAgent.AsynSendUIMsg((int)_windowManager.ModeDisplayerStore.CurrentModeDisplayerType, obj.AccountId, "");
+
+
+                // send a message to sync new attendee's class mode
+                int messageId = (int)UiMessage.DiscussionMode;
+                if (ClassMode == ListenMode)
+                {
+                    messageId = (int)UiMessage.ListeningMode;
+                    //_sdkService.RequireUserStopSpeak(contactInfo.PhoneId);
+
+                }
+                else if (ClassMode == DiscussionMode)
+                {
+                    messageId = (int)UiMessage.DiscussionMode;
+                }
+
+                _meetingSdkAgent.AsynSendUIMsg(messageId, obj.AccountId, "");
             }
         }
 
@@ -1686,14 +1762,13 @@ namespace St.Discussion
         //    //}
         //}
 
-        private async Task GotoDiscussionMode()
+        private void GotoDiscussionMode()
         {
-            //_viewLayoutService.ChangeMeetingMode(MeetingMode.Interaction);
-            //await _viewLayoutService.LaunchLayout();
+            _windowManager.ModeChange(ModeDisplayerType.InteractionMode);
 
-            //ClassMode = DiscussionMode;
-            //SpeakItem.Visibility = Visibility.Visible;
-            //MessageQueueManager.Instance.AddInfo(Messages.InfoGotoDiscussionMode);
+            ClassMode = DiscussionMode;
+            SpeakItem.Visibility = Visibility.Visible;
+            MessageQueueManager.Instance.AddInfo(Messages.InfoGotoDiscussionMode);
         }
 
         //private async void OtherExitMeetingEventHandler(Participant contactInfo)
