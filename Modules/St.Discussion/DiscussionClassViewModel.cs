@@ -14,8 +14,6 @@ using Caliburn.Micro;
 using Common;
 using MenuItem = System.Windows.Controls.MenuItem;
 using Serilog;
-using MeetingSdk.SdkWrapper;
-using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Prism.Events;
 using St.Common.Commands;
 using Action = System.Action;
@@ -63,7 +61,6 @@ namespace St.Discussion
             //_viewLayoutService = IoC.Get<IViewLayout>();
             //_viewLayoutService.ViewFrameList = InitializeViewFrameList(meetingView);
 
-            _sdkService = IoC.Get<IMeeting>();
             _bmsService = IoC.Get<IBms>();
 
             _localPushLiveService = IoC.Get<IPushLive>(GlobalResources.LocalPushLive);
@@ -76,7 +73,7 @@ namespace St.Discussion
             _startMeetingCallbackEvent = startMeetingCallback;
             _exitMeetingCallbackEvent = exitMeetingCallback;
 
-            MeetingId = _sdkService.MeetingId;
+            //MeetingId = _sdkService.MeetingId;
 
             _lessonDetail = IoC.Get<LessonDetail>();
             _userInfo = IoC.Get<UserInfo>();
@@ -316,7 +313,7 @@ namespace St.Discussion
                     if (_pressedUpKeyCount == 4)
                     {
                         _pressedUpKeyCount = 0;
-                        _sdkService.ShowQosTool();
+                        //_sdkService.ShowQosTool();
                     }
 
                     break;
@@ -342,7 +339,7 @@ namespace St.Discussion
                     if (_pressedDownKeyCount == 4)
                     {
                         _pressedDownKeyCount = 0;
-                        _sdkService.CloseQosTool();
+                        //_sdkService.CloseQosTool();
                     }
 
 
@@ -394,7 +391,6 @@ namespace St.Discussion
         private UIElement _upFocusedUiElement;
 
         private readonly IEventAggregator _eventAggregator;
-        private readonly IMeeting _sdkService;
         private readonly IBms _bmsService;
         private readonly IPushLive _localPushLiveService;
         private readonly IPushLive _serverPushLiveService;
@@ -773,48 +769,48 @@ namespace St.Discussion
                 Log.Logger.Debug($"【data hwnd】：{hwnd}");
             }
 
-            AsyncCallbackMsg joinMeetingResult =
-                await
-                    _sdkService.JoinMeeting(MeetingId, uint32SOfNonDataArray, uint32SOfNonDataArray.Length,
-                        uint32SOfDataArray,
-                        uint32SOfDataArray.Length);
+            //AsyncCallbackMsg joinMeetingResult =
+            //    await
+            //        _sdkService.JoinMeeting(MeetingId, uint32SOfNonDataArray, uint32SOfNonDataArray.Length,
+            //            uint32SOfDataArray,
+            //            uint32SOfDataArray.Length);
 
-            //if failed to join meeting, needs to roll back
-            if (joinMeetingResult.Status != 0)
-            {
-                Log.Logger.Error(
-                    $"【join meeting result】：result={joinMeetingResult.Status}, msg={joinMeetingResult.Message}");
+            ////if failed to join meeting, needs to roll back
+            //if (joinMeetingResult.Status != 0)
+            //{
+            //    Log.Logger.Error(
+            //        $"【join meeting result】：result={joinMeetingResult.Status}, msg={joinMeetingResult.Message}");
 
 
-                _exitByDialog = true;
-                _discussionClassView.Close();
-                _startMeetingCallbackEvent(false, joinMeetingResult.Message);
+            //    _exitByDialog = true;
+            //    _discussionClassView.Close();
+            //    _startMeetingCallbackEvent(false, joinMeetingResult.Message);
 
-            }
-            else
-            {
-                IsMenuOpen = true;
+            //}
+            //else
+            //{
+            //    IsMenuOpen = true;
 
-                GlobalCommands.Instance.SetCommandsStateInDiscussionClass();
+            //    GlobalCommands.Instance.SetCommandsStateInDiscussionClass();
 
-                //if join meeting successfully, then make main view invisible
-                _startMeetingCallbackEvent(true, "");
+            //    //if join meeting successfully, then make main view invisible
+            //    _startMeetingCallbackEvent(true, "");
 
-                if (_lessonDetail.Id > 0)
-                {
-                    ResponseResult result = await
-                        _bmsService.UpdateMeetingStatus(_lessonDetail.Id, _userInfo.UserId,
-                            DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                            string.Empty);
+            //    if (_lessonDetail.Id > 0)
+            //    {
+            //        ResponseResult result = await
+            //            _bmsService.UpdateMeetingStatus(_lessonDetail.Id, _userInfo.UserId,
+            //                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            //                string.Empty);
 
-                    HasErrorMsg(result.Status, result.Message);
-                }
-                ShowUiBasedOnIsSpeaker();
-                //if (_sdkService.IsCreator)
-                //{
-                InitAutoHideSettings();
-                //}
-            }
+            //        HasErrorMsg(result.Status, result.Message);
+            //    }
+            //    ShowUiBasedOnIsSpeaker();
+            //    //if (_sdkService.IsCreator)
+            //    //{
+            //    InitAutoHideSettings();
+            //    //}
+            //}
 
         }
 
@@ -831,44 +827,44 @@ namespace St.Discussion
         private void ShowUiBasedOnIsSpeaker()
         {
             //if not speaker, then clear mode menu items
-            if (_sdkService.IsCreator)
-            {
-                IsSpeaker = Visibility.Visible;
+            //if (_sdkService.IsCreator)
+            //{
+            //    IsSpeaker = Visibility.Visible;
 
 
-                ClassModeItem.Visibility = Visibility.Visible;
-                ShareDocItem.Visibility = Visibility.Visible;
-                ManageListenersItem.Visibility = Visibility.Visible;
-                LayoutItem.Visibility = Visibility.Visible;
+            //    ClassModeItem.Visibility = Visibility.Visible;
+            //    ShareDocItem.Visibility = Visibility.Visible;
+            //    ManageListenersItem.Visibility = Visibility.Visible;
+            //    LayoutItem.Visibility = Visibility.Visible;
 
-                SpeakItem.Visibility = Visibility.Collapsed;
+            //    SpeakItem.Visibility = Visibility.Collapsed;
 
-                _downFocusedUiElement = _discussionClassView.ClassModeButton;
+            //    _downFocusedUiElement = _discussionClassView.ClassModeButton;
 
-            }
-            else
-            {
-                IsSpeaker = Visibility.Collapsed;
+            //}
+            //else
+            //{
+            //    IsSpeaker = Visibility.Collapsed;
 
-                ClassModeItem.Visibility = Visibility.Collapsed;
-                ShareDocItem.Visibility = Visibility.Collapsed;
-                ManageListenersItem.Visibility = Visibility.Collapsed;
+            //    ClassModeItem.Visibility = Visibility.Collapsed;
+            //    ShareDocItem.Visibility = Visibility.Collapsed;
+            //    ManageListenersItem.Visibility = Visibility.Collapsed;
 
-                LayoutItem.Visibility = Visibility.Visible;
+            //    LayoutItem.Visibility = Visibility.Visible;
 
-                if (ClassMode == ListenMode)
-                {
-                    SpeakItem.Visibility = Visibility.Collapsed;
+            //    if (ClassMode == ListenMode)
+            //    {
+            //        SpeakItem.Visibility = Visibility.Collapsed;
 
-                }
-                if (ClassMode == DiscussionMode)
-                {
-                    SpeakItem.Visibility = Visibility.Visible;
+            //    }
+            //    if (ClassMode == DiscussionMode)
+            //    {
+            //        SpeakItem.Visibility = Visibility.Visible;
 
-                }
+            //    }
 
-                _downFocusedUiElement = _discussionClassView.LayoutButton;
-            }
+            //    _downFocusedUiElement = _discussionClassView.LayoutButton;
+            //}
 
             _downFocusedUiElement.Focus();
             
@@ -876,70 +872,70 @@ namespace St.Discussion
 
         private async Task OpenCloseDocAsync()
         {
-            if (ShareDocItem.Content == OpenDoc)
-            {
-                if (_sdkService.IsSharedDocOpened())
-                {
-                    MessageQueueManager.Instance.AddInfo(Messages.DocumentAlreadyOpened);
-                    ShareDocItem.Content = CloseDoc;
-                    return;
-                }
+            //if (ShareDocItem.Content == OpenDoc)
+            //{
+            //    if (_sdkService.IsSharedDocOpened())
+            //    {
+            //        MessageQueueManager.Instance.AddInfo(Messages.DocumentAlreadyOpened);
+            //        ShareDocItem.Content = CloseDoc;
+            //        return;
+            //    }
 
-                AsyncCallbackMsg openDocResult = await _sdkService.StartShareDoc();
+            //    AsyncCallbackMsg openDocResult = await _sdkService.StartShareDoc();
 
-                if (openDocResult.Status != 0)
-                {
-                    ShareDocItem.Content = OpenDoc;
-                    MessageQueueManager.Instance.AddInfo(openDocResult.Message);
-                }
-                else
-                {
-                    ShareDocItem.Content = CloseDoc;
-                }
+            //    if (openDocResult.Status != 0)
+            //    {
+            //        ShareDocItem.Content = OpenDoc;
+            //        MessageQueueManager.Instance.AddInfo(openDocResult.Message);
+            //    }
+            //    else
+            //    {
+            //        ShareDocItem.Content = CloseDoc;
+            //    }
 
-            }
-            else if (ShareDocItem.Content == CloseDoc)
-            {
-                if (_sdkService.IsSharedDocOpened())
-                {
-                    AsyncCallbackMsg closeDocResult = await _sdkService.StopShareDoc();
+            //}
+            //else if (ShareDocItem.Content == CloseDoc)
+            //{
+            //    if (_sdkService.IsSharedDocOpened())
+            //    {
+            //        AsyncCallbackMsg closeDocResult = await _sdkService.StopShareDoc();
 
-                    if (closeDocResult.Status != 0)
-                    {
-                        ShareDocItem.Content = CloseDoc;
-                        MessageQueueManager.Instance.AddInfo(closeDocResult.Message);
-                    }
-                    else
-                    {
-                        ShareDocItem.Content = OpenDoc;
-                    }
-                }
-                else
-                {
-                    MessageQueueManager.Instance.AddInfo(Messages.DocumentAlreadyClosed);
-                    ShareDocItem.Content = OpenDoc;
-                }
-            }
+            //        if (closeDocResult.Status != 0)
+            //        {
+            //            ShareDocItem.Content = CloseDoc;
+            //            MessageQueueManager.Instance.AddInfo(closeDocResult.Message);
+            //        }
+            //        else
+            //        {
+            //            ShareDocItem.Content = OpenDoc;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        MessageQueueManager.Instance.AddInfo(Messages.DocumentAlreadyClosed);
+            //        ShareDocItem.Content = OpenDoc;
+            //    }
+            //}
         }
 
         private async Task SpeakingStatusChangedAsync()
         {
-            if (SpeakItem.Content == IsSpeaking)
-            {
-                AsyncCallbackMsg stopSucceeded = await _sdkService.StopSpeak();
-                return;
-                //will change SpeakStatus in StopSpeakCallbackEventHandler.
-            }
+            //if (SpeakItem.Content == IsSpeaking)
+            //{
+            //    AsyncCallbackMsg stopSucceeded = await _sdkService.StopSpeak();
+            //    return;
+            //    //will change SpeakStatus in StopSpeakCallbackEventHandler.
+            //}
 
-            if (SpeakItem.Content == IsNotSpeaking)
-            {
-                AsyncCallbackMsg result = await _sdkService.ApplyToSpeak();
-                if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    // will change SpeakStatus in callback???
-                    SpeakItem.Content = IsSpeaking;
-                }
-            }
+            //if (SpeakItem.Content == IsNotSpeaking)
+            //{
+            //    AsyncCallbackMsg result = await _sdkService.ApplyToSpeak();
+            //    if (!HasErrorMsg(result.Status.ToString(), result.Message))
+            //    {
+            //        // will change SpeakStatus in callback???
+            //        SpeakItem.Content = IsSpeaking;
+            //    }
+            //}
         }
 
         public async Task ExitAsync()
@@ -1026,7 +1022,7 @@ namespace St.Discussion
 
         private void KickoutAsync(string userPhoneId)
         {
-            _sdkService.HostKickoutUser(userPhoneId);
+            //_sdkService.HostKickoutUser(userPhoneId);
         }
 
         private async Task RecordAsync()
@@ -1105,22 +1101,22 @@ namespace St.Discussion
 
         private void RegisterMeetingEvents()
         {
-            _discussionClassView.LocationChanged += _discussionClassView_LocationChanged;
-            _discussionClassView.Deactivated += _discussionClassView_Deactivated; 
-            _discussionClassView.Closing += _meetingView_Closing;
-            _sdkService.ViewCreatedEvent += ViewCreateEventHandler;
-            _sdkService.ViewClosedEvent += ViewCloseEventHandler;
-            _sdkService.CloseSharedDocEvent += _sdkService_CloseSharedDocEvent;
-            _sdkService.StartSpeakEvent += StartSpeakEventHandler;
-            _sdkService.StopSpeakEvent += StopSpeakEventHandler;
-            //_viewLayoutService.MeetingModeChangedEvent += MeetingModeChangedEventHandler;
-            //_viewLayoutService.ViewModeChangedEvent += ViewModeChangedEventHandler;
-            _sdkService.OtherJoinMeetingEvent += OtherJoinMeetingEventHandler;
-            _sdkService.OtherExitMeetingEvent += OtherExitMeetingEventHandler;
-            _sdkService.TransparentMessageReceivedEvent += UIMessageReceivedEventHandler;
-            _sdkService.ErrorMsgReceivedEvent += ErrorMsgReceivedEventHandler;
-            _sdkService.KickedByHostEvent += KickedByHostEventHandler;
-            _sdkService.DiskSpaceNotEnoughEvent += DiskSpaceNotEnoughEventHandler;
+            //_discussionClassView.LocationChanged += _discussionClassView_LocationChanged;
+            //_discussionClassView.Deactivated += _discussionClassView_Deactivated; 
+            //_discussionClassView.Closing += _meetingView_Closing;
+            //_sdkService.ViewCreatedEvent += ViewCreateEventHandler;
+            //_sdkService.ViewClosedEvent += ViewCloseEventHandler;
+            //_sdkService.CloseSharedDocEvent += _sdkService_CloseSharedDocEvent;
+            //_sdkService.StartSpeakEvent += StartSpeakEventHandler;
+            //_sdkService.StopSpeakEvent += StopSpeakEventHandler;
+            ////_viewLayoutService.MeetingModeChangedEvent += MeetingModeChangedEventHandler;
+            ////_viewLayoutService.ViewModeChangedEvent += ViewModeChangedEventHandler;
+            //_sdkService.OtherJoinMeetingEvent += OtherJoinMeetingEventHandler;
+            //_sdkService.OtherExitMeetingEvent += OtherExitMeetingEventHandler;
+            //_sdkService.TransparentMessageReceivedEvent += UIMessageReceivedEventHandler;
+            //_sdkService.ErrorMsgReceivedEvent += ErrorMsgReceivedEventHandler;
+            //_sdkService.KickedByHostEvent += KickedByHostEventHandler;
+            //_sdkService.DiskSpaceNotEnoughEvent += DiskSpaceNotEnoughEventHandler;
         }
 
         private void _discussionClassView_LocationChanged(object sender, EventArgs e)
@@ -1146,15 +1142,15 @@ namespace St.Discussion
             IsMenuOpen = false;
         }
 
-        private void _sdkService_CloseSharedDocEvent(AsyncCallbackMsg asyncCallbackMsg)
-        {
-            ShareDocItem.Content = OpenDoc;
-        }
+        //private void _sdkService_CloseSharedDocEvent(AsyncCallbackMsg asyncCallbackMsg)
+        //{
+        //    ShareDocItem.Content = OpenDoc;
+        //}
 
-        private void DiskSpaceNotEnoughEventHandler(AsyncCallbackMsg msg)
-        {
-            HasErrorMsg(msg.Status.ToString(), msg.Message);
-        }
+        //private void DiskSpaceNotEnoughEventHandler(AsyncCallbackMsg msg)
+        //{
+        //    HasErrorMsg(msg.Status.ToString(), msg.Message);
+        //}
 
         private async void _meetingView_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -1167,21 +1163,21 @@ namespace St.Discussion
 
         private void UnRegisterMeetingEvents()
         {
-            _eventAggregator.GetEvent<CommandReceivedEvent>().Unsubscribe(ExecuteCommand);
+            //_eventAggregator.GetEvent<CommandReceivedEvent>().Unsubscribe(ExecuteCommand);
 
-            _sdkService.ViewCreatedEvent -= ViewCreateEventHandler;
-            _sdkService.ViewClosedEvent -= ViewCloseEventHandler;
-            _sdkService.CloseSharedDocEvent -= _sdkService_CloseSharedDocEvent;
-            _sdkService.StartSpeakEvent -= StartSpeakEventHandler;
-            _sdkService.StopSpeakEvent -= StopSpeakEventHandler;
-            //_viewLayoutService.MeetingModeChangedEvent -= MeetingModeChangedEventHandler;
-            //_viewLayoutService.ViewModeChangedEvent -= ViewModeChangedEventHandler;
-            _sdkService.OtherJoinMeetingEvent -= OtherJoinMeetingEventHandler;
-            _sdkService.OtherExitMeetingEvent -= OtherExitMeetingEventHandler;
-            _sdkService.TransparentMessageReceivedEvent -= UIMessageReceivedEventHandler;
-            _sdkService.ErrorMsgReceivedEvent -= ErrorMsgReceivedEventHandler;
-            _sdkService.KickedByHostEvent -= KickedByHostEventHandler;
-            _sdkService.DiskSpaceNotEnoughEvent -= DiskSpaceNotEnoughEventHandler;
+            //_sdkService.ViewCreatedEvent -= ViewCreateEventHandler;
+            //_sdkService.ViewClosedEvent -= ViewCloseEventHandler;
+            //_sdkService.CloseSharedDocEvent -= _sdkService_CloseSharedDocEvent;
+            //_sdkService.StartSpeakEvent -= StartSpeakEventHandler;
+            //_sdkService.StopSpeakEvent -= StopSpeakEventHandler;
+            ////_viewLayoutService.MeetingModeChangedEvent -= MeetingModeChangedEventHandler;
+            ////_viewLayoutService.ViewModeChangedEvent -= ViewModeChangedEventHandler;
+            //_sdkService.OtherJoinMeetingEvent -= OtherJoinMeetingEventHandler;
+            //_sdkService.OtherExitMeetingEvent -= OtherExitMeetingEventHandler;
+            //_sdkService.TransparentMessageReceivedEvent -= UIMessageReceivedEventHandler;
+            //_sdkService.ErrorMsgReceivedEvent -= ErrorMsgReceivedEventHandler;
+            //_sdkService.KickedByHostEvent -= KickedByHostEventHandler;
+            //_sdkService.DiskSpaceNotEnoughEvent -= DiskSpaceNotEnoughEventHandler;
         }
 
         private void KickedByHostEventHandler()
@@ -1221,62 +1217,62 @@ namespace St.Discussion
         //    }
         //}
 
-        private void ErrorMsgReceivedEventHandler(AsyncCallbackMsg error)
-        {
-            HasErrorMsg("-1", error.Message);
-        }
+        //private void ErrorMsgReceivedEventHandler(AsyncCallbackMsg error)
+        //{
+        //    HasErrorMsg("-1", error.Message);
+        //}
 
-        private async void UIMessageReceivedEventHandler(TransparentMessage message)
-        {
-            Log.Logger.Debug(
-                $"UIMessageReceivedEventHandler => msgId={message.MessageId}, senderPhoneId={message.Sender?.PhoneId}");
+        //private async void UIMessageReceivedEventHandler(TransparentMessage message)
+        //{
+        //    Log.Logger.Debug(
+        //        $"UIMessageReceivedEventHandler => msgId={message.MessageId}, senderPhoneId={message.Sender?.PhoneId}");
 
-            //if (message.MessageId < 3)
-            //{
-            //    _sdkService.CreatorPhoneId = message.Sender.PhoneId;
+        //    //if (message.MessageId < 3)
+        //    //{
+        //    //    _sdkService.CreatorPhoneId = message.Sender.PhoneId;
 
-            //    MeetingMode meetingMode = (MeetingMode) message.MessageId;
-            //    _viewLayoutService.ChangeMeetingMode(meetingMode);
+        //    //    MeetingMode meetingMode = (MeetingMode) message.MessageId;
+        //    //    _viewLayoutService.ChangeMeetingMode(meetingMode);
 
-            //    await _viewLayoutService.LaunchLayout();
-            //}
-            //else
-            //{
-            //    if (message.MessageId == (int) UiMessage.BannedToSpeak)
-            //    {
+        //    //    await _viewLayoutService.LaunchLayout();
+        //    //}
+        //    //else
+        //    //{
+        //    //    if (message.MessageId == (int) UiMessage.BannedToSpeak)
+        //    //    {
 
-            //        AsyncCallbackMsg stopSucceeded = await _sdkService.StopSpeak();
-            //        return;
-            //    }
+        //    //        AsyncCallbackMsg stopSucceeded = await _sdkService.StopSpeak();
+        //    //        return;
+        //    //    }
 
-            //    if (message.MessageId == (int) UiMessage.AllowToSpeak)
-            //    {
-            //        AsyncCallbackMsg result = await _sdkService.ApplyToSpeak();
-            //        if (!HasErrorMsg(result.Status.ToString(), result.Message))
-            //        {
-            //            // will change SpeakStatus in callback???
-            //            SpeakItem.Content = IsSpeaking;
-            //        }
+        //    //    if (message.MessageId == (int) UiMessage.AllowToSpeak)
+        //    //    {
+        //    //        AsyncCallbackMsg result = await _sdkService.ApplyToSpeak();
+        //    //        if (!HasErrorMsg(result.Status.ToString(), result.Message))
+        //    //        {
+        //    //            // will change SpeakStatus in callback???
+        //    //            SpeakItem.Content = IsSpeaking;
+        //    //        }
 
-            //        return;
-            //    }
+        //    //        return;
+        //    //    }
 
-            //    if (message.MessageId == (int) UiMessage.ListeningMode)
-            //    {
-            //        ClassMode = ListenMode;
-            //        SpeakItem.Visibility = Visibility.Collapsed;
-            //        MessageQueueManager.Instance.AddInfo(Messages.InfoGotoListenerMode);
+        //    //    if (message.MessageId == (int) UiMessage.ListeningMode)
+        //    //    {
+        //    //        ClassMode = ListenMode;
+        //    //        SpeakItem.Visibility = Visibility.Collapsed;
+        //    //        MessageQueueManager.Instance.AddInfo(Messages.InfoGotoListenerMode);
 
-            //        await _sdkService.StopSpeak();
-            //        return;
+        //    //        await _sdkService.StopSpeak();
+        //    //        return;
 
-            //    }
-            //    if (message.MessageId == (int) UiMessage.DiscussionMode)
-            //    {
-            //       await GotoDiscussionMode();
-            //    }
-            //}
-        }
+        //    //    }
+        //    //    if (message.MessageId == (int) UiMessage.DiscussionMode)
+        //    //    {
+        //    //       await GotoDiscussionMode();
+        //    //    }
+        //    //}
+        //}
 
         private async Task GotoDiscussionMode()
         {
@@ -1288,90 +1284,90 @@ namespace St.Discussion
             //MessageQueueManager.Instance.AddInfo(Messages.InfoGotoDiscussionMode);
         }
 
-        private async void OtherExitMeetingEventHandler(Participant contactInfo)
-        {
-            //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.m_szPhoneId);
+        //private async void OtherExitMeetingEventHandler(Participant contactInfo)
+        //{
+        //    //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.m_szPhoneId);
 
-            //string displayName = string.Empty;
-            //if (!string.IsNullOrEmpty(attendee?.Name))
-            //{
-            //    displayName = attendee.Name + " - ";
-            //}
+        //    //string displayName = string.Empty;
+        //    //if (!string.IsNullOrEmpty(attendee?.Name))
+        //    //{
+        //    //    displayName = attendee.Name + " - ";
+        //    //}
 
-            //string exitMsg = $"{displayName}{contactInfo.m_szPhoneId}退出会议！";
-            //HasErrorMsg("-1", exitMsg);
+        //    //string exitMsg = $"{displayName}{contactInfo.m_szPhoneId}退出会议！";
+        //    //HasErrorMsg("-1", exitMsg);
 
-            if (contactInfo.PhoneId == _sdkService.CreatorPhoneId)
-            {
-                await GotoDiscussionMode();
-            }
-        }
+        //    if (contactInfo.PhoneId == _sdkService.CreatorPhoneId)
+        //    {
+        //        await GotoDiscussionMode();
+        //    }
+        //}
 
-        private void OtherJoinMeetingEventHandler(Participant contactInfo)
-        {
-            //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.PhoneId);
+        //private void OtherJoinMeetingEventHandler(Participant contactInfo)
+        //{
+        //    //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.PhoneId);
 
-            ////string displayName = string.Empty;
-            ////if (!string.IsNullOrEmpty(attendee?.Name))
-            ////{
-            ////    displayName = attendee.Name + " - ";
-            ////}
+        //    ////string displayName = string.Empty;
+        //    ////if (!string.IsNullOrEmpty(attendee?.Name))
+        //    ////{
+        //    ////    displayName = attendee.Name + " - ";
+        //    ////}
 
-            ////string joinMsg = $"{displayName}{contactInfo.m_szPhoneId}加入会议！";
-            ////HasErrorMsg("-1", joinMsg);
+        //    ////string joinMsg = $"{displayName}{contactInfo.m_szPhoneId}加入会议！";
+        //    ////HasErrorMsg("-1", joinMsg);
 
-            ////speaker automatically sends a message(with creatorPhoneId) to nonspeakers
-            ////!!!CAREFUL!!! ONLY speaker will call this
+        //    ////speaker automatically sends a message(with creatorPhoneId) to nonspeakers
+        //    ////!!!CAREFUL!!! ONLY speaker will call this
 
-            //Log.Logger.Debug($"OtherJoinMeetingEventHandler => phoneId={contactInfo.PhoneId}, name={contactInfo.Name}");
+        //    //Log.Logger.Debug($"OtherJoinMeetingEventHandler => phoneId={contactInfo.PhoneId}, name={contactInfo.Name}");
 
-            //if (_sdkService.IsCreator)
-            //{
-            //    //var newView =
-            //    //    _viewLayoutService.ViewFrameList.FirstOrDefault(
-            //    //        v => v.PhoneId == contactInfo.PhoneId && v.ViewType == 1);
+        //    //if (_sdkService.IsCreator)
+        //    //{
+        //    //    //var newView =
+        //    //    //    _viewLayoutService.ViewFrameList.FirstOrDefault(
+        //    //    //        v => v.PhoneId == contactInfo.PhoneId && v.ViewType == 1);
 
-            //    //if (newView != null) newView.IsIntoMeeting = true;
+        //    //    //if (newView != null) newView.IsIntoMeeting = true;
 
-            //    //_sdkService.SendUIMessage((int) _viewLayoutService.MeetingMode,
-            //    //    _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length, null);
+        //    //    //_sdkService.SendUIMessage((int) _viewLayoutService.MeetingMode,
+        //    //    //    _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length, null);
 
 
-            //    int meetingModeCmd = (int) _viewLayoutService.MeetingMode;
-            //    AsyncCallbackMsg sendMeetingModeMsg = _sdkService.SendMessage(meetingModeCmd,
-            //        meetingModeCmd.ToString(), meetingModeCmd.ToString().Length,
-            //        contactInfo.PhoneId);
+        //    //    int meetingModeCmd = (int) _viewLayoutService.MeetingMode;
+        //    //    AsyncCallbackMsg sendMeetingModeMsg = _sdkService.SendMessage(meetingModeCmd,
+        //    //        meetingModeCmd.ToString(), meetingModeCmd.ToString().Length,
+        //    //        contactInfo.PhoneId);
 
-            //    Log.Logger.Debug(
-            //        $"sendMeetingModeMsg => msgId={meetingModeCmd}, targetPhoneId={contactInfo.PhoneId}, result={sendMeetingModeMsg.Status}");
+        //    //    Log.Logger.Debug(
+        //    //        $"sendMeetingModeMsg => msgId={meetingModeCmd}, targetPhoneId={contactInfo.PhoneId}, result={sendMeetingModeMsg.Status}");
 
-            //    // send a message to sync new attendee's class mode
-            //    int messageId = (int) UiMessage.DiscussionMode;
-            //    if (ClassMode == ListenMode)
-            //    {
-            //        messageId = (int) UiMessage.ListeningMode;
-            //        //_sdkService.RequireUserStopSpeak(contactInfo.PhoneId);
+        //    //    // send a message to sync new attendee's class mode
+        //    //    int messageId = (int) UiMessage.DiscussionMode;
+        //    //    if (ClassMode == ListenMode)
+        //    //    {
+        //    //        messageId = (int) UiMessage.ListeningMode;
+        //    //        //_sdkService.RequireUserStopSpeak(contactInfo.PhoneId);
 
-            //    }
-            //    else if (ClassMode == DiscussionMode)
-            //    {
-            //        messageId = (int) UiMessage.DiscussionMode;
-            //    }
+        //    //    }
+        //    //    else if (ClassMode == DiscussionMode)
+        //    //    {
+        //    //        messageId = (int) UiMessage.DiscussionMode;
+        //    //    }
 
-            //    AsyncCallbackMsg sendClassModeMsg = _sdkService.SendMessage(messageId, messageId.ToString(),
-            //        messageId.ToString().Length,
-            //        contactInfo.PhoneId);
+        //    //    AsyncCallbackMsg sendClassModeMsg = _sdkService.SendMessage(messageId, messageId.ToString(),
+        //    //        messageId.ToString().Length,
+        //    //        contactInfo.PhoneId);
 
-            //    Log.Logger.Debug(
-            //        $"sendClassModeMsg => msgId={messageId}, targetPhoneId={contactInfo.PhoneId}, result={sendClassModeMsg.Status}");
+        //    //    Log.Logger.Debug(
+        //    //        $"sendClassModeMsg => msgId={messageId}, targetPhoneId={contactInfo.PhoneId}, result={sendClassModeMsg.Status}");
 
-            //}
-        }
+        //    //}
+        //}
 
-        private async void ViewCloseEventHandler(ParticipantView speakerView)
-        {
-            //await _viewLayoutService.HideViewAsync(speakerView);
-        }
+        //private async void ViewCloseEventHandler(ParticipantView speakerView)
+        //{
+        //    //await _viewLayoutService.HideViewAsync(speakerView);
+        //}
 
         private void StopSpeakEventHandler()
         {
@@ -1392,10 +1388,10 @@ namespace St.Discussion
             SpeakItem.Content = IsSpeaking;
         }
 
-        private async void ViewCreateEventHandler(ParticipantView speakerView)
-        {
-            //await _viewLayoutService.ShowViewAsync(speakerView);
-        }
+        //private async void ViewCreateEventHandler(ParticipantView speakerView)
+        //{
+        //    //await _viewLayoutService.ShowViewAsync(speakerView);
+        //}
 
         private bool CheckIsUserSpeaking(bool showMsgBar = false)
         {

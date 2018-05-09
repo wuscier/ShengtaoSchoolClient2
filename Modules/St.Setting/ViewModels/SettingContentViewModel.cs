@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Forms;
 using Caliburn.Micro;
-using MeetingSdk.SdkWrapper;
 using Serilog;
 using Action = System.Action;
 using MeetingSdk.NetAgent;
@@ -24,7 +23,6 @@ namespace St.Setting
         public SettingContentViewModel(SettingContentView meetingConfigView)
         {
             _view = meetingConfigView;
-            _sdkService = IoC.Get<IMeeting>();
             _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
             _deviceNameAccessor = IoC.Get<IDeviceNameAccessor>();
             _deviceConfigLoader = IoC.Get<IDeviceConfigLoader>();
@@ -77,7 +75,6 @@ namespace St.Setting
 
         //private fields
         private readonly SettingContentView _view;
-        private readonly IMeeting _sdkService;
         private readonly IDeviceNameAccessor _deviceNameAccessor;
         private readonly IDeviceConfigLoader _deviceConfigLoader;
         private readonly IMeetingSdkAgent _meetingSdkAgent;

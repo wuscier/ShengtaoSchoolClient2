@@ -14,7 +14,6 @@ using St.Host.Views;
 using St.RtClient;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using MeetingSdk.SdkWrapper;
 using St.Common.RtClient;
 using St.Host.Core;
 using MeetingSdk.NetAgent;
@@ -173,7 +172,6 @@ namespace St.Host
             builder.RegisterType<MainViewModel>().AsSelf().As<ISignOutHandler>().SingleInstance();
 
             builder.RegisterType<BmsService>().As<IBms>().SingleInstance();
-            builder.RegisterType<MeetingSdk.SdkWrapper.MeetingService>().As<IMeeting>().SingleInstance();
 
             builder.RegisterInstance(DefaultMeetingSdkAgent.Instance).As<IMeetingSdkAgent>().SingleInstance();
             builder.RegisterType<MeetingWindowManager>().As<IMeetingWindowManager>().SingleInstance();

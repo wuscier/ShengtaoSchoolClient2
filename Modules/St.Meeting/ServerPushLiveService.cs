@@ -2,7 +2,6 @@
 using System.IO;
 using St.Common;
 using Caliburn.Micro;
-using MeetingSdk.SdkWrapper;
 using Serilog;
 using MeetingSdk.NetAgent;
 using MeetingSdk.NetAgent.Models;
@@ -16,7 +15,6 @@ namespace St.Meeting
         private static readonly string ConfigFile = Path.Combine(Environment.CurrentDirectory,
             GlobalResources.ConfigPath);
 
-        private readonly IMeeting _sdkService;
         private readonly IMeetingSdkAgent _meetingService;
         private readonly object _syncRoot = new object();
 

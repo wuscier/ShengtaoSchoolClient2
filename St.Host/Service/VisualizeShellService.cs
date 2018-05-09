@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Interop;
 using Caliburn.Micro;
-using MeetingSdk.SdkWrapper;
+using MeetingSdk.NetAgent;
 using Serilog;
 using St.Common;
 using St.Common.Commands;
@@ -14,17 +14,17 @@ namespace St.Host
 {
     public class VisualizeShellService : IVisualizeShell
     {
+        private readonly IMeetingSdkAgent _meetingSdkAgent;
         private readonly UserInfo _userInfo;
-        private readonly IMeeting _sdkService;
         private readonly MainView _shellView;
         private readonly IRtClientService _rtClientService;
 
         public VisualizeShellService()
         {
             _userInfo = IoC.Get<UserInfo>();
-            _sdkService = IoC.Get<IMeeting>();
             _shellView = IoC.Get<MainView>();
             _rtClientService = IoC.Get<IRtClientService>();
+            _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
         }
 
 
@@ -90,8 +90,10 @@ namespace St.Host
                 LoginView loginView = IoC.Get<LoginView>();
                 loginView.Show();
 
-                _sdkService.Stop();
-                _sdkService.IsServerStarted = false;
+                await _meetingSdkAgent.Stop();
+                
+                //_sdkService.Stop();
+                //_sdkService.IsServerStarted = false;
             }
         }
 

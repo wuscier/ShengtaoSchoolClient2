@@ -143,10 +143,6 @@
       <Project>{1ac195a5-91eb-4c63-8035-0b9b1fa837e2}</Project>
       <Name>MeetingSdk.Wpf</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\MeetingSdk\MeetingSdk\MeetingSdk.csproj">
-      <Project>{906a73b6-c6df-4fc0-8b04-d2245f13f7c5}</Project>
-      <Name>MeetingSdk</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\St.Common\St.Common.csproj">
       <Project>{303508af-7f6f-48a5-96e3-253312ed7d9a}</Project>
       <Name>St.Common</Name>

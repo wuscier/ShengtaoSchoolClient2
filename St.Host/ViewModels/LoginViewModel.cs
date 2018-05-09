@@ -9,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml;
 using Caliburn.Micro;
-using MeetingSdk.SdkWrapper;
 using MeetingSdk.Wpf;
 using Newtonsoft.Json;
 using Prism.Commands;
@@ -554,9 +553,6 @@ namespace St.Host.ViewModels
                 UserInfo globalUserInfo = IoC.Get<UserInfo>();
                 userInfo.Pwd = Password;
                 globalUserInfo.CloneUserInfo(userInfo);
-
-                IMeeting sdkService = IoC.Get<IMeeting>();
-                sdkService.SelfPhoneId = userInfo.GetNube();
 
                 return true;
             }

@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using Caliburn.Micro;
-using MeetingSdk.SdkWrapper;
 using Prism.Commands;
 using St.Common;
 
@@ -11,7 +10,6 @@ namespace St.Discussion
     public class SelectAttendeeListViewModel
     {
         private readonly SelectAttendeeListView _selectAttendeeListView;
-        private readonly IMeeting _sdkService;
         private readonly List<UserInfo> _userInfos;
         private readonly SpecialViewType _targetSpecialViewType;
 
@@ -20,7 +18,6 @@ namespace St.Discussion
             _selectAttendeeListView = selectAttendeeListView;
             _targetSpecialViewType = specialViewType;
 
-            _sdkService = IoC.Get<IMeeting>();
             _userInfos = IoC.Get<List<UserInfo>>();
 
             AttendeeItems = new ObservableCollection<AttendeeItem>();

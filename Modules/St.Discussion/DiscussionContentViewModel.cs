@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
 using MeetingSdk.NetAgent;
-using MeetingSdk.SdkWrapper;
 using MeetingSdk.Wpf;
 using Prism.Commands;
 using Prism.Events;
@@ -30,7 +29,6 @@ namespace St.Discussion
             _discussionContentView = discussionContentView;
 
             _bmsService = IoC.Get<IBms>();
-            _sdkService = IoC.Get<IMeeting>();
 
             _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
             _windowManager = IoC.Get<IMeetingWindowManager>();
@@ -107,7 +105,6 @@ namespace St.Discussion
         //private fields
         private readonly DiscussionContentView _discussionContentView;
         private readonly IBms _bmsService;
-        private readonly IMeeting _sdkService;
         private readonly IMeetingSdkAgent _meetingSdkAgent;
         private readonly IMeetingWindowManager _windowManager;
 

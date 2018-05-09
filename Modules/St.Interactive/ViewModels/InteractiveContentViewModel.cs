@@ -9,7 +9,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
-using MeetingSdk.SdkWrapper;
 using Prism.Events;
 using Prism.Regions;
 using Serilog;
@@ -30,7 +29,6 @@ namespace St.Interactive
             _interactiveContentView = interactiveContentView;
 
             _bmsService = IoC.Get<IBms>();
-            _sdkService = IoC.Get<IMeeting>();
 
             _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
             _windowManager = IoC.Get<IMeetingWindowManager>();
@@ -106,7 +104,6 @@ namespace St.Interactive
         //private fields
         private readonly InteractiveContentView _interactiveContentView;
         private readonly IBms _bmsService;
-        private readonly IMeeting _sdkService;
         private readonly IMeetingSdkAgent _meetingSdkAgent;
         private readonly IMeetingWindowManager _windowManager;
         private readonly LessonInfo _lessonInfo;

@@ -13,8 +13,6 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 using Caliburn.Micro;
 using Common;
-using MeetingSdk.SdkWrapper;
-using MeetingSdk.SdkWrapper.MeetingDataModel;
 using Prism.Events;
 using MenuItem = System.Windows.Controls.MenuItem;
 using Serilog;
@@ -46,7 +44,6 @@ namespace St.Meeting
             //_viewLayoutService = IoC.Get<IViewLayout>();
             //_viewLayoutService.ViewFrameList = InitializeViewFrameList(meetingView);
 
-            _sdkService = IoC.Get<IMeeting>();
             _bmsService = IoC.Get<IBms>();
 
             _deviceNameAccessor = IoC.Get<IDeviceNameAccessor>();
@@ -97,16 +94,16 @@ namespace St.Meeting
             CancelSharingCommand = DelegateCommand.FromAsyncHandler(CancelSharingAsync);
             ExitCommand = DelegateCommand.FromAsyncHandler(ExitAsync);
             OpenExitDialogCommand = DelegateCommand.FromAsyncHandler(OpenExitDialogAsync);
-            KickoutCommand = new DelegateCommand<string>(KickoutAsync);
-            OpenCloseCameraCommand = DelegateCommand.FromAsyncHandler(OpenCloseCameraAsync);
-            GetCameraInfoCommand = DelegateCommand<string>.FromAsyncHandler(GetCameraInfoAsync);
-            OpenPropertyPageCommand = DelegateCommand<string>.FromAsyncHandler(OpenPropertyPageAsync);
-            SetDefaultDataCameraCommand = DelegateCommand<string>.FromAsyncHandler(SetDefaultDataCameraAsync);
-            SetDefaultFigureCameraCommand = DelegateCommand<string>.FromAsyncHandler(SetDefaultFigureCameraAsync);
-            SetMicStateCommand = DelegateCommand.FromAsyncHandler(SetMicStateAsync);
-            ScreenShareCommand = DelegateCommand.FromAsyncHandler(ScreenShareAsync);
-            StartSpeakCommand = new DelegateCommand<string>(StartSpeakAsync);
-            StopSpeakCommand = new DelegateCommand<string>(StopSpeakAsync);
+            //KickoutCommand = new DelegateCommand<string>(KickoutAsync);
+            //OpenCloseCameraCommand = DelegateCommand.FromAsyncHandler(OpenCloseCameraAsync);
+            //GetCameraInfoCommand = DelegateCommand<string>.FromAsyncHandler(GetCameraInfoAsync);
+            //OpenPropertyPageCommand = DelegateCommand<string>.FromAsyncHandler(OpenPropertyPageAsync);
+            //SetDefaultDataCameraCommand = DelegateCommand<string>.FromAsyncHandler(SetDefaultDataCameraAsync);
+            //SetDefaultFigureCameraCommand = DelegateCommand<string>.FromAsyncHandler(SetDefaultFigureCameraAsync);
+            //SetMicStateCommand = DelegateCommand.FromAsyncHandler(SetMicStateAsync);
+            //ScreenShareCommand = DelegateCommand.FromAsyncHandler(ScreenShareAsync);
+            //StartSpeakCommand = new DelegateCommand<string>(StartSpeakAsync);
+            //StopSpeakCommand = new DelegateCommand<string>(StopSpeakAsync);
             RecordCommand = new DelegateCommand(RecordAsync);
             PushLiveCommand = new DelegateCommand(PushLiveAsync);
             WindowKeyDownCommand = new DelegateCommand<object>(WindowKeyDownHandler);
@@ -311,7 +308,7 @@ namespace St.Meeting
                     if (_pressedUpKeyCount == 4)
                     {
                         _pressedUpKeyCount = 0;
-                        _sdkService.ShowQosTool();
+                        //_sdkService.ShowQosTool();
                     }
 
                     break;
@@ -325,7 +322,7 @@ namespace St.Meeting
                     if (_pressedDownKeyCount == 4)
                     {
                         _pressedDownKeyCount = 0;
-                        _sdkService.CloseQosTool();
+                        //_sdkService.CloseQosTool();
                     }
 
                     break;
@@ -372,7 +369,6 @@ namespace St.Meeting
 
         private readonly IDeviceNameAccessor _deviceNameAccessor;
         private readonly IEventAggregator _eventAggregator;
-        private readonly IMeeting _sdkService;
         private readonly IBms _bmsService;
         private readonly IPushLive _manualPushLive;
         private readonly IPushLive _serverPushLiveService;
@@ -991,12 +987,30 @@ namespace St.Meeting
 
                 _cancelSharingAction = async () =>
                 {
-                    AsyncCallbackMsg result = await _sdkService.CloseSharedCamera();
-                    if (!HasErrorMsg(result.Status.ToString(), result.Message))
+                    int? docCameraResourceId = 0;
+                    int? docAudioResourceId = 0;
+
+                    docCameraResourceId = _windowManager.Participant.Resources.FirstOrDefault(res => res.MediaType == MediaType.VideoDoc)?.ResourceId;
+                    docAudioResourceId = _windowManager.Participant.Resources.FirstOrDefault(res => res.MediaType == MediaType.AudioDoc)?.ResourceId;
+
+                    if (docCameraResourceId.HasValue && docCameraResourceId.Value != 0)
                     {
-                        SharingVisibility = Visibility.Visible;
-                        CancelSharingVisibility = Visibility.Collapsed;
+                        MeetingResult stopShareCameraResult = await _windowManager.Unpublish(MeetingSdk.NetAgent.Models.MediaType.VideoDoc, docCameraResourceId.Value);
                     }
+
+                    if (docAudioResourceId.HasValue && docAudioResourceId.Value != 0)
+                    {
+                        MeetingResult stopShareMicResult = await _windowManager.Unpublish(MeetingSdk.NetAgent.Models.MediaType.AudioDoc, docAudioResourceId.Value);
+                    }
+
+                    //if (stopShareCameraResult.StatusCode != 0 || stopShareMicResult.StatusCode != 0)
+                    //{
+                    //    HasErrorMsg("-1", "关闭课件失败！");
+                    //    return;
+                    //}
+
+                    SharingVisibility = Visibility.Visible;
+                    CancelSharingVisibility = Visibility.Collapsed;
                 };
 
                 SharingVisibility = Visibility.Collapsed;
@@ -1031,12 +1045,23 @@ namespace St.Meeting
 
             _cancelSharingAction = async () =>
             {
-                AsyncCallbackMsg result = await _sdkService.StopScreenSharing();
-                if (!HasErrorMsg(result.Status.ToString(), result.Message))
+                int? desktopResourceId = 0;
+
+                desktopResourceId = _windowManager.Participant.Resources.FirstOrDefault(res => res.MediaType == MediaType.VideoCaptureCard)?.ResourceId;
+
+                if (desktopResourceId.HasValue && desktopResourceId.Value != 0)
                 {
-                    SharingVisibility = Visibility.Visible;
-                    CancelSharingVisibility = Visibility.Collapsed;
+                    MeetingResult stopShareCameraResult = await _windowManager.Unpublish(MeetingSdk.NetAgent.Models.MediaType.VideoCaptureCard, desktopResourceId.Value);
+
+                    if (stopShareCameraResult.StatusCode != 0)
+                    {
+                        HasErrorMsg("-1", "停止共享桌面失败！");
+                        return;
+                    }
                 }
+
+                SharingVisibility = Visibility.Visible;
+                CancelSharingVisibility = Visibility.Collapsed;
             };
             SharingVisibility = Visibility.Collapsed;
             CancelSharingVisibility = Visibility.Visible;
@@ -1129,112 +1154,112 @@ namespace St.Meeting
             }));
         }
 
-        private void KickoutAsync(string userPhoneId)
-        {
-             _sdkService.HostKickoutUser(userPhoneId);
-        }
+        //private void KickoutAsync(string userPhoneId)
+        //{
+        //     _sdkService.HostKickoutUser(userPhoneId);
+        //}
 
-        private async Task OpenCloseCameraAsync()
-        {
-            if (OpenCloseCameraOperation == "open camera")
-            {
-                AsyncCallbackMsg result = await _sdkService.OpenCamera(SelectedCamera);
-                if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    OpenCloseCameraOperation = "close camera";
-                }
+        //private async Task OpenCloseCameraAsync()
+        //{
+        //    if (OpenCloseCameraOperation == "open camera")
+        //    {
+        //        AsyncCallbackMsg result = await _sdkService.OpenCamera(SelectedCamera);
+        //        if (!HasErrorMsg(result.Status.ToString(), result.Message))
+        //        {
+        //            OpenCloseCameraOperation = "close camera";
+        //        }
 
-            }
-            else
-            {
-                AsyncCallbackMsg result = await _sdkService.CloseCamera();
-                if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    OpenCloseCameraOperation = "open camera";
-                }
+        //    }
+        //    else
+        //    {
+        //        AsyncCallbackMsg result = await _sdkService.CloseCamera();
+        //        if (!HasErrorMsg(result.Status.ToString(), result.Message))
+        //        {
+        //            OpenCloseCameraOperation = "open camera";
+        //        }
 
-            }
-        }
+        //    }
+        //}
 
-        private async Task OpenPropertyPageAsync(string cameraName)
-        {
-            await _meetingView.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                AsyncCallbackMsg result = _sdkService.ShowCameraPropertyPage(cameraName);
-            }));
-        }
+        //private async Task OpenPropertyPageAsync(string cameraName)
+        //{
+        //    await _meetingView.Dispatcher.BeginInvoke(new Action(() =>
+        //    {
+        //        AsyncCallbackMsg result = _sdkService.ShowCameraPropertyPage(cameraName);
+        //    }));
+        //}
 
-        private async Task GetCameraInfoAsync(string cameraName)
-        {
-            await Task.Run(() =>
-            {
-                Camera videoDeviceInfo = _sdkService.GetCameraInfo(cameraName);
-            });
-        }
+        //private async Task GetCameraInfoAsync(string cameraName)
+        //{
+        //    await Task.Run(() =>
+        //    {
+        //        Camera videoDeviceInfo = _sdkService.GetCameraInfo(cameraName);
+        //    });
+        //}
 
-        private async Task SetDefaultFigureCameraAsync(string cameraName)
-        {
-            AsyncCallbackMsg result = await _sdkService.SetDefaultCamera(1, cameraName);
-            HasErrorMsg(result.Status.ToString(), result.Message);
-        }
+        //private async Task SetDefaultFigureCameraAsync(string cameraName)
+        //{
+        //    AsyncCallbackMsg result = await _sdkService.SetDefaultCamera(1, cameraName);
+        //    HasErrorMsg(result.Status.ToString(), result.Message);
+        //}
 
-        private async Task SetDefaultDataCameraAsync(string cameraName)
-        {
-            AsyncCallbackMsg result = await _sdkService.SetDefaultCamera(2, cameraName);
-            HasErrorMsg(result.Status.ToString(), result.Message);
-        }
+        //private async Task SetDefaultDataCameraAsync(string cameraName)
+        //{
+        //    AsyncCallbackMsg result = await _sdkService.SetDefaultCamera(2, cameraName);
+        //    HasErrorMsg(result.Status.ToString(), result.Message);
+        //}
 
-        private async Task ScreenShareAsync()
-        {
+        //private async Task ScreenShareAsync()
+        //{
 
-            if (ScreenShareState == "共享屏幕")
-            {
-                AsyncCallbackMsg result = await _sdkService.StartScreenSharing();
-                if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    ScreenShareState = "取消屏幕共享";
-                }
-            }
-            else
-            {
-                AsyncCallbackMsg result = await _sdkService.StopScreenSharing();
-                if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    ScreenShareState = "共享屏幕";
-                }
-            }
+        //    if (ScreenShareState == "共享屏幕")
+        //    {
+        //        AsyncCallbackMsg result = await _sdkService.StartScreenSharing();
+        //        if (!HasErrorMsg(result.Status.ToString(), result.Message))
+        //        {
+        //            ScreenShareState = "取消屏幕共享";
+        //        }
+        //    }
+        //    else
+        //    {
+        //        AsyncCallbackMsg result = await _sdkService.StopScreenSharing();
+        //        if (!HasErrorMsg(result.Status.ToString(), result.Message))
+        //        {
+        //            ScreenShareState = "共享屏幕";
+        //        }
+        //    }
 
-        }
+        //}
 
-        private async Task SetMicStateAsync()
-        {
-            if (MicState == "静音")
-            {
-                AsyncCallbackMsg result = await _sdkService.SetMicMuteState(1);
-                if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    MicState = "取消静音";
-                }
-            }
-            else
-            {
-                AsyncCallbackMsg result = await _sdkService.SetMicMuteState(0);
-                if (!HasErrorMsg(result.Status.ToString(), result.Message))
-                {
-                    MicState = "静音";
-                }
-            }
-        }
+        //private async Task SetMicStateAsync()
+        //{
+        //    if (MicState == "静音")
+        //    {
+        //        AsyncCallbackMsg result = await _sdkService.SetMicMuteState(1);
+        //        if (!HasErrorMsg(result.Status.ToString(), result.Message))
+        //        {
+        //            MicState = "取消静音";
+        //        }
+        //    }
+        //    else
+        //    {
+        //        AsyncCallbackMsg result = await _sdkService.SetMicMuteState(0);
+        //        if (!HasErrorMsg(result.Status.ToString(), result.Message))
+        //        {
+        //            MicState = "静音";
+        //        }
+        //    }
+        //}
 
-        private void StartSpeakAsync(string userPhoneId)
-        {
-             _sdkService.RequireUserSpeak(userPhoneId);
-        }
+        //private void StartSpeakAsync(string userPhoneId)
+        //{
+        //     _sdkService.RequireUserSpeak(userPhoneId);
+        //}
 
-        private void StopSpeakAsync(string userPhoneId)
-        {
-            _sdkService.RequireUserStopSpeak(userPhoneId);
-        }
+        //private void StopSpeakAsync(string userPhoneId)
+        //{
+        //    _sdkService.RequireUserStopSpeak(userPhoneId);
+        //}
 
         private void PushLiveAsync()
         {
@@ -1822,14 +1847,14 @@ namespace St.Meeting
             }
         }
 
-        private void DiskSpaceNotEnoughEventHandler(AsyncCallbackMsg msg)
-        {
-            HasErrorMsg(msg.Status.ToString(), msg.Message);
-        }
+        //private void DiskSpaceNotEnoughEventHandler(AsyncCallbackMsg msg)
+        //{
+        //    HasErrorMsg(msg.Status.ToString(), msg.Message);
+        //}
 
         private async void _meetingView_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            //UnRegisterMeetingEvents();
+            UnRegisterMeetingEvents();
             if (GlobalData.Instance.RunMode == RunMode.Development && !_exitByDialog)
             {
                 e.Cancel = true;
@@ -1912,80 +1937,80 @@ namespace St.Meeting
             }));
         }
 
-        private void ErrorMsgReceivedEventHandler(AsyncCallbackMsg error)
-        {
-            HasErrorMsg("-1", error.Message);
-        }
+        //private void ErrorMsgReceivedEventHandler(AsyncCallbackMsg error)
+        //{
+        //    HasErrorMsg("-1", error.Message);
+        //}
 
-        private void UIMessageReceivedEventHandler(TransparentMessage message)
-        {
-            //if (message.MessageId < 3)
-            //{
-            //    _sdkService.CreatorPhoneId = message.Sender.PhoneId;
+        //private void UIMessageReceivedEventHandler(TransparentMessage message)
+        //{
+        //    //if (message.MessageId < 3)
+        //    //{
+        //    //    _sdkService.CreatorPhoneId = message.Sender.PhoneId;
 
-            //    Common.MeetingMode meetingMode = (Common.MeetingMode) message.MessageId;
-            //    _viewLayoutService.ChangeMeetingMode(meetingMode);
+        //    //    Common.MeetingMode meetingMode = (Common.MeetingMode) message.MessageId;
+        //    //    _viewLayoutService.ChangeMeetingMode(meetingMode);
 
-            //    _viewLayoutService.LaunchLayout();
-            //}
-            //else
-            //{
-            //    if (message.MessageId == (int) UiMessage.BannedToSpeak)
-            //    {
-            //        AllowedToSpeak = false;
-            //    }
-            //    if (message.MessageId == (int) UiMessage.AllowToSpeak)
-            //    {
-            //        AllowedToSpeak = true;
-            //    }
-            //}
-        }
+        //    //    _viewLayoutService.LaunchLayout();
+        //    //}
+        //    //else
+        //    //{
+        //    //    if (message.MessageId == (int) UiMessage.BannedToSpeak)
+        //    //    {
+        //    //        AllowedToSpeak = false;
+        //    //    }
+        //    //    if (message.MessageId == (int) UiMessage.AllowToSpeak)
+        //    //    {
+        //    //        AllowedToSpeak = true;
+        //    //    }
+        //    //}
+        //}
 
-        private void OtherExitMeetingEventHandler(MeetingSdk.SdkWrapper.MeetingDataModel.Participant contactInfo)
-        {
-            //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.m_szPhoneId);
+        //private void OtherExitMeetingEventHandler(MeetingSdk.SdkWrapper.MeetingDataModel.Participant contactInfo)
+        //{
+        //    //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.m_szPhoneId);
 
-            //string displayName = string.Empty;
-            //if (!string.IsNullOrEmpty(attendee?.Name))
-            //{
-            //    displayName = attendee.Name + " - ";
-            //}
+        //    //string displayName = string.Empty;
+        //    //if (!string.IsNullOrEmpty(attendee?.Name))
+        //    //{
+        //    //    displayName = attendee.Name + " - ";
+        //    //}
 
-            //string exitMsg = $"{displayName}{contactInfo.m_szPhoneId}退出会议！";
-            //HasErrorMsg("-1", exitMsg);
+        //    //string exitMsg = $"{displayName}{contactInfo.m_szPhoneId}退出会议！";
+        //    //HasErrorMsg("-1", exitMsg);
 
-            if (contactInfo.PhoneId == _sdkService.CreatorPhoneId)
-            {
-                //
-            }
-        }
+        //    if (contactInfo.PhoneId == _sdkService.CreatorPhoneId)
+        //    {
+        //        //
+        //    }
+        //}
 
-        private void OtherJoinMeetingEventHandler(MeetingSdk.SdkWrapper.MeetingDataModel.Participant contactInfo)
-        {
-            //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.PhoneId);
+        //private void OtherJoinMeetingEventHandler(MeetingSdk.SdkWrapper.MeetingDataModel.Participant contactInfo)
+        //{
+        //    //var attendee = _userInfos.FirstOrDefault(userInfo => userInfo.GetNube() == contactInfo.PhoneId);
 
-            ////string displayName = string.Empty;
-            ////if (!string.IsNullOrEmpty(attendee?.Name))
-            ////{
-            ////    displayName = attendee.Name + " - ";
-            ////}
+        //    ////string displayName = string.Empty;
+        //    ////if (!string.IsNullOrEmpty(attendee?.Name))
+        //    ////{
+        //    ////    displayName = attendee.Name + " - ";
+        //    ////}
 
-            ////string joinMsg = $"{displayName}{contactInfo.m_szPhoneId}加入会议！";
-            ////HasErrorMsg("-1", joinMsg);
+        //    ////string joinMsg = $"{displayName}{contactInfo.m_szPhoneId}加入会议！";
+        //    ////HasErrorMsg("-1", joinMsg);
 
-            ////speaker automatically sends a message(with creatorPhoneId) to nonspeakers
-            ////!!!CAREFUL!!! ONLY speaker will call this
-            //if (_sdkService.IsCreator)
-            //{
-            //    _sdkService.SendMessage((int) _viewLayoutService.MeetingMode,
-            //        _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length, null);
-            //}
-        }
+        //    ////speaker automatically sends a message(with creatorPhoneId) to nonspeakers
+        //    ////!!!CAREFUL!!! ONLY speaker will call this
+        //    //if (_sdkService.IsCreator)
+        //    //{
+        //    //    _sdkService.SendMessage((int) _viewLayoutService.MeetingMode,
+        //    //        _viewLayoutService.MeetingMode.ToString(), _viewLayoutService.MeetingMode.ToString().Length, null);
+        //    //}
+        //}
 
-        private async void ViewCloseEventHandler(ParticipantView speakerView)
-        {
-            //await _viewLayoutService.HideViewAsync(speakerView);
-        }
+        //private async void ViewCloseEventHandler(ParticipantView speakerView)
+        //{
+        //    //await _viewLayoutService.HideViewAsync(speakerView);
+        //}
 
         private void StopSpeakEventHandler()
         {
@@ -2009,10 +2034,10 @@ namespace St.Meeting
             SpeakingStatus = IsSpeaking;
         }
 
-        private async void ViewCreateEventHandler(ParticipantView speakerView)
-        {
-            //await _viewLayoutService.ShowViewAsync(speakerView);
-        }
+        //private async void ViewCreateEventHandler(ParticipantView speakerView)
+        //{
+        //    //await _viewLayoutService.ShowViewAsync(speakerView);
+        //}
 
 
         //private bool CheckIsUserSpeaking(bool showMsgBar = false)

@@ -8,7 +8,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using Caliburn.Micro;
-using MeetingSdk.SdkWrapper;
 using Prism.Regions;
 using MeetingSdk.NetAgent;
 using System.Reflection;
@@ -23,7 +22,6 @@ namespace St.CollaborativeInfo
         public CollaborativeInfoContentViewModel(CollaborativeInfoContentView collaborativeInfoContentView)
         {
             _bmsService = IoC.Get<IBms>();
-            _sdkService = IoC.Get<IMeeting>();
             _meetingSdkAgent = IoC.Get<IMeetingSdkAgent>();
             _eventAggregator = IoC.Get<IEventAggregator>();
             _lessonInfo = IoC.Get<LessonInfo>();
@@ -38,7 +36,6 @@ namespace St.CollaborativeInfo
 
         //private fields
         private readonly IBms _bmsService;
-        private readonly IMeeting _sdkService;
         private readonly IMeetingSdkAgent _meetingSdkAgent;
         private readonly IEventAggregator _eventAggregator;
         private readonly LessonInfo _lessonInfo;

@@ -53,12 +53,12 @@ namespace St.Host
             }
             else
             {
-                await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    SscDialog refreshTokenDialog =
-                        new SscDialog($"{Messages.WarningRefreshTokenFailed}\r\n{refreshResult.Message}");
-                    refreshTokenDialog.ShowDialog();
-                }));
+                //await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                //{
+                //    SscDialog refreshTokenDialog =
+                //        new SscDialog($"{Messages.WarningRefreshTokenFailed}\r\n{refreshResult.Message}");
+                //    refreshTokenDialog.ShowDialog();
+                //}));
             }
         }
 

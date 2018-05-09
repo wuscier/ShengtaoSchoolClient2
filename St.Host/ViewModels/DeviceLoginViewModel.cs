@@ -9,7 +9,6 @@ using System.Windows.Input;
 using Caliburn.Micro;
 using Prism.Commands;
 using Serilog;
-using MeetingSdk.SdkWrapper;
 using Action = System.Action;
 using RtClientManager = St.Common.RtClient.RtClientManager;
 using MeetingSdk.Wpf;
@@ -155,8 +154,6 @@ namespace St.Host
                 UserInfo globalUserInfo = IoC.Get<UserInfo>();
                 globalUserInfo.CloneUserInfo(userInfo);
 
-                IMeeting sdkService = IoC.Get<IMeeting>();
-                sdkService.SelfPhoneId = userInfo.GetNube();
 
                 return true;
             }
