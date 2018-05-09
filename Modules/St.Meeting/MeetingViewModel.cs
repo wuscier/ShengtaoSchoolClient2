@@ -758,6 +758,29 @@ namespace St.Meeting
                 Height = _meetingView.ActualHeight
             };
 
+
+            //if not speaker, then clear mode menu items
+            if (!IsCreator)
+            {
+                ModeMenuItems.Clear();
+                IsSpeaker = Visibility.Collapsed;
+            }
+            else
+            {
+                IsSpeaker = Visibility.Visible;
+            }
+
+            if (_lessonDetail.Id > 0)
+            {
+                ResponseResult result = await
+                    _bmsService.UpdateMeetingStatus(_lessonDetail.Id, _userInfo.UserId,
+                        DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                        string.Empty);
+
+                HasErrorMsg(result.Status, result.Message);
+            }
+
+
             //uint[] uint32SOfNonDataArray =
             //{
             //    (uint) _meetingView.PictureBox1.Handle.ToInt32(),
@@ -803,27 +826,6 @@ namespace St.Meeting
             //    _startMeetingCallbackEvent(true, "");
 
 
-            //    //if not speaker, then clear mode menu items
-            //    if (!_sdkService.IsCreator)
-            //    {
-            //        ModeMenuItems.Clear();
-            //        IsSpeaker = Visibility.Collapsed;
-            //    }
-            //    else
-            //    {
-            //        IsSpeaker = Visibility.Visible;
-            //    }
-
-            //    if (_lessonDetail.Id > 0)
-            //    {
-            //        ResponseResult result = await
-            //            _bmsService.UpdateMeetingStatus(_lessonDetail.Id, _userInfo.UserId,
-            //                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-            //                string.Empty);
-
-            //        HasErrorMsg(result.Status, result.Message);
-            //    }
-            //}
 
         }
 
