@@ -1687,6 +1687,12 @@ namespace St.Meeting
                 await SyncClassMode();
             }
 
+            RefreshLocalRecordLive();
+
+            RefreshRemotePushLive();
+            RefreshPushLive();
+
+
             CurModeName = EnumHelper.GetDescription(typeof(ModeDisplayerType), obj);
             CurLayoutName = EnumHelper.GetDescription(typeof(LayoutRenderType), _windowManager.LayoutRendererStore.CurrentLayoutRenderType);
         }
@@ -1699,6 +1705,17 @@ namespace St.Meeting
 
         private void UiTransparentMsgReceivedEventHandler(UiTransparentMsg obj)
         {
+            if (obj.MsgId < 3)
+            {
+                GlobalData.AddOrUpdate(CacheKey.HostId, obj.TargetAccountId);
+
+                var classMode = (ModeDisplayerType)obj.MsgId;
+
+
+                if (_windowManager.ModeChange(classMode))
+                {
+                }
+            }
         }
 
         private void SdkCallbackEventHandler(SdkCallbackModel obj)
