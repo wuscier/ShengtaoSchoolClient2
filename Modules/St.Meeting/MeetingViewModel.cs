@@ -1577,6 +1577,14 @@ namespace St.Meeting
 
         private void ParticipantCollectionChangeEventHandler(IEnumerable<MeetingSdk.Wpf.Participant> obj)
         {
+            foreach (var participant in _windowManager.Participants)
+            {
+                var userInfo = _userInfos.FirstOrDefault(cls => cls.GetNube() == participant.Account.AccountId.ToString());
+                if (userInfo != null)
+                {
+                    participant.Account.AccountName = userInfo.Name;
+                }
+            }
         }
 
         private void RefreshViewContainerBackground()
