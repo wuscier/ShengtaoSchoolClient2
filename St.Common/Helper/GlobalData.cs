@@ -22,7 +22,7 @@ namespace St.Common
         public Version Version { get; set; }
         public Device Device { get; set; }
         public Window UpdatingDialog { get; set; }
-        public ViewArea ViewArea { get; set; }
+        //public ViewArea ViewArea { get; set; }
         public RunMode RunMode { get; set; }
         public IntPtr CurWindowHwnd { get; set; }
 

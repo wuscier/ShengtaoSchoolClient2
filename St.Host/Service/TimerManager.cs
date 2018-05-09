@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Timers;
-using System.Windows;
 using Caliburn.Micro;
 using Serilog;
 using St.Common;
 using St.RtClient;
-using Action = System.Action;
 
 namespace St.Host
 {

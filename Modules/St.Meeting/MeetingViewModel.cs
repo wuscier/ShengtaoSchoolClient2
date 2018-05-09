@@ -725,14 +725,11 @@ namespace St.Meeting
 
                 if (joinResult.StatusCode != 0)
                 {
-                    if (joinResult.StatusCode == -2014)
-                    {
-                        HasErrorMsg("-1", "该课程已经结束！");
-                    }
-                    else
-                    {
-                        HasErrorMsg("-1", "加入课程失败！");
-                    }
+                    string err = joinResult.StatusCode == -2014 ? "该课程已经结束！" : "加入课程失败！";
+
+                    _exitByDialog = true;
+                    _meetingView.Close();
+                    _startMeetingCallbackEvent(false, err);
                 }
             }
             else
@@ -748,11 +745,11 @@ namespace St.Meeting
 
             _startMeetingCallbackEvent(true, "");
 
-            GlobalData.Instance.ViewArea = new ViewArea()
-            {
-                Width = _meetingView.ActualWidth,
-                Height = _meetingView.ActualHeight
-            };
+            //GlobalData.Instance.ViewArea = new ViewArea()
+            //{
+            //    Width = _meetingView.ActualWidth,
+            //    Height = _meetingView.ActualHeight
+            //};
 
 
             //if not speaker, then clear mode menu items
@@ -775,6 +772,9 @@ namespace St.Meeting
 
                 HasErrorMsg(result.Status, result.Message);
             }
+
+            GlobalCommands.Instance.SetCommandsStateInNonDiscussionClass(IsCreator);
+
 
 
             //uint[] uint32SOfNonDataArray =
@@ -1087,7 +1087,7 @@ namespace St.Meeting
                 if (meetingResult.StatusCode != 0)
                 {
                     HasErrorMsg("-1", meetingResult.Message);
-                    Log.Logger.Error(meetingResult.Message);
+                    Log.Logger.Debug($"【exit meeting】：result={meetingResult.StatusCode}, msg={meetingResult.Message}");
                 }
 
 
