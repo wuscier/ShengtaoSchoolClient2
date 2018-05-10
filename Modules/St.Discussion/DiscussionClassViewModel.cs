@@ -605,56 +605,48 @@ namespace St.Discussion
 
                     switch (ClassMode)
                     {
-                        //case DiscussionMode: //Goto 听课模式,禁言所有听讲教室。
+                        case DiscussionMode: //Goto 听课模式,禁言所有听讲教室。
 
-                        //    ManageListenersItem.Visibility = Visibility.Collapsed;
-                        //    LayoutItem.Visibility = Visibility.Collapsed;
+                            ManageListenersItem.Visibility = Visibility.Collapsed;
+                            LayoutItem.Visibility = Visibility.Collapsed;
 
-                        //    ClassMode = ListenMode;
-                        //    ClassModeItem.Content = DiscussionMode;
+                            ClassMode = ListenMode;
+                            ClassModeItem.Content = DiscussionMode;
 
-                        //    _viewLayoutService.ChangeMeetingMode(MeetingMode.Sharing);
+                            _windowManager.ModeChange(ModeDisplayerType.ShareMode);
 
+                            MessageQueueManager.Instance.AddInfo(Messages.InfoGotoListenerMode);
 
-                        //    await _viewLayoutService.LaunchLayout();
+                            //foreach (var listener in listeners)
+                            //{
+                            //    _sdkService.RequireUserStopSpeak(listener);
+                            //}
+                            int listeningMode = (int)UiMessage.ListeningMode;
+                            await _meetingSdkAgent.AsynSendUIMsg(listeningMode, 0, "");
 
-                        //    MessageQueueManager.Instance.AddInfo(Messages.InfoGotoListenerMode);
+                            break;
+                        case ListenMode: //Goto 评课模式，
 
-                        //    //foreach (var listener in listeners)
-                        //    //{
-                        //    //    _sdkService.RequireUserStopSpeak(listener);
-                        //    //}
-                        //    int listeningMode = (int) UiMessage.ListeningMode;
-                        //     _sdkService.SendMessage(listeningMode,
-                        //        listeningMode.ToString(),
-                        //        listeningMode.ToString().Length, null);
+                            ManageListenersItem.Visibility = Visibility.Visible;
+                            LayoutItem.Visibility = Visibility.Visible;
 
-                        //    break;
-                        //case ListenMode: //Goto 评课模式，
-
-                        //    ManageListenersItem.Visibility = Visibility.Visible;
-                        //    LayoutItem.Visibility = Visibility.Visible;
-
-                        //    ClassMode = DiscussionMode;
-                        //    ClassModeItem.Content = ListenMode;
-
-                        //    _viewLayoutService.ChangeMeetingMode(MeetingMode.Interaction);
-                        //    await _viewLayoutService.LaunchLayout();
+                            ClassMode = DiscussionMode;
+                            ClassModeItem.Content = ListenMode;
 
 
-                        //    MessageQueueManager.Instance.AddInfo(Messages.InfoGotoDiscussionMode);
-                        //    //foreach (var listener in listeners)
-                        //    //{
-                        //    //    _sdkService.RequireUserSpeak(listener);
-                        //    //}
+                            _windowManager.ModeChange(ModeDisplayerType.InteractionMode);
 
-                        //    int discussionMode = (int) UiMessage.DiscussionMode;
-                        //     _sdkService.SendMessage(discussionMode,
-                        //        discussionMode.ToString(),
-                        //        discussionMode.ToString().Length, null);
+                            MessageQueueManager.Instance.AddInfo(Messages.InfoGotoDiscussionMode);
+                            //foreach (var listener in listeners)
+                            //{
+                            //    _sdkService.RequireUserSpeak(listener);
+                            //}
+
+                            int discussionMode = (int)UiMessage.DiscussionMode;
+                            await _meetingSdkAgent.AsynSendUIMsg(discussionMode, 0, "");
 
 
-                        //    break;
+                            break;
                     }
 
                     _downFocusedUiElement.Focus();
