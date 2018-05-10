@@ -56,15 +56,22 @@ namespace St.Discussion
 
         private void LoadedAsync()
         {
-            var videoboxs = _windowManager.VideoBoxManager.Items;
+            List<Participant> participants = new List<Participant>();
 
-            var attendees = from videobox in videoboxs
+            participants.Add(_windowManager.Participant);
+
+            foreach (var participant in _windowManager.Participants)
+            {
+                participants.Add(participant);
+            }
+
+            var attendees = from p in participants
                             select new AttendeeItem()
                             {
-                                Text = videobox.Name,
-                                Id = videobox.AccountResource.AccountModel.AccountId.ToString(),
-                                Hwnd = videobox.Handle,
-                                ButtonCommand = DelegateCommand<AttendeeItem>.FromAsyncHandler(async (attendeeItem) =>
+                                Text = p.Account.AccountName,
+                                Id = p.Account.AccountId.ToString(),
+                                //Hwnd = videobox.Handle,
+                                ButtonCommand = new DelegateCommand<AttendeeItem>((attendeeItem) =>
                                 {
 
                                     _windowManager.VideoBoxManager.SetProperty(_targetSpecialViewType.ToString(), attendeeItem.Text);
