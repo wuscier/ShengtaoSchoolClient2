@@ -3,20 +3,25 @@ using System.Windows.Input;
 using WindowsInput.Native;
 using Prism.Commands;
 using St.Common;
+using MeetingSdk.Wpf;
+using Caliburn.Micro;
+using St.Common.Helper;
 
 namespace St.Discussion
 {
     public class LayoutViewModel
     {
         private readonly LayoutView _layoutView;
+        private readonly IMeetingWindowManager _windowManager;
 
         public LayoutViewModel(LayoutView layoutView)
         {
             _layoutView = layoutView;
 
+            _windowManager = IoC.Get<IMeetingWindowManager>();
 
             WindowKeyDownCommand = new DelegateCommand<object>(WindowKeyDownHandlerAsync);
-            SetAverageLayoutCommand = DelegateCommand.FromAsyncHandler(SetAverageLayoutAsync);
+            SetAverageLayoutCommand = new DelegateCommand(SetAverageLayoutAsync);
             SelectAttendeeAsBigCommand = new DelegateCommand(SelectAttendeeAsBig);
             SelectAttendeeAsFullCommand = new DelegateCommand(SelectAttendeeAsFull);
             LoadedCommand = new DelegateCommand(() =>
@@ -27,21 +32,20 @@ namespace St.Discussion
 
         private void SelectAttendeeAsFull()
         {
-            //SelectAttendeeListView selectAttendeeListView = new SelectAttendeeListView(SpecialViewType.FullScreen);
-            //selectAttendeeListView.ShowDialog();
+            SelectAttendeeListView selectAttendeeListView = new SelectAttendeeListView(LayoutRenderType.CloseupLayout);
+            selectAttendeeListView.ShowDialog();
         }
 
         private void SelectAttendeeAsBig()
         {
-            //SelectAttendeeListView selectAttendeeListView = new SelectAttendeeListView(SpecialViewType.Big);
-            //selectAttendeeListView.ShowDialog();
+            SelectAttendeeListView selectAttendeeListView = new SelectAttendeeListView(LayoutRenderType.BigSmallsLayout);
+            selectAttendeeListView.ShowDialog();
         }
 
-        private async Task SetAverageLayoutAsync()
+        private void SetAverageLayoutAsync()
         {
-            //_viewLayoutService.ChangeViewMode(ViewMode.Average);
-            //await _viewLayoutService.LaunchLayout();
-            //_layoutView.Close();
+            _windowManager.LayoutChange(WindowNames.MainWindow, LayoutRenderType.AverageLayout);
+            _layoutView.Close();
         }
 
         private void WindowKeyDownHandlerAsync(object args)

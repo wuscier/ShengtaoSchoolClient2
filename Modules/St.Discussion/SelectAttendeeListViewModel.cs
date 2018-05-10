@@ -1,9 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
 using Caliburn.Micro;
+using MeetingSdk.Wpf;
 using Prism.Commands;
 using St.Common;
+using St.Common.Helper;
+using WindowsInput.Native;
+using UserInfo = St.Common.UserInfo;
 
 namespace St.Discussion
 {
@@ -11,10 +16,13 @@ namespace St.Discussion
     {
         private readonly SelectAttendeeListView _selectAttendeeListView;
         private readonly List<UserInfo> _userInfos;
-        private readonly SpecialViewType _targetSpecialViewType;
+        private readonly LayoutRenderType _targetSpecialViewType;
+        private readonly IMeetingWindowManager _windowManager;
 
-        public SelectAttendeeListViewModel(SelectAttendeeListView selectAttendeeListView, SpecialViewType specialViewType)
+        public SelectAttendeeListViewModel(SelectAttendeeListView selectAttendeeListView, LayoutRenderType specialViewType)
         {
+            _windowManager = IoC.Get<IMeetingWindowManager>();
+
             _selectAttendeeListView = selectAttendeeListView;
             _targetSpecialViewType = specialViewType;
 
@@ -48,38 +56,32 @@ namespace St.Discussion
 
         private void LoadedAsync()
         {
-            //var openedViews = _viewLayoutService.ViewFrameList.Where(v => v.IsOpened);
+            var videoboxs = _windowManager.VideoBoxManager.Items;
 
-            //var attendees = from openedView in openedViews
-            //    select new AttendeeItem()
-            //    {
-            //        Text = openedView.ViewName,
-            //        Id = openedView.PhoneId,
-            //        Hwnd = openedView.Hwnd,
-            //        ButtonCommand = DelegateCommand<AttendeeItem>.FromAsyncHandler(async (attendeeItem) =>
-            //        {
-            //            var specialView =
-            //                _viewLayoutService.ViewFrameList.FirstOrDefault(
-            //                    v => v.PhoneId == attendeeItem.Id && v.Hwnd == attendeeItem.Hwnd);
+            var attendees = from videobox in videoboxs
+                            select new AttendeeItem()
+                            {
+                                Text = videobox.Name,
+                                Id = videobox.AccountResource.AccountModel.AccountId.ToString(),
+                                Hwnd = videobox.Handle,
+                                ButtonCommand = DelegateCommand<AttendeeItem>.FromAsyncHandler(async (attendeeItem) =>
+                                {
 
-            //            if (!CheckIsUserSpeaking(specialView, true))
-            //            {
-            //                return;
-            //            }
+                                    _windowManager.VideoBoxManager.SetProperty(_targetSpecialViewType.ToString(), attendeeItem.Text);
 
-            //            _viewLayoutService.SetSpecialView(specialView, _targetSpecialViewType);
-            //            await _viewLayoutService.LaunchLayout();
-            //            _selectAttendeeListView.Close();
-            //        })
-            //    };
 
-            //attendees.ToList().ForEach(attendee =>
-            //{
-            //    AttendeeItems.Add(attendee);
-            //});
+                                    _windowManager.LayoutChange(WindowNames.MainWindow, _targetSpecialViewType);
+                                    _selectAttendeeListView.Close();
+                                })
+                            };
 
+            attendees.ToList().ForEach(attendee =>
+            {
+                AttendeeItems.Add(attendee);
+            });
+
+            InputSimulatorManager.Instance.Simulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
             //InputSimulatorManager.Instance.Simulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
-            ////InputSimulatorManager.Instance.Simulator.Keyboard.KeyPress(VirtualKeyCode.TAB);
 
         }
 

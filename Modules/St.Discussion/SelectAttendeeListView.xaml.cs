@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using MeetingSdk.Wpf;
 using St.Common;
 
 namespace St.Discussion
@@ -8,7 +9,7 @@ namespace St.Discussion
     /// </summary>
     public partial class SelectAttendeeListView
     {
-        public SelectAttendeeListView(SpecialViewType specialViewType)
+        public SelectAttendeeListView(LayoutRenderType specialViewType)
         {
             InitializeComponent();
 
