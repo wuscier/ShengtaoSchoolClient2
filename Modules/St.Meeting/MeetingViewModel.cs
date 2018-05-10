@@ -970,11 +970,11 @@ namespace St.Meeting
                     return;
                 }
 
-                if (!_windowManager.Participant.IsSpeaking)
-                {
-                    HasErrorMsg("-1", "发言状态才可以进行课件分享！");
-                    return;
-                }
+                //if (!_windowManager.Participant.IsSpeaking)
+                //{
+                //    HasErrorMsg("-1", "发言状态才可以进行课件分享！");
+                //    return;
+                //}
 
                 MeetingResult<int> publishDocCameraResult = await _windowManager.Publish(MeetingSdk.NetAgent.Models.MediaType.VideoDoc, docCameras.FirstOrDefault());
                 MeetingResult<int> publishDocMicResult = await _windowManager.Publish(MeetingSdk.NetAgent.Models.MediaType.AudioDoc, docMics.FirstOrDefault());

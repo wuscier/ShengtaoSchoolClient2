@@ -937,70 +937,104 @@ namespace St.Discussion
 
         private async Task OpenCloseDocAsync()
         {
-            //if (ShareDocItem.Content == OpenDoc)
-            //{
-            //    if (_sdkService.IsSharedDocOpened())
-            //    {
-            //        MessageQueueManager.Instance.AddInfo(Messages.DocumentAlreadyOpened);
-            //        ShareDocItem.Content = CloseDoc;
-            //        return;
-            //    }
+            if (!_windowManager.Participant.IsSpeaking)
+            {
+                MessageQueueManager.Instance.AddInfo(Messages.WarningYouAreNotSpeaking);
+                return;
+            }
 
-            //    AsyncCallbackMsg openDocResult = await _sdkService.StartShareDoc();
+            if (ShareDocItem.Content == OpenDoc)
+            {
+                //if (_sdkService.IsSharedDocOpened())
+                //{
+                //    MessageQueueManager.Instance.AddInfo(Messages.DocumentAlreadyOpened);
+                //    ShareDocItem.Content = CloseDoc;
+                //    return;
+                //}
 
-            //    if (openDocResult.Status != 0)
-            //    {
-            //        ShareDocItem.Content = OpenDoc;
-            //        MessageQueueManager.Instance.AddInfo(openDocResult.Message);
-            //    }
-            //    else
-            //    {
-            //        ShareDocItem.Content = CloseDoc;
-            //    }
 
-            //}
-            //else if (ShareDocItem.Content == CloseDoc)
-            //{
-            //    if (_sdkService.IsSharedDocOpened())
-            //    {
-            //        AsyncCallbackMsg closeDocResult = await _sdkService.StopShareDoc();
+                MeetingResult<IList<VideoDeviceModel>> videoDeviceResult = _meetingSdkAgent.GetVideoDevices();
 
-            //        if (closeDocResult.Status != 0)
-            //        {
-            //            ShareDocItem.Content = CloseDoc;
-            //            MessageQueueManager.Instance.AddInfo(closeDocResult.Message);
-            //        }
-            //        else
-            //        {
-            //            ShareDocItem.Content = OpenDoc;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        MessageQueueManager.Instance.AddInfo(Messages.DocumentAlreadyClosed);
-            //        ShareDocItem.Content = OpenDoc;
-            //    }
-            //}
+                MeetingResult<IList<string>> micResult = _meetingSdkAgent.GetMicrophones();
+
+                AggregatedConfig configManager = GlobalData.Instance.AggregatedConfig;
+
+                IEnumerable<string> docCameras;
+                if (!_deviceNameAccessor.TryGetName(DeviceName.Camera, (devName) => { return devName.Option == "second"; }, out docCameras) || !videoDeviceResult.Result.Any(vdm => vdm.DeviceName == docCameras.FirstOrDefault()))
+                {
+                    HasErrorMsg("-1", "课件摄像头未配置！");
+                    return;
+                }
+
+
+                if (configManager.DocVideoInfo?.DisplayWidth == 0 || configManager.DocVideoInfo?.DisplayHeight == 0 || configManager.DocVideoInfo?.VideoBitRate == 0)
+                {
+                    HasErrorMsg("-1", "课件采集参数未设置！");
+                    return;
+                }
+
+
+                IEnumerable<string> docMics;
+                if (!_deviceNameAccessor.TryGetName(DeviceName.Microphone, (devName) => { return devName.Option == "second"; }, out docMics) || !micResult.Result.Any(mic => mic == docMics.FirstOrDefault()))
+                {
+                    HasErrorMsg("-1", "课件麦克风未配置！");
+                    return;
+                }
+
+                MeetingResult<int> publishDocCameraResult = await _windowManager.Publish(MeetingSdk.NetAgent.Models.MediaType.VideoDoc, docCameras.FirstOrDefault());
+                MeetingResult<int> publishDocMicResult = await _windowManager.Publish(MeetingSdk.NetAgent.Models.MediaType.AudioDoc, docMics.FirstOrDefault());
+
+                if (publishDocCameraResult.StatusCode != 0 || publishDocMicResult.StatusCode != 0)
+                {
+                    ShareDocItem.Content = OpenDoc;
+                    MessageQueueManager.Instance.AddInfo("打开课件失败！");
+
+                    return;
+                }
+
+                ShareDocItem.Content = CloseDoc;
+            }
+            else if (ShareDocItem.Content == CloseDoc)
+            {
+                int? docCameraResourceId = 0;
+                int? docAudioResourceId = 0;
+
+                docCameraResourceId = _windowManager.Participant.Resources.FirstOrDefault(res => res.MediaType == MediaType.VideoDoc)?.ResourceId;
+                docAudioResourceId = _windowManager.Participant.Resources.FirstOrDefault(res => res.MediaType == MediaType.AudioDoc)?.ResourceId;
+
+                if (docCameraResourceId.HasValue && docCameraResourceId.Value != 0)
+                {
+                    MeetingResult stopShareCameraResult = await _windowManager.Unpublish(MeetingSdk.NetAgent.Models.MediaType.VideoDoc, docCameraResourceId.Value);
+                }
+
+                if (docAudioResourceId.HasValue && docAudioResourceId.Value != 0)
+                {
+                    MeetingResult stopShareMicResult = await _windowManager.Unpublish(MeetingSdk.NetAgent.Models.MediaType.AudioDoc, docAudioResourceId.Value);
+                }
+
+                ShareDocItem.Content = OpenDoc;
+            }
         }
 
         private async Task SpeakingStatusChangedAsync()
         {
-            //if (SpeakItem.Content == IsSpeaking)
-            //{
-            //    AsyncCallbackMsg stopSucceeded = await _sdkService.StopSpeak();
-            //    return;
-            //    //will change SpeakStatus in StopSpeakCallbackEventHandler.
-            //}
+            if (SpeakItem.Content == IsSpeaking)
+            {
+                await _meetingSdkAgent.AskForStopSpeak();
 
-            //if (SpeakItem.Content == IsNotSpeaking)
-            //{
-            //    AsyncCallbackMsg result = await _sdkService.ApplyToSpeak();
-            //    if (!HasErrorMsg(result.Status.ToString(), result.Message))
-            //    {
-            //        // will change SpeakStatus in callback???
-            //        SpeakItem.Content = IsSpeaking;
-            //    }
-            //}
+                return;
+                //will change SpeakStatus in StopSpeakCallbackEventHandler.
+            }
+
+            if (SpeakItem.Content == IsNotSpeaking)
+            {
+                var result = await _meetingSdkAgent.AskForSpeak();
+                if (!HasErrorMsg(result.StatusCode.ToString(), result.Message))
+                {
+                    // will change SpeakStatus in callback???
+                    SpeakItem.Content = IsSpeaking;
+                }
+            }
         }
 
         public async Task ExitAsync()
