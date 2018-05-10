@@ -158,6 +158,12 @@ namespace St.Host
                 return true;
             }
 
+            if (userInfo.GetNube() == null)
+            {
+                DialogContent = "未开通视讯号！";
+                return false;
+            }
+
             Log.Logger.Error($"【get user info via device no. failed】：user info is null");
             DialogContent = Messages.ErrorLoginFailed;
             return false;

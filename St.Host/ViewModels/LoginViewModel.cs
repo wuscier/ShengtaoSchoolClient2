@@ -557,6 +557,12 @@ namespace St.Host.ViewModels
                 return true;
             }
 
+            if (userInfo.GetNube() == null)
+            {
+                HasErrorMsg("-1", "未开通视讯号！");
+                return false;
+            }
+
             Log.Logger.Error($"【get user info via account failed】：user info is null");
             HasErrorMsg("-1", Messages.ErrorLoginFailed);
             return false;

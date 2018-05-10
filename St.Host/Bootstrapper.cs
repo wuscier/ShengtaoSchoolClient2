@@ -60,6 +60,8 @@ namespace St.Host
 
                 var deviceLoginViewModel = deviceLoginView.DataContext as DeviceLoginViewModel;
 
+                Log.Logger.Debug($"【device startup result：{deviceLoginViewModel.IsLoginSucceeded}");
+
                 if (deviceLoginViewModel != null && !deviceLoginViewModel.IsLoginSucceeded)
                 {
                     Application.Current.Shutdown();
